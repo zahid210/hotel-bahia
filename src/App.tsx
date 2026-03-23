@@ -8,32 +8,6 @@ import { NuevaReservaForm } from '@/features/reservas/NuevaReservaForm'
 
 type Pagina = 'dashboard' | 'reservas' | 'reportes'
 
-// ── Banner de aviso para móvil ────────────────────────────────
-function BannerMovil() {
-  const [descartado, setDescartado] = useState(false)
-  if (descartado) return null
-  return (
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-50
-                    bg-gray-900 text-white px-4 py-3
-                    flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs leading-relaxed">
-          <span className="text-amber-400 flex-shrink-0">⚠</span>
-          <span>
-          Panel optimizado para escritorio.
-          Algunas funciones pueden no verse correctamente en móvil.
-        </span>
-        </div>
-        <button
-            onClick={() => setDescartado(true)}
-            className="text-gray-400 hover:text-white flex-shrink-0
-                   text-sm leading-none"
-        >
-          ✕
-        </button>
-      </div>
-  )
-}
-
 // ── App principal ─────────────────────────────────────────────
 export default function App() {
   const { nombre, rol, logout } = useAuthStore()
@@ -61,8 +35,7 @@ export default function App() {
   }
 
   return (
-      <PrivateRoute onLogin={() => mostrarMensaje('✅ Sesión iniciada')}>
-        <BannerMovil />
+      <PrivateRoute onLogin={() => mostrarMensaje('Sesión iniciada')}>
 
         <div className="flex h-screen bg-gray-50 overflow-hidden">
 
@@ -170,14 +143,6 @@ export default function App() {
                           : 'Reportes'}
                 </h1>
               </div>
-              <button
-                  onClick={abrirModal}
-                  className="px-3 lg:px-4 py-1.5 bg-gray-900 text-white
-                         text-xs font-medium rounded-md hover:bg-gray-800
-                         transition-colors"
-              >
-                + Reserva
-              </button>
             </header>
 
             <div className="flex-1 overflow-hidden p-4 lg:p-6">
@@ -215,7 +180,7 @@ export default function App() {
                   <NuevaReservaForm
                       onSuccess={() => {
                         setModalAbierto(false)
-                        mostrarMensaje('✅ Reserva confirmada correctamente')
+                        mostrarMensaje('Reserva confirmada correctamente')
                       }}
                   />
                 </div>

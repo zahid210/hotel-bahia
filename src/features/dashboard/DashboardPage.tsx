@@ -52,19 +52,19 @@ export function DashboardPage({ onMensaje }: Props) {
     const handleMarcarLista = async (habitacionId: number) => {
         await marcarLista(habitacionId)
         const hab = habitacionesConReserva.find(h => h.id === habitacionId)
-        onMensaje(`✅ Hab. ${hab?.numero ?? habitacionId} lista y disponible`)
+        onMensaje(`Hab. ${hab?.numero ?? habitacionId} lista y disponible`)
     }
 
     // ── Acciones de reserva con feedback ─────────────────────
     const handleCheckIn = async (reservaId: string) => {
         const actualizada = await checkIn(reservaId)
-        onMensaje(`✅ Check-in · Hab. ${actualizada.habitacionNumero} → Ocupada`)
+        onMensaje(`Check-in · Hab. ${actualizada.habitacionNumero} → Ocupada`)
         return actualizada
     }
 
     const handleCheckOut = async (reservaId: string) => {
         const actualizada = await checkOut(reservaId)
-        onMensaje(`✅ Check-out · Hab. ${actualizada.habitacionNumero} → Limpieza`)
+        onMensaje(`Check-out · Hab. ${actualizada.habitacionNumero} → Limpieza`)
         setSeleccionadaId(null)
         return actualizada
     }
@@ -337,7 +337,7 @@ export function DashboardPage({ onMensaje }: Props) {
                         <NuevaReservaForm
                             onSuccess={() => {
                                 setModalAbierto(false)
-                                onMensaje('✅ Reserva confirmada correctamente')
+                                onMensaje('Reserva confirmada correctamente')
                                 void onReservaCreada()
                             }}
                         />
