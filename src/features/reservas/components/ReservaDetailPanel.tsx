@@ -28,15 +28,7 @@ const formatLocalTime = (t: string | null | undefined): string => {
 const formatSoles = (n: number | string) =>
     `S/ ${Number(n).toLocaleString('es-PE', {minimumFractionDigits: 2})}`
 
-// ── Config de estados ─────────────────────────────────────────
-const ESTADO_CFG = {
-    PENDIENTE: {label: 'Pendiente', cls: 'bg-purple-50 text-purple-700 border-purple-200'},
-    CONFIRMADA: {label: 'Confirmada', cls: 'bg-violet-50 text-violet-700 border-violet-200'},
-    CHECKIN: {label: 'En hotel', cls: 'bg-red-50    text-red-700    border-red-200'},
-    CHECKOUT: {label: 'Check-out', cls: 'bg-gray-50   text-gray-500   border-gray-200'},
-    CANCELADA: {label: 'Cancelada', cls: 'bg-gray-50   text-gray-400   border-gray-200'},
-} as const
-
+// ── Subcomponente: fila de datos ──────────────────────────────
 const Campo = ({ label, valor, mono = false, destacado = false }: {
     label: string; valor: string | number; mono?: boolean; destacado?: boolean
 }) => (
@@ -47,6 +39,14 @@ const Campo = ({ label, valor, mono = false, destacado = false }: {
         </span>
     </div>
 )
+
+const ESTADO_CFG = {
+    PENDIENTE: {label: 'Pendiente', cls: 'bg-purple-50 text-purple-700 border-purple-200'},
+    CONFIRMADA: {label: 'Confirmada', cls: 'bg-violet-50 text-violet-700 border-violet-200'},
+    CHECKIN: {label: 'En hotel', cls: 'bg-red-50    text-red-700    border-red-200'},
+    CHECKOUT: {label: 'Check-out', cls: 'bg-gray-50   text-gray-500   border-gray-200'},
+    CANCELADA: {label: 'Cancelada', cls: 'bg-gray-50   text-gray-400   border-gray-200'},
+} as const
 
 interface Props {
     reserva: Reserva; procesando: string | null; onClose: () => void; hoy: string;
@@ -69,7 +69,6 @@ export function ReservaDetailPanel({
     const totalFinal = Number(reserva.totalEstancia ?? totalBase)
     const horasExtra = reserva.horasExtra ?? 0
 
-    // ── Handlers ──────────────────────────────────────────────
     const handleCheckIn = async () => {
         setErrorAccion(null)
         try {
@@ -104,17 +103,11 @@ export function ReservaDetailPanel({
     const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
 
     return (
-        /* Cambios realizados:
-           1. Eliminado 'bg-black/40' para que no se vea nada oscuro debajo.
-           2. Eliminado 'p-4' para que el componente toque los bordes si es necesario.
-           3. Añadido 'pointer-events-none' al padre y 'pointer-events-auto' al hijo
-              para que el clic pase a través del fondo invisible pero funcione en el form.
-        */
-        <div className="fixed inset-0 z-50 flex items-center justify-center lg:relative lg:inset-auto lg:z-0 lg:p-0 lg:bg-transparent lg:items-stretch pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 lg:relative lg:inset-auto lg:z-0 lg:p-0 lg:bg-transparent lg:items-stretch">
 
-            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col h-fit max-h-[90vh] overflow-hidden lg:w-72 lg:max-w-none lg:rounded-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full pointer-events-auto">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col h-fit max-h-[90vh] overflow-hidden lg:w-72 lg:max-w-none lg:rounded-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full">
 
-                {/* ── Header ───────────────────────────────────────────── */}
+                {/* Header */}
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
                     <div>
                         <div className="text-sm font-semibold text-gray-900">Hab. {reserva.habitacionNumero}</div>
@@ -125,8 +118,8 @@ export function ReservaDetailPanel({
                     <button onClick={onClose} className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">✕</button>
                 </div>
 
-                {/* ── Body ─────────────────────────────────────────────── */}
-                <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
+                {/* Body - Eliminado pb-safe para quitar la barra gris inferior */}
+                <div className="flex-1 overflow-y-auto overscroll-contain">
                     <div className="px-5 pt-4 pb-2">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${cfg.cls}`}>
                             {cfg.label}
@@ -171,7 +164,6 @@ export function ReservaDetailPanel({
                         </>
                     )}
 
-                    {/* Resumen Económico */}
                     <div className="mx-5 my-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
                         <div className="space-y-1">
                             <Campo label={`${reserva.noches ?? 1} noche(s) × ${formatSoles(Number(reserva.precioNoche))}`} valor={formatSoles(totalBase)} mono />
@@ -183,7 +175,6 @@ export function ReservaDetailPanel({
                         </div>
                     </div>
 
-                    {/* Notas */}
                     {reserva.notas && (
                         <div className="px-5 pb-3">
                             <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Notas</div>
@@ -195,7 +186,6 @@ export function ReservaDetailPanel({
                         <div className="mx-5 mb-3 p-2.5 bg-red-50 border border-red-200 rounded-md text-xs text-red-700">⚠ {errorAccion}</div>
                     )}
 
-                    {/* Acciones */}
                     <div className="px-5 pb-4 space-y-2">
                         {reserva.estado === 'CONFIRMADA' && (
                             <>
