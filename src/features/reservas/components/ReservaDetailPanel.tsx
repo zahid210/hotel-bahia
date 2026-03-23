@@ -103,9 +103,13 @@ export function ReservaDetailPanel({
     const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 lg:relative lg:inset-auto lg:z-0 lg:p-0 lg:bg-transparent lg:items-stretch">
+        /* Cambiamos items-center por items-end en móvil para que el modal "nazca" desde abajo y no deje ver el fondo */
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 lg:relative lg:inset-auto lg:z-0 lg:bg-transparent lg:items-stretch">
 
-            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col h-fit max-h-[90vh] overflow-hidden lg:w-72 lg:max-w-none lg:rounded-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full">
+            {/* Eliminamos p-4 y rounded-xl en móvil para que pegue al borde (como tu form de reserva).
+               lg:p-0 y lg:rounded-none lo mantienen como panel lateral en PC.
+            */}
+            <div className="w-full max-w-md bg-white rounded-t-xl lg:rounded-none shadow-2xl flex flex-col h-fit max-h-[95vh] overflow-hidden lg:w-72 lg:max-w-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full">
 
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
@@ -118,7 +122,7 @@ export function ReservaDetailPanel({
                     <button onClick={onClose} className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">✕</button>
                 </div>
 
-                {/* Body - Eliminado pb-safe para quitar la barra gris inferior */}
+                {/* Body - Eliminamos pb-safe y cualquier margen extra */}
                 <div className="flex-1 overflow-y-auto overscroll-contain">
                     <div className="px-5 pt-4 pb-2">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${cfg.cls}`}>
@@ -210,7 +214,8 @@ export function ReservaDetailPanel({
                         )}
                     </div>
 
-                    <div className="px-5 pb-6">
+                    {/* ID de referencia al final con un padding inferior real */}
+                    <div className="px-5 pt-2 pb-8">
                         <div className="text-[10px] text-gray-300 font-mono">
                             ID: #{reserva.id.toUpperCase()}
                         </div>
