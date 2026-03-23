@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+
+# Entornos — .env.production SÍ se puede subir (no tiene secretos)
+# pero .env.local NUNCA
+.env.local
+.env.development.local
+.env.test.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
