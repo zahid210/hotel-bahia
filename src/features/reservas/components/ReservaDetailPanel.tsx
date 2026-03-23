@@ -104,12 +104,17 @@ export function ReservaDetailPanel({
     const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
 
     return (
-        /* ENVOLTORIO: Fixed en móvil para centrar como un modal, Relative en escritorio para el panel lateral */
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 lg:relative lg:inset-auto lg:z-0 lg:p-0 lg:bg-transparent lg:items-stretch">
+        /* Cambios realizados:
+           1. Eliminado 'bg-black/40' para que no se vea nada oscuro debajo.
+           2. Eliminado 'p-4' para que el componente toque los bordes si es necesario.
+           3. Añadido 'pointer-events-none' al padre y 'pointer-events-auto' al hijo
+              para que el clic pase a través del fondo invisible pero funcione en el form.
+        */
+        <div className="fixed inset-0 z-50 flex items-center justify-center lg:relative lg:inset-auto lg:z-0 lg:p-0 lg:bg-transparent lg:items-stretch pointer-events-none">
 
-            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col h-fit max-h-[90vh] overflow-hidden lg:w-72 lg:max-w-none lg:rounded-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col h-fit max-h-[90vh] overflow-hidden lg:w-72 lg:max-w-none lg:rounded-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full pointer-events-auto">
 
-                {/* Header */}
+                {/* ── Header ───────────────────────────────────────────── */}
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
                     <div>
                         <div className="text-sm font-semibold text-gray-900">Hab. {reserva.habitacionNumero}</div>
@@ -120,7 +125,7 @@ export function ReservaDetailPanel({
                     <button onClick={onClose} className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors">✕</button>
                 </div>
 
-                {/* Body */}
+                {/* ── Body ─────────────────────────────────────────────── */}
                 <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
                     <div className="px-5 pt-4 pb-2">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${cfg.cls}`}>
@@ -215,7 +220,6 @@ export function ReservaDetailPanel({
                         )}
                     </div>
 
-                    {/* ID de referencia recuperado */}
                     <div className="px-5 pb-6">
                         <div className="text-[10px] text-gray-300 font-mono">
                             ID: #{reserva.id.toUpperCase()}
