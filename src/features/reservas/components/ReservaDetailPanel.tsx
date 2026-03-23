@@ -132,11 +132,14 @@ export function ReservaDetailPanel({
     const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
 
     return (
-        /* Overlay de fondo */
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        /* MODAL EN MÓVIL (fixed + inset + flex)
+           PANEL EN ESCRITORIO (lg:relative + lg:w-72 + lg:border-l)
+        */
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20
+                        lg:relative lg:inset-auto lg:z-0 lg:flex lg:items-stretch lg:p-0 lg:bg-transparent">
 
-            {/* Contenedor central - igual que NuevaReservaForm */}
-            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-xl flex flex-col h-fit max-h-[90vh] overflow-hidden
+                            lg:w-72 lg:max-w-none lg:rounded-none lg:shadow-none lg:border-l lg:border-gray-100 lg:h-full lg:max-h-full">
 
                 {/* ── Header ───────────────────────────────────────────── */}
                 <div className="px-5 py-4 border-b border-gray-100
@@ -152,18 +155,18 @@ export function ReservaDetailPanel({
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 flex items-center justify-center
-                   rounded-md border border-gray-200 text-gray-400
-                   hover:text-gray-700 hover:bg-gray-50 text-sm
-                   transition-colors"
+                        className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center
+                                   rounded-md border border-gray-200 text-gray-400
+                                   hover:text-gray-700 hover:bg-gray-50 text-sm
+                                   transition-colors"
                     >✕</button>
                 </div>
 
                 {/* ── Body scrollable ──────────────────────────────────── */}
-                <div className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-4">
+                <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
 
                     {/* Estado badge */}
-                    <div>
+                    <div className="px-5 pt-4 pb-2">
                         <span className={`inline-flex items-center px-2.5 py-1
                                 rounded-full text-xs font-medium border ${cfg.cls}`}>
                         {cfg.label}
@@ -171,9 +174,9 @@ export function ReservaDetailPanel({
                     </div>
 
                     {/* ── Huésped ─────────────────────────────────────────── */}
-                    <div>
+                    <div className="px-5 py-3">
                         <div className="text-xs font-medium text-gray-400 uppercase
-                              tracking-wide mb-1">Huésped
+                              tracking-wide mb-2">Huésped
                         </div>
                         <div className="text-sm font-semibold text-gray-900">
                             {reserva.nombreHuesped} {reserva.apellidoHuesped}
@@ -186,10 +189,10 @@ export function ReservaDetailPanel({
                         </div>
                     </div>
 
-                    <div className="h-px bg-gray-100" />
+                    <div className="h-px bg-gray-100 mx-5"/>
 
                     {/* ── Fechas acordadas ─────────────────────────────────── */}
-                    <div>
+                    <div className="px-5 py-3">
                         <div className="text-xs font-medium text-gray-400 uppercase
                               tracking-wide mb-2">Estancia acordada
                         </div>
@@ -214,64 +217,45 @@ export function ReservaDetailPanel({
                         <Campo label="Noches" valor={Number(reserva.noches ?? 1)} mono />
                     </div>
 
-                    {/* ── Timestamps reales ─────────────────────── */}
-                    {(reserva.checkinReal || reserva.checkoutReal) && (
-                        <div className="pt-2">
-                            <div className="text-xs font-medium text-gray-400 uppercase
-                                  tracking-wide mb-2">Registro real
-                            </div>
-                            {reserva.checkinReal && (
-                                <Campo
-                                    label="Check-in efectivo"
-                                    valor={formatHora(reserva.checkinReal)}
-                                    mono
-                                />
-                            )}
-                            {reserva.checkoutReal && (
-                                <Campo
-                                    label="Check-out efectivo"
-                                    valor={formatHora(reserva.checkoutReal)}
-                                    mono
-                                />
-                            )}
-                        </div>
-                    )}
+                    <div className="h-px bg-gray-100 mx-5"/>
 
-                    {/* ── Cargo late check-out ───────────── */}
-                    {horasExtra > 0 && (
-                        <div className="my-3 p-3 bg-orange-50 border
-                        border-orange-200 rounded-lg">
-                            <div className="text-xs font-semibold text-orange-700 mb-2">
-                                ⚠ Día(s) adicional(es)
+                    {/* ── Registro real ─────────────────────── */}
+                    {(reserva.checkinReal || reserva.checkoutReal) && (
+                        <>
+                            <div className="px-5 py-3">
+                                <div className="text-xs font-medium text-gray-400 uppercase
+                                  tracking-wide mb-2">Registro real
+                                </div>
+                                {reserva.checkinReal && (
+                                    <Campo
+                                        label="Check-in efectivo"
+                                        valor={formatHora(reserva.checkinReal)}
+                                        mono
+                                    />
+                                )}
+                                {reserva.checkoutReal && (
+                                    <Campo
+                                        label="Check-out efectivo"
+                                        valor={formatHora(reserva.checkoutReal)}
+                                        mono
+                                    />
+                                )}
                             </div>
-                            <Campo
-                                label={`Día(s) extra`}
-                                valor={`${horasExtra} noche${horasExtra > 1 ? 's' : ''}`}
-                                mono
-                            />
-                            <div className="flex justify-between items-baseline pt-1.5
-                                mt-1.5 border-t border-orange-200">
-                                <span className="text-xs font-medium text-orange-700">
-                                    Cargo adicional
-                                </span>
-                                <span className="text-sm font-bold text-orange-700 font-mono">
-                                    {formatSoles(cargoExtra)}
-                                </span>
-                            </div>
-                        </div>
+                            <div className="h-px bg-gray-100 mx-5"/>
+                        </>
                     )}
 
                     {/* ── Resumen económico ────────────────────────────────────── */}
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="mx-5 my-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
                         <div className="space-y-1">
                             <Campo
                                 label={`${reserva.noches ?? 1} noche(s) × ${formatSoles(Number(reserva.precioNoche))}`}
-                                valor={formatSoles(totalBase)}
+                                valor={formatSoles(Number(reserva.noches ?? 1) * Number(reserva.precioNoche ?? 0))}
                                 mono
                             />
                             {cargoExtra > 0 && (
                                 <Campo
-                                    label="Cargos adicionales"
+                                    label={`Días extra (${horasExtra})`}
                                     valor={formatSoles(cargoExtra)}
                                     mono
                                 />
@@ -288,7 +272,7 @@ export function ReservaDetailPanel({
 
                     {/* Notas */}
                     {reserva.notas && (
-                        <div>
+                        <div className="px-5 pb-3">
                             <div className="text-xs font-medium text-gray-400 uppercase
                                 tracking-wide mb-1">Notas
                             </div>
@@ -299,64 +283,37 @@ export function ReservaDetailPanel({
                         </div>
                     )}
 
-                    {/* Error de acción */}
+                    {/* Error */}
                     {errorAccion && (
-                        <div className="p-2.5 bg-red-50 border border-red-200
+                        <div className="mx-5 mb-3 p-2.5 bg-red-50 border border-red-200
                               rounded-md text-xs text-red-700">
                             ⚠ {errorAccion}
                         </div>
                     )}
 
-                    {/* ── Acciones por estado ──────────────────────────────── */}
-                    <div className="space-y-2 pt-2">
+                    {/* ── Acciones ──────────────────────────────── */}
+                    <div className="px-5 pb-6 space-y-2">
                         {reserva.estado === 'CONFIRMADA' && (
                             <>
                                 <button
                                     onClick={handleCheckIn}
                                     disabled={isBusy}
                                     className="w-full py-2.5 bg-gray-900 text-white text-sm
-                               font-medium rounded-lg hover:bg-gray-800
-                               disabled:opacity-50 transition-colors
-                               flex items-center justify-center gap-2"
+                               font-medium rounded-lg flex items-center justify-center gap-2"
                                 >
-                                    {isBusy
-                                        ? <><span className={spinnerCls}/> Procesando...</>
-                                        : '✓ Realizar Check-in'}
+                                    {isBusy ? <><span className={spinnerCls}/> Procesando...</> : '✓ Realizar Check-in'}
                                 </button>
-
                                 {confirmandoCancelacion ? (
                                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                                        <p className="text-xs text-red-700 mb-2.5 leading-relaxed text-center">
-                                            ¿Confirmar cancelación?
-                                        </p>
                                         <div className="flex gap-2">
-                                            <button
-                                                onClick={handleCancelar}
-                                                disabled={isBusy}
-                                                className="flex-1 py-1.5 bg-red-600 text-white text-xs
-                                     font-medium rounded-md hover:bg-red-700
-                                     disabled:opacity-50"
-                                            >
-                                                Sí
-                                            </button>
-                                            <button
-                                                onClick={() => setConfirmandoCancelacion(false)}
-                                                className="flex-1 py-1.5 border border-gray-200
-                                     text-gray-600 text-xs font-medium
-                                     rounded-md hover:bg-gray-50"
-                                            >
-                                                No
-                                            </button>
+                                            <button onClick={handleCancelar} className="flex-1 py-1.5 bg-red-600 text-white text-xs font-medium rounded-md">Sí, cancelar</button>
+                                            <button onClick={() => setConfirmandoCancelacion(false)} className="flex-1 py-1.5 border border-gray-200 text-gray-600 text-xs font-medium rounded-md">No</button>
                                         </div>
                                     </div>
                                 ) : (
                                     <button
-                                        onClick={() => {
-                                            setErrorAccion(null)
-                                            setConfirmandoCancelacion(true)
-                                        }}
-                                        className="w-full py-2 border border-gray-200 text-gray-500
-                                 text-xs font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                                        onClick={() => setConfirmandoCancelacion(true)}
+                                        className="w-full py-2 text-gray-400 text-xs font-medium rounded-lg hover:bg-gray-50 transition-colors"
                                     >
                                         Cancelar reserva
                                     </button>
@@ -365,56 +322,15 @@ export function ReservaDetailPanel({
                         )}
 
                         {reserva.estado === 'CHECKIN' && (
-                            <>
-                                {excedida ? (
-                                    <div className="p-3 bg-amber-50 border border-amber-300
-                          rounded-lg text-xs text-amber-800 leading-relaxed">
-                                        ⚠ Fecha de salida superada. Se aplicará cargo extra.
-                                    </div>
-                                ) : (
-                                    <div className="text-xs text-amber-600 text-center bg-amber-50
-                          rounded-md py-1.5 px-2 border border-amber-100
-                          leading-relaxed">
-                                        Permanecer después de medianoche cobrará 1 noche adicional.
-                                    </div>
-                                )}
-
-                                <button
-                                    onClick={handleCheckOut}
-                                    disabled={isBusy}
-                                    className={[
-                                        'w-full py-2.5 text-sm font-medium rounded-lg',
-                                        'disabled:opacity-50 transition-colors',
-                                        'flex items-center justify-center gap-2',
-                                        excedida
-                                            ? 'bg-amber-500 text-white hover:bg-amber-600'
-                                            : 'bg-gray-900 text-white hover:bg-gray-800',
-                                    ].join(' ')}
-                                >
-                                    {isBusy
-                                        ? <><span className={spinnerCls} /> Procesando...</>
-                                        : excedida
-                                            ? '→ Checkout + cargo extra'
-                                            : '→ Realizar Check-out'}
-                                </button>
-                            </>
-                        )}
-
-                        {(reserva.estado === 'CHECKOUT' || reserva.estado === 'CANCELADA') && (
-                            <div className="w-full py-2.5 text-center text-xs text-gray-400
-                                bg-gray-50 rounded-lg border border-gray-100 uppercase tracking-widest">
-                                {reserva.estado === 'CHECKOUT' ? 'Completada ✓' : 'Cancelada'}
-                            </div>
+                            <button
+                                onClick={handleCheckOut}
+                                disabled={isBusy}
+                                className={`w-full py-2.5 text-sm font-medium rounded-lg flex items-center justify-center gap-2 ${excedida ? 'bg-amber-500 text-white' : 'bg-gray-900 text-white'}`}
+                            >
+                                {isBusy ? <><span className={spinnerCls} /> Procesando...</> : '→ Realizar Check-out'}
+                            </button>
                         )}
                     </div>
-
-                    {/* Footer ID */}
-                    <div className="pt-2 text-center">
-                        <div className="text-[10px] text-gray-300 font-mono">
-                            REF: {reserva.id.split('-')[0].toUpperCase()}
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
