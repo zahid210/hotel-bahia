@@ -139,7 +139,7 @@ export function ReservaDetailPanel({
 
             {/* ── Header ───────────────────────────────────────────── */}
             <div className="px-5 py-4 border-b border-gray-100
-                      flex items-center justify-between flex-shrink-0">
+                flex items-center justify-between flex-shrink-0">
                 <div>
                     <div className="text-sm font-semibold">
                         Hab. {reserva.habitacionNumero}
@@ -149,13 +149,14 @@ export function ReservaDetailPanel({
                             reserva.tipoHabitacion.slice(1).toLowerCase()}
                     </div>
                 </div>
+                {/* Botón cerrar — más grande en móvil para facilitar el toque */}
                 <button
                     onClick={onClose}
-                    className="w-7 h-7 flex items-center justify-center rounded-md
-                     border border-gray-200 text-gray-400
-                     hover:text-gray-700 hover:bg-gray-50 text-sm"
-                >✕
-                </button>
+                    className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center
+               rounded-md border border-gray-200 text-gray-400
+               hover:text-gray-700 hover:bg-gray-50 text-sm
+               transition-colors"
+                >✕</button>
             </div>
 
             {/* ── Body scrollable ──────────────────────────────────── */}

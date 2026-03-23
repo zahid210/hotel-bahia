@@ -267,21 +267,53 @@ export function DashboardPage({ onMensaje }: Props) {
             </div>
 
             {/* ════════════════════════════════════════════════════
-          PANEL LATERAL
-      ════════════════════════════════════════════════════ */}
+    PANEL LATERAL — Desktop: columna derecha
+    Móvil: bottom sheet deslizante desde abajo
+════════════════════════════════════════════════════ */}
             {seleccionada?.reservaActiva && (
-                <div className="flex-shrink-0 animate-[slideIn_0.2s_ease]">
-                    <ReservaDetailPanel
-                        reserva={seleccionada.reservaActiva}
-                        procesando={procesando}
-                        hoy={HOY}
-                        onClose={() => setSeleccionadaId(null)}
-                        onCheckIn={handleCheckIn}
-                        onCheckOut={handleCheckOut}
-                        onCancelar={handleCancelar}
-                        onMensaje={onMensaje}
+                <>
+                    {/* ── Desktop: panel fijo a la derecha ─────────────── */}
+                    <div className="hidden lg:block flex-shrink-0
+                    animate-[slideIn_0.2s_ease]">
+                        <ReservaDetailPanel
+                            reserva={seleccionada.reservaActiva}
+                            procesando={procesando}
+                            hoy={HOY}
+                            onClose={() => setSeleccionadaId(null)}
+                            onCheckIn={handleCheckIn}
+                            onCheckOut={handleCheckOut}
+                            onCancelar={handleCancelar}
+                            onMensaje={onMensaje}
+                        />
+                    </div>
+
+                    {/* ── Móvil: bottom sheet ───────────────────────────── */}
+                    <div className="lg:hidden fixed inset-x-0 bottom-0 z-50
+                    bg-white rounded-t-2xl border-t border-gray-200
+                    shadow-2xl max-h-[85vh] overflow-y-auto
+                    animate-[slideUp_0.25s_ease]">
+                        {/* Handle visual — indica que se puede arrastrar */}
+                        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+                            <div className="w-10 h-1 bg-gray-200 rounded-full" />
+                        </div>
+                        <ReservaDetailPanel
+                            reserva={seleccionada.reservaActiva}
+                            procesando={procesando}
+                            hoy={HOY}
+                            onClose={() => setSeleccionadaId(null)}
+                            onCheckIn={handleCheckIn}
+                            onCheckOut={handleCheckOut}
+                            onCancelar={handleCancelar}
+                            onMensaje={onMensaje}
+                        />
+                    </div>
+
+                    {/* ── Overlay oscuro en móvil ───────────────────────── */}
+                    <div
+                        className="lg:hidden fixed inset-0 bg-black/40 z-40"
+                        onClick={() => setSeleccionadaId(null)}
                     />
-                </div>
+                </>
             )}
 
             {/* ════════════════════════════════════════════════════
