@@ -167,7 +167,7 @@ export function DashboardPage({ onMensaje }: Props) {
             </span>
                         <span className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-blue-400 rounded" />
-              Botón "✓ Lista" = marcar disponible
+              "✓ Lista" = marcar disponible
             </span>
                     </div>
 

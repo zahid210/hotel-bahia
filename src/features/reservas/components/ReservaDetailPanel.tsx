@@ -134,12 +134,11 @@ export function ReservaDetailPanel({
     const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
 
     return (
-        <div className="w-72 flex-shrink-0 border-l border-gray-100 bg-white
-                    flex flex-col h-full overflow-hidden">
+        <div className="w-full lg:w-72 flex-shrink-0 lg:border-l border-gray-100 bg-white flex flex-col h-full max-h-[85vh] lg:max-h-full overflow-hidden">
 
             {/* ── Header ───────────────────────────────────────────── */}
             <div className="px-5 py-4 border-b border-gray-100
-                flex items-center justify-between flex-shrink-0">
+                  flex items-center justify-between flex-shrink-0">
                 <div>
                     <div className="text-sm font-semibold">
                         Hab. {reserva.habitacionNumero}
@@ -160,7 +159,7 @@ export function ReservaDetailPanel({
             </div>
 
             {/* ── Body scrollable ──────────────────────────────────── */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
 
                 {/* Estado badge */}
                 <div className="px-5 pt-4 pb-2">
@@ -199,9 +198,9 @@ export function ReservaDetailPanel({
                     {excedida ? (
                         <div className="flex justify-between items-baseline py-1.5
                   border-b border-gray-50">
-    <span className="text-xs font-medium text-amber-600">
-      ⚠ Salida límite
-    </span>
+                <span className="text-xs font-medium text-amber-600">
+                    ⚠ Salida límite
+                </span>
                             <span className="text-xs font-semibold text-amber-600 font-mono">
       {formatFecha(reserva.fechaSalida)} · {formatLocalTime(reserva.horaSalidaAcordada)}
     </span>
@@ -328,7 +327,7 @@ export function ReservaDetailPanel({
                 )}
 
                 {/* ── Acciones por estado ──────────────────────────────── */}
-                <div className="px-5 pb-4 space-y-2">
+                <div className="px-5 pb-6 space-y-2">
 
                     {/* CONFIRMADA → Check-in */}
                     {reserva.estado === 'CONFIRMADA' && (

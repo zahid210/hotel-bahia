@@ -174,9 +174,6 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                 <div>
                     <label className={lbl}>
                         Hora entrada
-                        <span className="ml-1 text-gray-300 normal-case font-normal">
-              (def. 15:00)
-            </span>
                     </label>
                     <select {...register('horaEntradaAcordada')} className={campo}>
                         {HORAS.map(h => (
@@ -202,9 +199,6 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                 <div>
                     <label className={lbl}>
                         Hora salida límite
-                        <span className="ml-1 text-gray-300 normal-case font-normal">
-              (def. 12:00)
-            </span>
                     </label>
                     <select {...register('horaSalidaAcordada')} className={campo}>
                         {HORAS.map(h => (
