@@ -95,19 +95,21 @@ public class ReporteService {
 
         long diasPeriodo = ChronoUnit.DAYS.between(inicio, fin) + 1;
 
-        long ocupacionesTotales = enPeriodo.stream()
+        List<Reserva> soloCheckin = enPeriodo.stream()
+                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN)
+                .toList();
+
+        long ocupacionesTotales = soloCheckin.stream()
                 .mapToLong(r -> {
                     LocalDate desde = r.getFechaEntrada().isBefore(inicio)
                             ? inicio
                             : r.getFechaEntrada();
 
-                    // ← CAMBIO: fin.plusDays(1) en lugar de fin
                     LocalDate hasta = r.getFechaSalida().isAfter(fin)
                             ? fin.plusDays(1)
                             : r.getFechaSalida();
 
-                    long dias = ChronoUnit.DAYS.between(desde, hasta);
-                    return Math.max(dias, 0);  // blindaje contra negativos
+                    return Math.max(ChronoUnit.DAYS.between(desde, hasta), 0);
                 })
                 .sum();
 
@@ -134,23 +136,25 @@ public class ReporteService {
             LocalDate inicio,
             LocalDate fin) {
 
+        // ── Solo CHECKIN para consistencia con el Dashboard ───────
+        List<Reserva> soloCheckin = enPeriodo.stream()
+                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN)
+                .toList();
+
         List<OcupacionDia> resultado = new ArrayList<>();
         LocalDate cursor = inicio;
 
         while (!cursor.isAfter(fin)) {
             final LocalDate dia = cursor;
 
-            // Habitaciones ocupadas ese día
-            long ocupadas = enPeriodo.stream()
+            long ocupadas = soloCheckin.stream()
                     .filter(r ->
                             !r.getFechaEntrada().isAfter(dia) &&
                                     r.getFechaSalida().isAfter(dia)
                     )
                     .count();
 
-            // Ingresos atribuibles a ese día
-            BigDecimal ingresoDia = enPeriodo.stream()
-                    .filter(r -> r.getEstado() == EstadoReserva.CHECKOUT)
+            BigDecimal ingresoDia = soloCheckin.stream()
                     .filter(r ->
                             !r.getFechaEntrada().isAfter(dia) &&
                                     r.getFechaSalida().isAfter(dia)
@@ -159,7 +163,8 @@ public class ReporteService {
                         long noches = r.calcularNochesFacturables();
                         return noches > 0
                                 ? r.calcularTotalEstancia()
-                                .divide(BigDecimal.valueOf(noches), 4, RoundingMode.HALF_UP)
+                                .divide(BigDecimal.valueOf(noches),
+                                        4, RoundingMode.HALF_UP)
                                 : BigDecimal.ZERO;
                     })
                     .reduce(BigDecimal.ZERO, BigDecimal::add)
