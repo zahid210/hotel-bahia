@@ -95,11 +95,13 @@ public class ReporteService {
 
         long diasPeriodo = ChronoUnit.DAYS.between(inicio, fin) + 1;
 
-        List<Reserva> soloCheckin = enPeriodo.stream()
-                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN)
+        // CHECKIN = ocupada ahora / CHECKOUT = estuvo ocupada en el período
+        List<Reserva> ocupacionReal = enPeriodo.stream()
+                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN
+                        || r.getEstado() == EstadoReserva.CHECKOUT)
                 .toList();
 
-        long ocupacionesTotales = soloCheckin.stream()
+        long ocupacionesTotales = ocupacionReal.stream()
                 .mapToLong(r -> {
                     LocalDate desde = r.getFechaEntrada().isBefore(inicio)
                             ? inicio
@@ -136,9 +138,10 @@ public class ReporteService {
             LocalDate inicio,
             LocalDate fin) {
 
-        // ── Solo CHECKIN para consistencia con el Dashboard ───────
-        List<Reserva> soloCheckin = enPeriodo.stream()
-                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN)
+        // CHECKIN = ocupada ahora / CHECKOUT = estuvo ocupada en el período
+        List<Reserva> ocupacionReal = enPeriodo.stream()
+                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN
+                        || r.getEstado() == EstadoReserva.CHECKOUT)
                 .toList();
 
         List<OcupacionDia> resultado = new ArrayList<>();
@@ -147,14 +150,14 @@ public class ReporteService {
         while (!cursor.isAfter(fin)) {
             final LocalDate dia = cursor;
 
-            long ocupadas = soloCheckin.stream()
+            long ocupadas = ocupacionReal.stream()
                     .filter(r ->
                             !r.getFechaEntrada().isAfter(dia) &&
                                     r.getFechaSalida().isAfter(dia)
                     )
                     .count();
 
-            BigDecimal ingresoDia = soloCheckin.stream()
+            BigDecimal ingresoDia = ocupacionReal.stream()
                     .filter(r ->
                             !r.getFechaEntrada().isAfter(dia) &&
                                     r.getFechaSalida().isAfter(dia)
@@ -215,7 +218,7 @@ public class ReporteService {
                             lista.size(),
                             noches,
                             ingreso,
-                            0 // se puede calcular si se necesita
+                            0
                     );
                 })
                 .sorted(Comparator.comparing(RendimientoTipo::ingresoTotal).reversed())
