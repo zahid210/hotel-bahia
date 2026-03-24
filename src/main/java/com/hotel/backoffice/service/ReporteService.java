@@ -80,31 +80,34 @@ public class ReporteService {
                         && !r.getFechaEntrada().isBefore(inicio))
                 .count();
 
-        // Ingreso total: suma de totalEstancia de reservas con checkout
         BigDecimal ingresoTotal = facturadas.stream()
                 .map(Reserva::calcularTotalEstancia)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Noches vendidas: suma de noches facturables
         long nochesVendidas = facturadas.stream()
                 .mapToLong(Reserva::calcularNochesFacturables)
                 .sum();
 
-        // Ingreso promedio por noche
         BigDecimal ingresoPorNoche = nochesVendidas > 0
                 ? ingresoTotal.divide(
                 BigDecimal.valueOf(nochesVendidas), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
-        // Ocupación promedio del período
         long diasPeriodo = ChronoUnit.DAYS.between(inicio, fin) + 1;
+
         long ocupacionesTotales = enPeriodo.stream()
                 .mapToLong(r -> {
-                    LocalDate desdeFecha = r.getFechaEntrada().isBefore(inicio)
-                            ? inicio : r.getFechaEntrada();
-                    LocalDate hastaFecha = r.getFechaSalida().isAfter(fin)
-                            ? fin : r.getFechaSalida();
-                    return ChronoUnit.DAYS.between(desdeFecha, hastaFecha);
+                    LocalDate desde = r.getFechaEntrada().isBefore(inicio)
+                            ? inicio
+                            : r.getFechaEntrada();
+
+                    // ← CAMBIO: fin.plusDays(1) en lugar de fin
+                    LocalDate hasta = r.getFechaSalida().isAfter(fin)
+                            ? fin.plusDays(1)
+                            : r.getFechaSalida();
+
+                    long dias = ChronoUnit.DAYS.between(desde, hasta);
+                    return Math.max(dias, 0);  // blindaje contra negativos
                 })
                 .sum();
 
@@ -119,7 +122,7 @@ public class ReporteService {
                 cancelaciones,
                 ingresoTotal,
                 ingresoPorNoche,
-                Math.min(ocupacionPromedio, 100),
+                Math.min(Math.round(ocupacionPromedio * 10.0) / 10.0, 100),
                 nochesVendidas
         );
     }
@@ -223,10 +226,9 @@ public class ReporteService {
                         r -> r.getHabitacion().getNumero()
                 ));
 
-        return porHab.entrySet().stream()
-                .map(e -> {
-                    List<Reserva> lista = e.getValue();
-                    Reserva primera = lista.get(0);
+        return porHab.values().stream()
+                .map(lista -> {
+                    Reserva primera = lista.getFirst();
 
                     long noches = lista.stream()
                             .mapToLong(Reserva::calcularNochesFacturables)
