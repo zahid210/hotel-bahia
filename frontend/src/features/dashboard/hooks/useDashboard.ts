@@ -9,7 +9,7 @@ export interface HabitacionConReserva extends Habitacion {
     excedida:      boolean   // true si fechaSalida < HOY y estado CHECKIN
 }
 
-export function useDashboard() {
+export function useDashboard(refreshSignal = 0) {
     const [habitaciones, setHabitaciones] = useState<Habitacion[]>([])
     const [reservas,     setReservas]     = useState<Reserva[]>([])
     const [cargando,     setCargando]     = useState(true)
@@ -49,7 +49,7 @@ export function useDashboard() {
         }
     }, [])
 
-    useEffect(() => { cargar() }, [cargar])
+    useEffect(() => { void cargar() }, [cargar, refreshSignal])
 
     // ── Cruce habitación ↔ reserva activa ─────────────────────
     const habitacionesConReserva = useMemo<HabitacionConReserva[]>(() =>
@@ -120,9 +120,6 @@ export function useDashboard() {
                 )
             }
             return actualizada
-        } catch (e: unknown) {
-            if (esSesionExpirada(e)) throw e  // re-lanza para que el panel no muestre acción
-            throw e
         } finally {
             setProcesando(null)
         }
@@ -141,9 +138,6 @@ export function useDashboard() {
             setHabitaciones(prev =>
                 prev.map(h => h.id === habitacionId ? actualizada : h)
             )
-        } catch (e: unknown) {
-            if (esSesionExpirada(e)) return
-            throw e
         } finally {
             setProcesando(null)
         }

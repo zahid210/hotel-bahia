@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { reservaService, NuevaReservaForm as FormData } from '@/services/reservaService'
 import { habitacionService, Habitacion } from '@/services/habitacionService'
 
@@ -31,11 +32,19 @@ export function NuevaReservaForm({ onSuccess }: Props) {
 
     // ── Carga habitaciones disponibles ───────────────────────
     useEffect(() => {
-        habitacionService.listarTodas().then(todas => {
-            setDisponibles(
-                todas.filter(h => h.estado === 'LIBRE' || h.estado === 'LIMPIEZA')
-            )
-        })
+        let activo = true
+        habitacionService.listarTodas()
+            .then(todas => {
+                if (!activo) return
+                setDisponibles(
+                    todas.filter(h => h.estado === 'LIBRE' || h.estado === 'LIMPIEZA')
+                )
+            })
+            .catch(e => {
+                if (!activo || esSesionExpirada(e)) return
+                setErrorGlobal(e instanceof Error ? e.message : 'Error de conexión')
+            })
+        return () => { activo = false }
     }, [])
 
     // ── Submit ────────────────────────────────────────────────

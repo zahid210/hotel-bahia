@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useDashboard } from './hooks/useDashboard'
 import { RoomCard } from './components/RoomCard'
 import { ReservaDetailPanel } from '@/features/reservas/components/ReservaDetailPanel'
@@ -10,15 +11,16 @@ const PISOS = [1, 2, 3, 4, 5]
 
 interface Props {
     onMensaje: (msg: string) => void
+    refreshSignal?: number
 }
 
-export function DashboardPage({ onMensaje }: Props) {
+export function DashboardPage({ onMensaje, refreshSignal = 0 }: Props) {
     const {
         habitacionesConReserva,
         stats, HOY, cargando, error, procesando,
         cargar, checkIn, checkOut, cancelar,
         marcarLista, onReservaCreada,
-    } = useDashboard()
+    } = useDashboard(refreshSignal)
 
     const [filtro,         setFiltro]         = useState<Filtro>('TODAS')
     const [seleccionadaId, setSeleccionadaId] = useState<number | null>(null)
@@ -50,16 +52,20 @@ export function DashboardPage({ onMensaje }: Props) {
 
     // ── Marcar lista con feedback ─────────────────────────────
     const handleMarcarLista = async (habitacionId: number) => {
-        await marcarLista(habitacionId)
-        const hab = habitacionesConReserva.find(h => h.id === habitacionId)
-        onMensaje(`Hab. ${hab?.numero ?? habitacionId} lista y disponible`)
+        try {
+            await marcarLista(habitacionId)
+            const hab = habitacionesConReserva.find(h => h.id === habitacionId)
+            onMensaje(`Hab. ${hab?.numero ?? habitacionId} lista y disponible`)
+        } catch (e: unknown) {
+            if (esSesionExpirada(e)) return
+            onMensaje(e instanceof Error ? e.message : 'Error al liberar la habitación')
+        }
     }
 
     // ── Acciones de reserva con feedback ─────────────────────
+    // El panel lateral muestra el toast de éxito de cada acción
     const handleCheckIn = async (reservaId: string) => {
-        const actualizada = await checkIn(reservaId)
-        onMensaje(`Check-in · Hab. ${actualizada.habitacionNumero} → Ocupada`)
-        return actualizada
+        await checkIn(reservaId)
     }
 
     const handleCheckOut = async (reservaId: string) => {

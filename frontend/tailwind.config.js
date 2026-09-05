@@ -8,9 +8,14 @@ export default {
           '0%':   { opacity: '0', transform: 'translateX(16px)' },
           '100%': { opacity: '1', transform: 'translateX(0)'    },
         },
+        slideUp: {
+          '0%':   { opacity: '0', transform: 'translateY(24px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)'    },
+        },
       },
       animation: {
         slideIn: 'slideIn 0.2s ease',
+        slideUp: 'slideUp 0.25s ease',
       },
     },
   },

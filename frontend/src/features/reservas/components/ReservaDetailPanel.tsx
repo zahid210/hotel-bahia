@@ -111,7 +111,6 @@ export function ReservaDetailPanel({
         } catch (e: unknown) {
             if (esSesionExpirada(e)) return
             setErrorAccion(e instanceof Error ? e.message : 'Error')
-            onMensaje(`Reserva de ${reserva.nombreHuesped} cancelada`)
         }
     }
 

@@ -18,6 +18,7 @@ export default function App() {
   const [modalAbierto,    setModalAbierto]    = useState(false)
   const [mensaje,         setMensaje]         = useState<string | null>(null)
   const [sidebarAbierto,  setSidebarAbierto]  = useState(false)
+  const [versionReservas, setVersionReservas] = useState(0)
 
   const mostrarMensaje = useCallback((texto: string) => {
     setMensaje(texto)
@@ -150,12 +151,16 @@ export default function App() {
 
             <div className="flex-1 overflow-hidden p-4 lg:p-6">
               {pagina === 'dashboard' && (
-                  <DashboardPage onMensaje={mostrarMensaje} />
+                  <DashboardPage
+                      onMensaje={mostrarMensaje}
+                      refreshSignal={versionReservas}
+                  />
               )}
               {pagina === 'reservas' && (
                   <ReservasPage
                       onNuevaReserva={abrirModal}
                       onMensaje={mostrarMensaje}
+                      refreshSignal={versionReservas}
                   />
               )}
               {pagina === 'reportes' && (
@@ -193,6 +198,7 @@ export default function App() {
                   <NuevaReservaForm
                       onSuccess={() => {
                         setModalAbierto(false)
+                        setVersionReservas(v => v + 1)
                         mostrarMensaje('Reserva confirmada correctamente')
                       }}
                   />

@@ -20,11 +20,13 @@ const calcNoches = (e: string, s: string) =>
 interface Props {
     onNuevaReserva: () => void
     onMensaje: (texto: string) => void
+    refreshSignal?: number
 }
 
 export const ReservasPage = memo(function ReservasPage({
                                                            onNuevaReserva,
                                                            onMensaje,
+                                                           refreshSignal = 0,
                                                        }: Props) {
     const [reservas,  setReservas]  = useState<Reserva[]>([])
     const [cargando,  setCargando]  = useState(true)
@@ -45,7 +47,7 @@ export const ReservasPage = memo(function ReservasPage({
         }
     }, [])
 
-    useEffect(() => { cargar() }, [cargar])
+    useEffect(() => { cargar() }, [cargar, refreshSignal])
 
     const stats = useMemo(() => ({
         total:      reservas.length,
