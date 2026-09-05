@@ -16,6 +16,8 @@ public record ReservaRequestDTO(
         String apellidoHuesped,
 
         @NotBlank(message = "El tipo de documento es obligatorio")
+        @Pattern(regexp = "DNI|PASAPORTE|CE",
+                 message = "El tipo de documento debe ser DNI, PASAPORTE o CE")
         String tipoDocumento,
 
         @NotBlank(message = "El número de documento es obligatorio")
@@ -33,6 +35,7 @@ public record ReservaRequestDTO(
         LocalTime horaEntradaAcordada,    // nullable → default 15:00
         LocalTime horaSalidaAcordada,     // nullable → default 12:00
 
+        @NotNull(message = "El número de huéspedes es obligatorio")
         @Min(value = 1,  message = "Debe haber al menos 1 huésped")
         @Max(value = 10, message = "Máximo 10 huéspedes")
         Short numHuespedes,
