@@ -39,21 +39,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // ── Extraer email del token ──────────────────────────────
-    public String getEmail(String token) {
-        return parsearClaims(token).getSubject();
-    }
-
-    // ── Extraer rol del token ────────────────────────────────
-    public String getRol(String token) {
-        return parsearClaims(token).get("rol", String.class);
-    }
-
-    // ── Validar token ────────────────────────────────────────
-    public boolean esValido(String token) {
+    // ── Validar token y devolver email en una sola pasada ─────
+    public String getEmailSiValido(String token) {
         try {
-            parsearClaims(token);
-            return true;
+            return parsearClaims(token).getSubject();
         } catch (ExpiredJwtException e) {
             log.warn("Token expirado");
         } catch (MalformedJwtException e) {
@@ -61,7 +50,7 @@ public class JwtTokenProvider {
         } catch (JwtException e) {
             log.warn("Token inválido: {}", e.getMessage());
         }
-        return false;
+        return null;
     }
 
     // ── Parsear claims (privado) ─────────────────────────────

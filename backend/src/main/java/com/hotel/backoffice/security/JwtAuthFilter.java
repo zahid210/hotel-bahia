@@ -28,18 +28,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = extraerToken(request);
 
-        if (StringUtils.hasText(token) && tokenProvider.esValido(token)) {
-            String     email       = tokenProvider.getEmail(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        if (StringUtils.hasText(token)) {
+            String email = tokenProvider.getEmailSiValido(token);
+            if (email != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            // No autenticar cuentas desactivadas: aunque el token siga válido,
-            // un usuario desactivado pierde el acceso de inmediato
-            if (userDetails.isEnabled()) {
-                var auth = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                // No autenticar cuentas desactivadas: aunque el token siga válido,
+                // un usuario desactivado pierde el acceso de inmediato
+                if (userDetails.isEnabled()) {
+                    var auth = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 
