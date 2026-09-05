@@ -1,5 +1,5 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip,
     ResponsiveContainer, Cell, PieChart, Pie, Legend, TooltipProps
@@ -103,7 +103,12 @@ export function ReportesPage() {
     const [fechaIni,  setFechaIni]  = useState('')
     const [fechaFin,  setFechaFin]  = useState('')
 
-    const cargar = useCallback(async (p: Periodo) => {
+    // Contador de peticiones: descarta resultados obsoletos si el usuario
+    // cambia de período mientras una respuesta sigue en vuelo.
+    const secuencia = useRef(0)
+
+    const cargar = useCallback(async (p: Periodo, ini?: string, fin?: string) => {
+        const id = ++secuencia.current
         setCargando(true)
         setError(null)
         try {
@@ -112,26 +117,27 @@ export function ReportesPage() {
             else if (p === 'semana') data = await reporteService.semana()
             else if (p === 'mes')    data = await reporteService.mes()
             else {
-                if (!fechaIni || !fechaFin) return
-                data = await reporteService.porRango(fechaIni, fechaFin)
+                if (!ini || !fin) return
+                data = await reporteService.porRango(ini, fin)
             }
+            if (id !== secuencia.current) return
             setReporte(data)
         } catch (e: unknown) {
             if (esSesionExpirada(e)) return
+            if (id !== secuencia.current) return
             setError(e instanceof Error ? e.message : 'Error al cargar reporte')
         } finally {
-            setCargando(false)
+            if (id === secuencia.current) setCargando(false)
         }
-    }, [fechaIni, fechaFin])
+    }, [])
 
     useEffect(() => {
-        // Se añade 'void' y la dependencia 'cargar'
         void cargar(periodo)
     }, [periodo, cargar])
 
     const handleCustom = () => {
         if (fechaIni && fechaFin) {
-            void cargar('custom') // Se añade 'void'
+            void cargar('custom', fechaIni, fechaFin)
         }
     }
 
@@ -189,7 +195,7 @@ export function ReportesPage() {
                 )}
 
                 <button
-                    onClick={() => cargar(periodo)}
+                    onClick={() => cargar(periodo, fechaIni, fechaFin)}
                     disabled={cargando}
                     className="ml-auto px-3 py-1.5 border border-gray-200 rounded-lg
                      text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-40"
