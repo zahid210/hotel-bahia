@@ -29,6 +29,12 @@ public class ReporteService {
 
     // ── Reporte completo por rango de fechas ──────────────────
     public ReporteCompleto generarReporte(LocalDate inicio, LocalDate fin) {
+        if (inicio.isAfter(fin)) {
+            throw new IllegalArgumentException(
+                    "La fecha de inicio no puede ser posterior a la de fin."
+            );
+        }
+
         List<Reserva> enPeriodo   = reservaRepo.findEnPeriodo(inicio, fin);
         int           totalHabs   = (int) habitacionRepo.count();
 
@@ -126,48 +132,59 @@ public class ReporteService {
                         || r.getEstado() == EstadoReserva.CHECKOUT)
                 .toList();
 
-        List<OcupacionDia> resultado = new ArrayList<>();
-        LocalDate cursor = inicio;
+        int     dias          = (int) ChronoUnit.DAYS.between(inicio, fin) + 1;
+        LocalDate finExclusivo = fin.plusDays(1);
 
-        while (!cursor.isAfter(fin)) {
-            final LocalDate dia = cursor;
+        // Arreglo de diferencias: por cada reserva sumamos los días que ocupa
+        long[]       ocupadas = new long[dias];
+        BigDecimal[] ingreso  = new BigDecimal[dias];
+        Arrays.fill(ingreso, BigDecimal.ZERO);
 
-            long ocupadas = ocupacionReal.stream()
-                    .filter(r ->
-                            !r.getFechaEntrada().isAfter(dia) &&
-                                    r.getFechaSalida().isAfter(dia)
-                    )
-                    .count();
+        for (Reserva r : ocupacionReal) {
+            LocalDate desde = r.getFechaEntrada().isBefore(inicio)
+                    ? inicio : r.getFechaEntrada();
+            LocalDate hasta = r.getFechaSalida().isAfter(fin)
+                    ? finExclusivo : r.getFechaSalida();
 
-            BigDecimal ingresoDia = ocupacionReal.stream()
-                    .filter(r ->
-                            !r.getFechaEntrada().isAfter(dia) &&
-                                    r.getFechaSalida().isAfter(dia)
-                    )
-                    .map(r -> {
-                        long noches = r.calcularNochesFacturables();
-                        return noches > 0
-                                ? r.calcularTotalEstancia()
-                                .divide(BigDecimal.valueOf(noches),
-                                        4, RoundingMode.HALF_UP)
-                                : BigDecimal.ZERO;
-                    })
-                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                    .setScale(2, RoundingMode.HALF_UP);
+            if (hasta.isBefore(inicio) || desde.isAfter(fin)) continue;
 
-            double pct = totalHabs > 0
-                    ? Math.min((double) ocupadas / totalHabs * 100, 100)
+            int desdeIdx = (int) ChronoUnit.DAYS.between(inicio, desde);
+            int hastaIdx = (int) ChronoUnit.DAYS.between(inicio, hasta);
+
+            long noches = r.calcularNochesFacturables();
+            BigDecimal valorNoche = noches > 0
+                    ? r.calcularTotalEstancia()
+                    .divide(BigDecimal.valueOf(noches), 4, RoundingMode.HALF_UP)
+                    : BigDecimal.ZERO;
+
+            ocupadas[desdeIdx]++;
+            ingreso[desdeIdx] = ingreso[desdeIdx].add(valorNoche);
+            if (hastaIdx < dias) {
+                ocupadas[hastaIdx]--;
+                ingreso[hastaIdx] = ingreso[hastaIdx].subtract(valorNoche);
+            }
+        }
+
+        List<OcupacionDia> resultado = new ArrayList<>(dias);
+        long       acumOcupadas = 0;
+        BigDecimal acumIngreso  = BigDecimal.ZERO;
+
+        for (int i = 0; i < dias; i++) {
+            acumOcupadas += ocupadas[i];
+            acumIngreso   = acumIngreso.add(ingreso[i]);
+
+            LocalDate dia = inicio.plusDays(i);
+            double    pct = totalHabs > 0
+                    ? Math.min((double) acumOcupadas / totalHabs * 100, 100)
                     : 0;
 
             resultado.add(new OcupacionDia(
                     dia.format(FMT),
-                    (int) ocupadas,
+                    (int) acumOcupadas,
                     totalHabs,
                     Math.round(pct * 10.0) / 10.0,
-                    ingresoDia
+                    acumIngreso.setScale(2, RoundingMode.HALF_UP)
             ));
-
-            cursor = cursor.plusDays(1);
         }
 
         return resultado;
