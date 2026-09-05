@@ -43,6 +43,11 @@ run_backend() {
     if [ ! -f /usr/lib/jvm/java-21-openjdk-amd64/bin/java ]; then
         echo "⚠ No se encontró Java 21 en /usr/lib/jvm/java-21-openjdk-amd64."
     fi
+    if [ ! -f "$BACKEND/src/main/resources/application-local.yml" ]; then
+        echo "• Creando application-local.yml desde la plantilla…"
+        cp "$BACKEND/src/main/resources/application-local.example.yml" \
+           "$BACKEND/src/main/resources/application-local.yml"
+    fi
     export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
     echo "▶ Backend en http://localhost:8080  (perfil local)"
     cd "$BACKEND" && ./mvnw -q spring-boot:run -Dspring-boot.run.profiles=local

@@ -1,0 +1,22 @@
+# Plantilla de configuración local. Copiar a application-local.yml
+# (este archivo local está en .gitignore y no se sube a Git).
+#
+#   cp application-local.example.yml application-local.yml
+# O simplemente ejecutar ./scripts/dev.sh: lo copia automáticamente.
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/hotel_bahia
+    username: hotel
+    password: hotel_bahia
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # create: reinicia la BD desde cero en cada arranque local
+      ddl-auto: create
+    show-sql: true
+
+app:
+  jwt:
+    secret: local-dev-secret-key-for-hotel-bahia-not-for-production-use-only-32chars!!
+    expiration-ms: 86400000
