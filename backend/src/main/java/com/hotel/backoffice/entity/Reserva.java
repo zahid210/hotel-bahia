@@ -143,19 +143,17 @@ public class Reserva {
             this.cargoHorasExtra = BigDecimal.ZERO;
         } else {
             // ── Pasó la medianoche: cobrar noches completas ──
-            // Cuenta cuántas noches completas han pasado
-            // desde la medianoche de la fecha de salida
+            // Cuenta cuántas noches completas ha pasado
+            // desde la fecha de salida:
+            //   salida 2026-03-16, checkout 2026-03-17T02:00 → 1 noche
+            //   salida 2026-03-16, checkout 2026-03-18T10:00 → 2 noches
             long nochesExtra = ChronoUnit.DAYS.between(
-                    medianocheSalida.toLocalDate(),  // día siguiente al de salida
-                    momentoCheckout.toLocalDate()    // día del checkout real
+                    this.fechaSalida,            // día acordado de salida
+                    momentoCheckout.toLocalDate() // día del checkout real
             );
 
-            // Si el checkout es exactamente a medianoche (00:00:00)
-            // eso cuenta como 1 noche extra (entró en el nuevo día)
-            if (momentoCheckout.equals(medianocheSalida)) {
-                nochesExtra = 1;
-            } else if (nochesExtra < 1) {
-                // Entre medianoche y las 23:59 del día siguiente = 1 noche
+            // Mínimo 1 noche extra si pasó la medianoche
+            if (nochesExtra < 1) {
                 nochesExtra = 1;
             }
 
