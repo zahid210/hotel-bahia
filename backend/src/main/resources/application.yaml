@@ -3,10 +3,10 @@ spring:
     active: local
 
   datasource:
-    url:      ${DATABASE_URL:jdbc:postgresql://localhost:5432/hotel_bahia}
+    url:      ${DATABASE_URL:jdbc:mariadb://localhost:3306/hotel_bahia}
     username: ${DATABASE_USERNAME:hotel}
     password: ${DATABASE_PASSWORD:hotel_bahia}
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: org.mariadb.jdbc.Driver
     hikari:
       maximum-pool-size: 5
       minimum-idle: 1
