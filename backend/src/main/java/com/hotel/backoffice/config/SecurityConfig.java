@@ -41,8 +41,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // ── Rutas públicas ──────────────────────────
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        // ── Todoo lo demas requiere autenticacion
+                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        // ── Todo lo demás requiere autenticación ─────
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

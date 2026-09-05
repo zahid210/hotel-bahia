@@ -4,11 +4,13 @@ import com.hotel.backoffice.dto.response.HabitacionResponseDTO;
 import com.hotel.backoffice.service.HabitacionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/habitaciones")
+@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
 @RequiredArgsConstructor
 public class HabitacionController {
 
