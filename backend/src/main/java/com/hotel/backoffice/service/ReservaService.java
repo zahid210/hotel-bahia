@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -40,7 +41,7 @@ public class ReservaService {
     @Transactional(readOnly = true)
     public List<ReservaResponseDTO> listarPorEstado(String estado) {
         try {
-            EstadoReserva estadoEnum = EstadoReserva.valueOf(estado.toUpperCase());
+            EstadoReserva estadoEnum = EstadoReserva.valueOf(estado.toUpperCase(Locale.ROOT));
             return reservaRepo.findByEstadoOrderByFechaEntradaDesc(estadoEnum)
                     .stream()
                     .map(ReservaResponseDTO::from)
@@ -74,6 +75,14 @@ public class ReservaService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Habitación no encontrada")
                 );
+
+        // 2b. Validar capacidad
+        if (dto.numHuespedes() > hab.getCapacidad()) {
+            throw new IllegalArgumentException(
+                    "El número de huéspedes excede la capacidad de la habitación ("
+                            + hab.getCapacidad() + ")."
+            );
+        }
 
         // 3. Validar estado de habitación
         if (hab.getEstado() == EstadoHabitacion.MANTENIMIENTO) {
@@ -191,6 +200,12 @@ public class ReservaService {
     public ReservaResponseDTO cancelarReserva(UUID id) {
         Reserva reserva = reservaRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+        if (reserva.getEstado() == EstadoReserva.CHECKOUT
+                || reserva.getEstado() == EstadoReserva.CANCELADA) {
+            throw new IllegalArgumentException(
+                    "No se puede cancelar una reserva en estado " + reserva.getEstado() + "."
+            );
+        }
         if (reserva.getEstado() == EstadoReserva.CHECKIN) {
             reserva.getHabitacion().setEstado(EstadoHabitacion.LIMPIEZA);
         }
