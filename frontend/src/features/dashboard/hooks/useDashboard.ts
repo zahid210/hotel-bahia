@@ -9,6 +9,13 @@ export interface HabitacionConReserva extends Habitacion {
     excedida:      boolean   // true si fechaSalida < HOY y estado CHECKIN
 }
 
+// ── Mapa de transiciones reserva → habitación ────────────
+const RESERVA_A_HAB: Partial<Record<string, Habitacion['estado']>> = {
+    CHECKIN:   'OCUPADA',
+    CHECKOUT:  'LIMPIEZA',
+    CANCELADA: 'LIBRE',
+}
+
 export function useDashboard(refreshSignal = 0) {
     const [habitaciones, setHabitaciones] = useState<Habitacion[]>([])
     const [reservas,     setReservas]     = useState<Reserva[]>([])
@@ -91,15 +98,8 @@ export function useDashboard(refreshSignal = 0) {
         excedidas: habitacionesConReserva.filter(h => h.excedida).length,
     }), [habitaciones, reservas, HOY, habitacionesConReserva])
 
-    // ── Mapa de transiciones reserva → habitación ────────────
-    const RESERVA_A_HAB: Partial<Record<string, Habitacion['estado']>> = {
-        CHECKIN:   'OCUPADA',
-        CHECKOUT:  'LIMPIEZA',
-        CANCELADA: 'LIBRE',
-    }
-
     // ── Ejecutor genérico ─────────────────────────────────────
-    const ejecutar = async (
+    const ejecutar = useCallback(async (
         reservaId: string,
         accion: () => Promise<Reserva>
     ): Promise<Reserva> => {
@@ -123,15 +123,24 @@ export function useDashboard(refreshSignal = 0) {
         } finally {
             setProcesando(null)
         }
-    }
+    }, [])
 
     // ── Acciones de reserva ───────────────────────────────────
-    const checkIn  = (id: string) => ejecutar(id, () => reservaService.checkIn(id))
-    const checkOut = (id: string) => ejecutar(id, () => reservaService.checkOut(id))
-    const cancelar = (id: string) => ejecutar(id, () => reservaService.cancelar(id))
+    const checkIn  = useCallback(
+        (id: string) => ejecutar(id, () => reservaService.checkIn(id)),
+        [ejecutar]
+    )
+    const checkOut = useCallback(
+        (id: string) => ejecutar(id, () => reservaService.checkOut(id)),
+        [ejecutar]
+    )
+    const cancelar = useCallback(
+        (id: string) => ejecutar(id, () => reservaService.cancelar(id)),
+        [ejecutar]
+    )
 
     // ── Marcar habitación en limpieza como libre ──────────────
-    const marcarLista = async (habitacionId: number): Promise<void> => {
+    const marcarLista = useCallback(async (habitacionId: number): Promise<void> => {
         setProcesando(String(habitacionId))
         try {
             const actualizada = await habitacionService.cambiarEstado(habitacionId, 'LIBRE')
@@ -141,7 +150,7 @@ export function useDashboard(refreshSignal = 0) {
         } finally {
             setProcesando(null)
         }
-    }
+    }, [])
 
     const onReservaCreada = useCallback(async () => {
         const revs = await reservaService.listarTodas()

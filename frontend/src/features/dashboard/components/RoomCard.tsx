@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { HabitacionConReserva } from '../hooks/useDashboard'
 
 const ESTADO_CFG = {
@@ -31,9 +32,9 @@ interface Props {
     onMarcarLista?: (id: number) => void
 }
 
-export function RoomCard({
-                             habitacion, seleccionada, hoy, onClick, onMarcarLista
-                         }: Props) {
+export const RoomCard = memo(function RoomCard({
+                                                     habitacion, seleccionada, hoy, onClick, onMarcarLista
+                                                 }: Props) {
     const cfg = ESTADO_CFG[habitacion.estado] ?? ESTADO_CFG.LIBRE
     const res = habitacion.reservaActiva
 
@@ -152,4 +153,4 @@ export function RoomCard({
             )}
         </div>
     )
-}
+})

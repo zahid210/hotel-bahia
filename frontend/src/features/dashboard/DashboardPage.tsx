@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useDashboard } from './hooks/useDashboard'
 import { RoomCard } from './components/RoomCard'
@@ -14,7 +14,7 @@ interface Props {
     refreshSignal?: number
 }
 
-export function DashboardPage({ onMensaje, refreshSignal = 0 }: Props) {
+export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSignal = 0 }: Props) {
     const {
         habitacionesConReserva,
         stats, HOY, cargando, error, procesando,
@@ -44,14 +44,14 @@ export function DashboardPage({ onMensaje, refreshSignal = 0 }: Props) {
         , [filtradas])
 
     // ── Click en card ─────────────────────────────────────────
-    const handleClickCard = (id: number) => {
+    const handleClickCard = useCallback((id: number) => {
         const hab = habitacionesConReserva.find(h => h.id === id)
         if (!hab?.reservaActiva) return
         setSeleccionadaId(prev => prev === id ? null : id)
-    }
+    }, [habitacionesConReserva])
 
     // ── Marcar lista con feedback ─────────────────────────────
-    const handleMarcarLista = async (habitacionId: number) => {
+    const handleMarcarLista = useCallback(async (habitacionId: number) => {
         try {
             await marcarLista(habitacionId)
             const hab = habitacionesConReserva.find(h => h.id === habitacionId)
@@ -60,27 +60,27 @@ export function DashboardPage({ onMensaje, refreshSignal = 0 }: Props) {
             if (esSesionExpirada(e)) return
             onMensaje(e instanceof Error ? e.message : 'Error al liberar la habitación')
         }
-    }
+    }, [marcarLista, habitacionesConReserva, onMensaje])
 
     // ── Acciones de reserva con feedback ─────────────────────
     // El panel lateral muestra el toast de éxito de cada acción
-    const handleCheckIn = async (reservaId: string) => {
+    const handleCheckIn = useCallback(async (reservaId: string) => {
         await checkIn(reservaId)
-    }
+    }, [checkIn])
 
-    const handleCheckOut = async (reservaId: string) => {
+    const handleCheckOut = useCallback(async (reservaId: string) => {
         const actualizada = await checkOut(reservaId)
         onMensaje(`Check-out · Hab. ${actualizada.habitacionNumero} → Limpieza`)
         setSeleccionadaId(null)
         return actualizada
-    }
+    }, [checkOut, onMensaje])
 
-    const handleCancelar = async (reservaId: string) => {
+    const handleCancelar = useCallback(async (reservaId: string) => {
         const actualizada = await cancelar(reservaId)
         onMensaje(`Reserva cancelada · Hab. ${actualizada.habitacionNumero}`)
         setSeleccionadaId(null)
         return actualizada
-    }
+    }, [cancelar, onMensaje])
 
     // ── Render ────────────────────────────────────────────────
     if (error) return (
@@ -352,4 +352,4 @@ export function DashboardPage({ onMensaje, refreshSignal = 0 }: Props) {
             )}
         </div>
     )
-}
+})
