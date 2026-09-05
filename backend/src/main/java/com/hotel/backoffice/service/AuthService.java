@@ -4,9 +4,10 @@ import com.hotel.backoffice.dto.request.*;
 import com.hotel.backoffice.dto.response.AuthResponseDTO;
 import com.hotel.backoffice.entity.Usuario;
 import com.hotel.backoffice.entity.Usuario.Rol;
-import com.hotel.backoffice.exception.ResourceNotFoundException;
+import com.hotel.backoffice.exception.*;
 import com.hotel.backoffice.repository.UsuarioRepository;
 import com.hotel.backoffice.security.JwtTokenProvider;
+import com.hotel.backoffice.security.LoginRateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
@@ -21,17 +22,27 @@ public class AuthService {
     private final PasswordEncoder     encoder;
     private final JwtTokenProvider    tokenProvider;
     private final AuthenticationManager authManager;
+    private final LoginRateLimiter    rateLimiter;
 
     // ── LOGIN ────────────────────────────────────────────────
     public AuthResponseDTO login(LoginRequestDTO dto) {
+        if (rateLimiter.bloqueado(dto.email())) {
+            throw new ThrottledException(
+                    "Demasiados intentos fallidos. Intente nuevamente en 15 minutos."
+            );
+        }
+
         try {
             // 1. Validar credenciales con Spring Security
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(dto.email(), dto.password())
             );
         } catch (AuthenticationException e) {
+            rateLimiter.registrarFallo(dto.email());
             throw new BadCredentialsException("Email o contraseña incorrectos.");
         }
+
+        rateLimiter.limpiar(dto.email());
 
         // 2. Cargar usuario para armar la respuesta
         Usuario usuario = repo.findByEmail(dto.email())

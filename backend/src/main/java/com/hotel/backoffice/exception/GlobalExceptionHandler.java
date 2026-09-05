@@ -1,11 +1,15 @@
 package com.hotel.backoffice.exception;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,6 +27,12 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("NO_DISPONIBLE", ex.getMessage()));
     }
 
+    @ExceptionHandler(ThrottledException.class)
+    public ResponseEntity<ErrorResponse> handleThrottled(ThrottledException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ErrorResponse("DEMASIADOS_INTENTOS", ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         String mensaje = ex.getBindingResult().getFieldErrors()
@@ -33,8 +43,29 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("VALIDACION_FALLIDA", mensaje));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse("SOLICITUD_INVALIDA", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConflictoDatos(DataIntegrityViolationException ex) {
+        log.warn("Conflicto de datos: {}", ex.getMostSpecificCause().getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("CONFLICTO_DATOS",
+                        "El registro ya existe o viola restricciones de datos."));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNoLegible(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse("JSON_INVALIDO", "Formato de solicitud inválido."));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
+        log.error("Error no controlado", ex);
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse("ERROR_INTERNO", "Contacte al administrador."));
     }
