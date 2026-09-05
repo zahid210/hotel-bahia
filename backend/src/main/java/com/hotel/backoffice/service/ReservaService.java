@@ -30,12 +30,14 @@ public class ReservaService {
     private final HuespedRepository    huespedRepo;
     private final UsuarioRepository    usuarioRepo;
 
+    @Transactional(readOnly = true)
     public List<ReservaResponseDTO> listarTodas() {
         return reservaRepo.findAllByOrderByFechaEntradaDesc()
                 .stream().map(ReservaResponseDTO::from).toList();
     }
 
     // Filtrar por estado desde el controller
+    @Transactional(readOnly = true)
     public List<ReservaResponseDTO> listarPorEstado(String estado) {
         try {
             EstadoReserva estadoEnum = EstadoReserva.valueOf(estado.toUpperCase());
@@ -51,6 +53,7 @@ public class ReservaService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ReservaResponseDTO obtenerPorId(UUID id) {
         return reservaRepo.findById(id)
                 .map(ReservaResponseDTO::from)
@@ -162,7 +165,7 @@ public class ReservaService {
         reserva.setEstado(EstadoReserva.CHECKIN);
         reserva.getHabitacion().setEstado(EstadoHabitacion.OCUPADA);
 
-        return ReservaResponseDTO.from(reservaRepo.save(reserva));
+        return ReservaResponseDTO.from(reserva);
     }
 
     // ── CHECK-OUT: registra timestamp + calcula late checkout ─────
@@ -182,7 +185,7 @@ public class ReservaService {
         reserva.setEstado(EstadoReserva.CHECKOUT);
         reserva.getHabitacion().setEstado(EstadoHabitacion.LIMPIEZA);
 
-        return ReservaResponseDTO.from(reservaRepo.save(reserva));
+        return ReservaResponseDTO.from(reserva);
     }
 
     public ReservaResponseDTO cancelarReserva(UUID id) {
@@ -192,6 +195,6 @@ public class ReservaService {
             reserva.getHabitacion().setEstado(EstadoHabitacion.LIMPIEZA);
         }
         reserva.setEstado(EstadoReserva.CANCELADA);
-        return ReservaResponseDTO.from(reservaRepo.save(reserva));
+        return ReservaResponseDTO.from(reserva);
     }
 }

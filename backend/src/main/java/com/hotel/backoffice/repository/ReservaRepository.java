@@ -2,6 +2,7 @@ package com.hotel.backoffice.repository;
 
 import com.hotel.backoffice.entity.Reserva;
 import com.hotel.backoffice.entity.Reserva.EstadoReserva;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,8 +13,14 @@ import java.util.UUID;
 
 public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
 
+    @Override
+    @EntityGraph(attributePaths = {"habitacion", "huesped"})
+    Optional<Reserva> findById(UUID id);
+
+    @EntityGraph(attributePaths = {"habitacion", "huesped"})
     List<Reserva> findAllByOrderByFechaEntradaDesc();
 
+    @EntityGraph(attributePaths = {"habitacion", "huesped"})
     Optional<Reserva> findByIdAndEstado(UUID id, EstadoReserva estado);
 
     // --- QUERY EXISTENTE: Para evitar solapamiento de fechas ---
@@ -33,6 +40,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
     );
 
     // --- NUEVA QUERY 1: Filtrar por estado (Ej: ver solo las 'CONFIRMADA') ---
+    @EntityGraph(attributePaths = {"habitacion", "huesped"})
     List<Reserva> findByEstadoOrderByFechaEntradaDesc(EstadoReserva estado);
 
     // --- NUEVA QUERY 2: Reservas activas (Uso de JOIN FETCH para optimizar) ---
