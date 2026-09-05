@@ -44,4 +44,32 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
         ORDER BY r.fechaEntrada ASC
     """)
     List<Reserva> findReservasActivas();
+
+    // --- Queries para reportes: filtrar en BD en vez de cargar todo ---
+    @Query("""
+        SELECT r FROM Reserva r
+        JOIN FETCH r.habitacion
+        JOIN FETCH r.huesped
+        WHERE r.estado <> 'CANCELADA'
+          AND r.fechaEntrada <= :fin
+          AND r.fechaSalida  >= :inicio
+        ORDER BY r.fechaEntrada DESC
+    """)
+    List<Reserva> findEnPeriodo(
+            @Param("inicio") LocalDate inicio,
+            @Param("fin")    LocalDate fin
+    );
+
+    long countByEstadoIn(List<EstadoReserva> estados);
+
+    @Query("""
+        SELECT COUNT(r) FROM Reserva r
+        WHERE r.estado = 'CANCELADA'
+          AND r.fechaEntrada <= :fin
+          AND r.fechaSalida  >= :inicio
+    """)
+    long countCanceladasEnPeriodo(
+            @Param("inicio") LocalDate inicio,
+            @Param("fin")    LocalDate fin
+    );
 }

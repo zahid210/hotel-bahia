@@ -1,7 +1,6 @@
 package com.hotel.backoffice.service;
 
 import com.hotel.backoffice.dto.response.ReporteDTO.*;
-import com.hotel.backoffice.entity.Habitacion;
 import com.hotel.backoffice.entity.Reserva;
 import com.hotel.backoffice.entity.Reserva.EstadoReserva;
 import com.hotel.backoffice.repository.HabitacionRepository;
@@ -30,29 +29,22 @@ public class ReporteService {
 
     // ── Reporte completo por rango de fechas ──────────────────
     public ReporteCompleto generarReporte(LocalDate inicio, LocalDate fin) {
-        List<Reserva>    todasReservas = reservaRepo.findAllByOrderByFechaEntradaDesc();
-        List<Habitacion> habitaciones  = habitacionRepo.findAllByOrderByNumeroAsc();
-        int              totalHabs     = habitaciones.size();
-
-        // Filtra reservas que se solapan con el período solicitado
-        List<Reserva> enPeriodo = todasReservas.stream()
-                .filter(r -> !r.getEstado().equals(EstadoReserva.CANCELADA))
-                .filter(r ->
-                        !r.getFechaEntrada().isAfter(fin) &&
-                                !r.getFechaSalida().isBefore(inicio)
-                )
-                .toList();
+        List<Reserva> enPeriodo   = reservaRepo.findEnPeriodo(inicio, fin);
+        int           totalHabs   = (int) habitacionRepo.count();
 
         // Solo checkouts para cálculo de ingresos reales
-        List<Reserva> facturadas = enPeriodo.stream()
+        List<Reserva> facturadas  = enPeriodo.stream()
                 .filter(r -> r.getEstado().equals(EstadoReserva.CHECKOUT))
                 .toList();
 
         return new ReporteCompleto(
                 inicio.format(FMT),
                 fin.format(FMT),
-                calcularResumen(todasReservas, facturadas, enPeriodo,
-                        totalHabs, inicio, fin),
+                calcularResumen(
+                        (int) reservaRepo.countByEstadoIn(
+                                List.of(EstadoReserva.CHECKIN, EstadoReserva.CONFIRMADA)),
+                        (int) reservaRepo.countCanceladasEnPeriodo(inicio, fin),
+                        facturadas, enPeriodo, totalHabs, inicio, fin),
                 calcularOcupacionPorDia(enPeriodo, totalHabs, inicio, fin),
                 calcularRendimientoPorTipo(facturadas),
                 calcularTopHabitaciones(facturadas),
@@ -62,23 +54,13 @@ public class ReporteService {
 
     // ── Resumen del período ───────────────────────────────────
     private ResumenPeriodo calcularResumen(
-            List<Reserva> todas,
+            int reservasActivas,
+            int cancelaciones,
             List<Reserva> facturadas,
             List<Reserva> enPeriodo,
             int totalHabs,
             LocalDate inicio,
             LocalDate fin) {
-
-        int reservasActivas = (int) todas.stream()
-                .filter(r -> r.getEstado() == EstadoReserva.CHECKIN
-                        || r.getEstado() == EstadoReserva.CONFIRMADA)
-                .count();
-
-        int cancelaciones = (int) todas.stream()
-                .filter(r -> r.getEstado() == EstadoReserva.CANCELADA)
-                .filter(r -> !r.getFechaEntrada().isAfter(fin)
-                        && !r.getFechaEntrada().isBefore(inicio))
-                .count();
 
         BigDecimal ingresoTotal = facturadas.stream()
                 .map(Reserva::calcularTotalEstancia)
