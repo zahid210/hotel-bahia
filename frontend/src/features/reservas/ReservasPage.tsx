@@ -1,4 +1,5 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
+import { formatFecha } from '@/lib/format'
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
 import { reservaService, Reserva } from '@/services/reservaService'
 
@@ -15,13 +16,6 @@ type FiltroTab = 'TODAS' | 'ACTIVAS' | 'HISTORIAL'
 const calcNoches = (e: string, s: string) =>
     Math.round((new Date(s + 'T00:00:00').getTime()
         - new Date(e + 'T00:00:00').getTime()) / 86_400_000)
-
-const formatFecha = (d: string) => {
-    const [y, m, day] = d.split('-').map(Number)
-    return new Date(y, m - 1, day).toLocaleDateString('es-PE', {
-        day: '2-digit', month: 'short', year: 'numeric',
-    })
-}
 
 interface Props {
     onNuevaReserva: () => void

@@ -1,14 +1,9 @@
 import {useState} from 'react'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
+import { formatFecha } from '@/lib/format'
 import {Reserva} from '@/services/reservaService'
 
 // ── Helpers de formato ────────────────────────────────────────
-const formatFecha = (d: string) => {
-    const [y, m, day] = d.split('-').map(Number)
-    return new Date(y, m - 1, day).toLocaleDateString('es-PE', {
-        weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
-    })
-}
 
 const formatHora = (isoDateTime: string | null | undefined): string => {
     if (!isoDateTime) return '—'

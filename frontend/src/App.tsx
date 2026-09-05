@@ -1,10 +1,13 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, lazy, Suspense } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { PrivateRoute } from '@/components/PrivateRoute'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { ReservasPage } from '@/features/reservas/ReservasPage'
-import { ReportesPage } from '@/features/reportes/ReportesPage'
 import { NuevaReservaForm } from '@/features/reservas/NuevaReservaForm'
+
+const ReportesPage = lazy(() =>
+    import('@/features/reportes/ReportesPage').then(m => ({ default: m.ReportesPage }))
+)
 
 type Pagina = 'dashboard' | 'reservas' | 'reportes'
 
@@ -155,7 +158,17 @@ export default function App() {
                       onMensaje={mostrarMensaje}
                   />
               )}
-              {pagina === 'reportes' && <ReportesPage />}
+              {pagina === 'reportes' && (
+                  <Suspense fallback={
+                      <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
+                        <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
+                                         rounded-full animate-spin" />
+                        Cargando reportes...
+                      </div>
+                  }>
+                    <ReportesPage />
+                  </Suspense>
+              )}
             </div>
           </main>
 
