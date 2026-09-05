@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: hotel-bahia-db
+    restart: unless-stopped
+    # Puerto 5433 en el host (el 5432 del sistema puede estar ocupado
+    # por un PostgreSQL local). Si usas este contenedor, apunta
+    # application-local.yml a jdbc:postgresql://localhost:5433/hotel_bahia
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: hotel_bahia
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel_bahia
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel -d hotel_bahia"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

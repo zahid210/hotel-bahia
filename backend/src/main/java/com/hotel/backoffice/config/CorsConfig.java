@@ -20,8 +20,8 @@ public class CorsConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
                 "http://localhost:4173",
-                frontendUrl,
-                "https://*.vercel.app"
+                "http://localhost:3000",
+                frontendUrl
         ));
 
         config.setAllowedMethods(List.of(

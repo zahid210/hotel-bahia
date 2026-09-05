@@ -4,9 +4,9 @@ node_modules/
 # Build
 dist/
 
-# Entornos — .env.production SÍ se puede subir (no tiene secretos)
-# pero .env.local NUNCA
+# Entornos — archivos .env.* locales NUNCA se suben
 .env.local
+.env.development
 .env.development.local
 .env.test.local
 
