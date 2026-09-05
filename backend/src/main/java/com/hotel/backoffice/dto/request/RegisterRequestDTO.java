@@ -13,5 +13,7 @@ public record RegisterRequestDTO(
         @Size(min = 6, message = "Mínimo 6 caracteres")
         String password,
 
+        @Pattern(regexp = "ADMIN|RECEPCIONISTA", flags = Pattern.Flag.CASE_INSENSITIVE,
+                 message = "El rol debe ser ADMIN o RECEPCIONISTA")
         String rol   // ADMIN o RECEPCIONISTA (opcional, default RECEPCIONISTA)
 ) {}

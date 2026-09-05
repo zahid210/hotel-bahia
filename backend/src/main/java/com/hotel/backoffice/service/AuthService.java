@@ -48,10 +48,6 @@ public class AuthService {
         Usuario usuario = repo.findByEmail(dto.email())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        if (!usuario.getActivo()) {
-            throw new BadCredentialsException("Cuenta desactivada. Contacte al administrador.");
-        }
-
         // 3. Generar token JWT
         String token = tokenProvider.generarToken(
                 usuario.getEmail(),

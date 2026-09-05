@@ -5,9 +5,9 @@ import com.hotel.backoffice.dto.response.AuthResponseDTO;
 import com.hotel.backoffice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,31 +18,19 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO dto) {
-        try {
-            return ResponseEntity.ok(authService.login(dto));
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorBody(e.getMessage()));
-        }
+    public AuthResponseDTO login(@Valid @RequestBody LoginRequestDTO dto) {
+        return authService.login(dto);
     }
 
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO dto) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(authService.register(dto));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorBody(e.getMessage()));
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponseDTO register(@Valid @RequestBody RegisterRequestDTO dto) {
+        return authService.register(dto);
     }
 
     @GetMapping("/me")
     public ResponseEntity<String> me() {
         return ResponseEntity.ok("Token válido ✓");
     }
-
-    private record ErrorBody(String mensaje) {}
 }
