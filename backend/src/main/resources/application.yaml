@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: local
-
   datasource:
     url:      ${DATABASE_URL:jdbc:mariadb://localhost:3306/hotel_bahia}
     username: ${DATABASE_USERNAME:hotel}
@@ -31,6 +28,6 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:local-dev-secret-key-for-hotel-bahia-not-for-production-use-only-32chars!!}
+    secret: ${JWT_SECRET:}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   timezone: America/Lima

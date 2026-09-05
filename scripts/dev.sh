@@ -45,7 +45,7 @@ run_backend() {
     fi
     export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
     echo "▶ Backend en http://localhost:8080  (perfil local)"
-    cd "$BACKEND" && ./mvnw -q spring-boot:run
+    cd "$BACKEND" && ./mvnw -q spring-boot:run -Dspring-boot.run.profiles=local
 }
 
 run_frontend() {
