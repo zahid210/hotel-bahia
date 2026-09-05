@@ -173,6 +173,7 @@ export function ReportesPage() {
                         <input
                             type="date" value={fechaIni}
                             onChange={e => setFechaIni(e.target.value)}
+                            aria-label="Fecha inicio del reporte"
                             className="px-2 py-1.5 border border-gray-200 rounded-md text-xs
                          bg-gray-50 focus:outline-none focus:border-gray-900"
                         />
@@ -180,6 +181,7 @@ export function ReportesPage() {
                         <input
                             type="date" value={fechaFin}
                             onChange={e => setFechaFin(e.target.value)}
+                            aria-label="Fecha fin del reporte"
                             className="px-2 py-1.5 border border-gray-200 rounded-md text-xs
                          bg-gray-50 focus:outline-none focus:border-gray-900"
                         />
@@ -197,6 +199,8 @@ export function ReportesPage() {
                 <button
                     onClick={() => cargar(periodo, fechaIni, fechaFin)}
                     disabled={cargando}
+                    aria-label="Actualizar reporte"
+                    title="Actualizar reporte"
                     className="ml-auto px-3 py-1.5 border border-gray-200 rounded-lg
                      text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-40"
                 >

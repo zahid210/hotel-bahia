@@ -138,6 +138,8 @@ export default function App() {
                     className="lg:hidden text-gray-500 hover:text-gray-900
                            text-lg leading-none"
                     onClick={() => setSidebarAbierto(!sidebarAbierto)}
+                    aria-label={sidebarAbierto ? 'Cerrar menú' : 'Abrir menú'}
+                    aria-expanded={sidebarAbierto}
                 >
                   ☰
                 </button>
@@ -182,6 +184,9 @@ export default function App() {
               <div
                   className="fixed inset-0 bg-black/40 z-50 flex items-center
                        justify-center p-4"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Nueva reserva"
                   onClick={e => e.target === e.currentTarget && setModalAbierto(false)}
               >
                 <div className="bg-white rounded-xl border border-gray-100
@@ -191,6 +196,7 @@ export default function App() {
                     <h2 className="text-sm font-semibold">Nueva reserva</h2>
                     <button
                         onClick={() => setModalAbierto(false)}
+                        aria-label="Cerrar"
                         className="text-gray-400 hover:text-gray-700
                              text-lg leading-none"
                     >✕</button>

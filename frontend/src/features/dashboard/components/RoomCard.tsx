@@ -49,6 +49,8 @@ export const RoomCard = memo(function RoomCard({
         !habitacion.excedida    // ← "sale hoy" solo si no está ya excedida
 
     const esClickable = !!res
+    const esAccionLista =
+        habitacion.estado === 'LIMPIEZA' && !res && !!onMarcarLista
 
     // ── Config visual según si está excedida ─────────────────
     // Excedida usa ámbar para diferenciarse del rojo de "ocupada normal"
@@ -57,28 +59,27 @@ export const RoomCard = memo(function RoomCard({
     const textFinal   = habitacion.excedida ? 'text-amber-700'  : cfg.text
     const labelFinal  = habitacion.excedida ? 'Excedida'        : cfg.label
 
-    return (
-        <div
-            onClick={esClickable ? onClick : undefined}
-            className={[
-                'relative rounded-lg border p-3 transition-all duration-150 select-none',
-                bgFinal,
-                // Borde por prioridad: seleccionada > excedida > urgente > normal
-                seleccionada
-                    ? 'border-gray-900 ring-2 ring-gray-900 ring-offset-1 shadow-sm'
-                    : habitacion.excedida
-                        ? 'border-amber-400 ring-1 ring-amber-300'
-                        : saleHoy
-                            ? 'border-orange-400 ring-1 ring-orange-300'
-                            : pendienteCheckIn
-                                ? 'border-violet-400 ring-1 ring-violet-300'
-                                : cfg.border,
-                esClickable
-                    ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-sm'
-                    : 'cursor-default',
-            ].join(' ')}
-        >
-            {/* ── Franja superior según estado ─────────────────────── */}
+    const estilos = [
+        'relative rounded-lg border p-3 transition-all duration-150 select-none text-left',
+        bgFinal,
+        // Borde por prioridad: seleccionada > excedida > urgente > normal
+        seleccionada
+            ? 'border-gray-900 ring-2 ring-gray-900 ring-offset-1 shadow-sm'
+            : habitacion.excedida
+                ? 'border-amber-400 ring-1 ring-amber-300'
+                : saleHoy
+                    ? 'border-orange-400 ring-1 ring-orange-300'
+                    : pendienteCheckIn
+                        ? 'border-violet-400 ring-1 ring-violet-300'
+                        : cfg.border,
+        esClickable
+            ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-sm'
+            : 'cursor-default',
+    ].join(' ')
+
+    const contenido = (
+        <>
+        {/* ── Franja superior según estado ─────────────────────── */}
             {habitacion.excedida && (
                 <div className="absolute top-0 inset-x-0 h-1
                         bg-amber-400 rounded-t-lg" />
@@ -141,9 +142,9 @@ export const RoomCard = memo(function RoomCard({
             )}
 
             {/* ── Botón lista en limpieza ───────────────────────────── */}
-            {habitacion.estado === 'LIMPIEZA' && !res && onMarcarLista && (
+            {esAccionLista && (
                 <button
-                    onClick={e => { e.stopPropagation(); onMarcarLista(habitacion.id) }}
+                    onClick={() => onMarcarLista(habitacion.id)}
                     className="mt-2.5 w-full py-1.5 text-xs font-medium text-blue-600
                      border border-blue-200 rounded-md bg-white
                      hover:bg-blue-50 active:scale-95 transition-all"
@@ -151,6 +152,22 @@ export const RoomCard = memo(function RoomCard({
                     ✓ Lista
                 </button>
             )}
-        </div>
+        </>
+    )
+
+    if (esAccionLista) {
+        return <div className={estilos}>{contenido}</div>
+    }
+
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={!esClickable}
+            aria-label={`Habitación ${habitacion.numero} ${labelFinal}`}
+            className={estilos}
+        >
+            {contenido}
+        </button>
     )
 })

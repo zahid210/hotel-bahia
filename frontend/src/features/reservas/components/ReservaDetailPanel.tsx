@@ -145,6 +145,7 @@ export function ReservaDetailPanel({
                 {/* Botón cerrar — más grande en móvil para facilitar el toque */}
                 <button
                     onClick={onClose}
+                    aria-label="Cerrar panel"
                     className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center
                rounded-md border border-gray-200 text-gray-400
                hover:text-gray-700 hover:bg-gray-50 text-sm

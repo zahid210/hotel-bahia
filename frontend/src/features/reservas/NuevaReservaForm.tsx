@@ -89,8 +89,9 @@ export function NuevaReservaForm({ onSuccess }: Props) {
 
             {/* ── Habitación ─────────────────────────────────────── */}
             <div>
-                <label className={lbl}>Habitación *</label>
+                <label htmlFor="habitacionId" className={lbl}>Habitación *</label>
                 <select
+                    id="habitacionId"
                     {...register('habitacionId', { required: 'Selecciona una habitación' })}
                     className={campo}
                 >
@@ -124,8 +125,9 @@ export function NuevaReservaForm({ onSuccess }: Props) {
             {/* ── Nombre + Apellido ──────────────────────────────── */}
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className={lbl}>Nombre *</label>
+                    <label htmlFor="nombreHuesped" className={lbl}>Nombre *</label>
                     <input
+                        id="nombreHuesped"
                         {...register('nombreHuesped', { required: 'Obligatorio' })}
                         className={campo} placeholder="María"
                     />
@@ -134,8 +136,9 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                     )}
                 </div>
                 <div>
-                    <label className={lbl}>Apellido *</label>
+                    <label htmlFor="apellidoHuesped" className={lbl}>Apellido *</label>
                     <input
+                        id="apellidoHuesped"
                         {...register('apellidoHuesped', { required: 'Obligatorio' })}
                         className={campo} placeholder="García"
                     />
@@ -148,16 +151,20 @@ export function NuevaReservaForm({ onSuccess }: Props) {
             {/* ── Documento ──────────────────────────────────────── */}
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className={lbl}>Tipo doc.</label>
-                    <select {...register('tipoDocumento')} className={campo}>
+                    <label htmlFor="tipoDocumento" className={lbl}>Tipo doc.</label>
+                    <select id="tipoDocumento" {...register('tipoDocumento')} className={campo}>
                         <option value="DNI">DNI</option>
                         <option value="PASAPORTE">Pasaporte</option>
                         <option value="CE">CE</option>
                     </select>
+                    {errors.tipoDocumento && (
+                        <p className={err}>{errors.tipoDocumento.message}</p>
+                    )}
                 </div>
                 <div>
-                    <label className={lbl}>N° Documento *</label>
+                    <label htmlFor="nroDocumento" className={lbl}>N° Documento *</label>
                     <input
+                        id="nroDocumento"
                         {...register('nroDocumento', { required: 'Obligatorio' })}
                         className={campo} placeholder="12345678"
                     />
@@ -170,8 +177,9 @@ export function NuevaReservaForm({ onSuccess }: Props) {
             {/* ── Fecha entrada + hora de entrada ────────────────── */}
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className={lbl}>Fecha entrada *</label>
+                    <label htmlFor="fechaEntrada" className={lbl}>Fecha entrada *</label>
                     <input
+                        id="fechaEntrada"
                         type="date"
                         {...register('fechaEntrada', { required: 'Obligatorio' })}
                         className={campo}
@@ -181,10 +189,10 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                     )}
                 </div>
                 <div>
-                    <label className={lbl}>
+                    <label htmlFor="horaEntradaAcordada" className={lbl}>
                         Hora entrada
                     </label>
-                    <select {...register('horaEntradaAcordada')} className={campo}>
+                    <select id="horaEntradaAcordada" {...register('horaEntradaAcordada')} className={campo}>
                         {HORAS.map(h => (
                             <option key={h} value={h}>{h}</option>
                         ))}
@@ -195,8 +203,9 @@ export function NuevaReservaForm({ onSuccess }: Props) {
             {/* ── Fecha salida + hora límite ──────────────────────── */}
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className={lbl}>Fecha salida *</label>
+                    <label htmlFor="fechaSalida" className={lbl}>Fecha salida *</label>
                     <input
+                        id="fechaSalida"
                         type="date"
                         {...register('fechaSalida', { required: 'Obligatorio' })}
                         className={campo}
@@ -206,10 +215,10 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                     )}
                 </div>
                 <div>
-                    <label className={lbl}>
+                    <label htmlFor="horaSalidaAcordada" className={lbl}>
                         Hora salida límite
                     </label>
-                    <select {...register('horaSalidaAcordada')} className={campo}>
+                    <select id="horaSalidaAcordada" {...register('horaSalidaAcordada')} className={campo}>
                         {HORAS.map(h => (
                             <option key={h} value={h}>{h}</option>
                         ))}
@@ -230,8 +239,8 @@ export function NuevaReservaForm({ onSuccess }: Props) {
 
             {/* ── N° huéspedes ───────────────────────────────────── */}
             <div className="w-1/2">
-                <label className={lbl}>N° huéspedes</label>
-                <select {...register('numHuespedes')} className={campo}>
+                <label htmlFor="numHuespedes" className={lbl}>N° huéspedes</label>
+                <select id="numHuespedes" {...register('numHuespedes')} className={campo}>
                     {[1, 2, 3, 4, 5, 6].map(n => (
                         <option key={n} value={n}>{n}</option>
                     ))}
@@ -240,8 +249,9 @@ export function NuevaReservaForm({ onSuccess }: Props) {
 
             {/* ── Notas ──────────────────────────────────────────── */}
             <div>
-                <label className={lbl}>Notas</label>
+                <label htmlFor="notas" className={lbl}>Notas</label>
                 <textarea
+                    id="notas"
                     {...register('notas')}
                     rows={2}
                     className={campo}

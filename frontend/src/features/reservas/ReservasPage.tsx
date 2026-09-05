@@ -137,6 +137,7 @@ export const ReservasPage = memo(function ReservasPage({
                     value={busqueda}
                     onChange={e => setBusqueda(e.target.value)}
                     placeholder="Buscar por huésped, habitación, documento..."
+                    aria-label="Buscar reservas"
                     className="flex-1 min-w-40 px-3 py-1.5 border border-gray-200 rounded-lg
                      text-xs bg-gray-50 focus:outline-none focus:border-gray-400
                      focus:bg-white placeholder:text-gray-300 transition-colors"
@@ -146,6 +147,8 @@ export const ReservasPage = memo(function ReservasPage({
                     onClick={() => {
                         cargar().then(() => onMensaje('Listado de reservas actualizado'))
                     }}
+                    aria-label="Actualizar listado"
+                    title="Actualizar listado"
                     className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
      text-gray-500 hover:bg-gray-50 transition-colors"
                 >↻</button>

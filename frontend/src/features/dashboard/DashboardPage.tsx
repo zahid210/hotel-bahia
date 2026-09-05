@@ -118,13 +118,24 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                         return (
                             <div
                                 key={i}
+                                role={s.filtro ? 'button' : undefined}
+                                tabIndex={s.filtro ? 0 : undefined}
                                 onClick={() => s.filtro && setFiltro(
                                     filtro === s.filtro ? 'TODAS' : s.filtro as Filtro
                                 )}
+                                onKeyDown={s.filtro
+                                    ? (e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault()
+                                            setFiltro(filtro === s.filtro ? 'TODAS' : s.filtro as Filtro)
+                                        }
+                                    }
+                                    : undefined}
                                 className={[
                                     'p-3 transition-colors',
                                     i < arr.length - 1 ? 'border-r border-gray-100' : '',
                                     s.filtro ? 'cursor-pointer' : '',
+                                    s.filtro ? 'focus-visible:outline-2 focus-visible:outline-gray-900' : '',
                                     activo ? 'bg-gray-900' : s.filtro ? 'bg-gray-50 hover:bg-gray-100' : 'bg-gray-50',
                                 ].join(' ')}
                             >
@@ -183,6 +194,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                             onClick={cargar}
                             disabled={cargando}
                             title="Actualizar todo"
+                            aria-label="Actualizar todo"
                             className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
                          text-gray-500 hover:bg-gray-50 disabled:opacity-40
                          transition-colors flex items-center justify-center min-w-[32px]"
@@ -329,6 +341,9 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 <div
                     className="fixed inset-0 bg-black/40 z-50 flex items-center
                      justify-center p-4"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Nueva reserva"
                     onClick={e => e.target === e.currentTarget && setModalAbierto(false)}
                 >
                     <div className="bg-white rounded-xl border border-gray-100 w-full
@@ -337,6 +352,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                             <h2 className="text-sm font-semibold">Nueva reserva</h2>
                             <button
                                 onClick={() => setModalAbierto(false)}
+                                aria-label="Cerrar"
                                 className="text-gray-400 hover:text-gray-700 text-lg leading-none"
                             >✕</button>
                         </div>
