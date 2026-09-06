@@ -65,7 +65,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
     // ── Acciones de reserva con feedback ─────────────────────
     // El panel lateral muestra el toast de éxito de cada acción
     const handleCheckIn = useCallback(async (reservaId: string) => {
-        await checkIn(reservaId)
+        return await checkIn(reservaId)
     }, [checkIn])
 
     const handleCheckOut = useCallback(async (reservaId: string) => {

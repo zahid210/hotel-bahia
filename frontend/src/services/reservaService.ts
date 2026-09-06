@@ -53,12 +53,6 @@ export const reservaService = {
     listarTodas: () =>
         api.get<Reserva[]>('/reservas').then(r => r.data),
 
-    listarPorEstado: (estado: string) =>
-        api.get<Reserva[]>(`/reservas?estado=${estado}`).then(r => r.data),
-
-    obtener: (id: string) =>
-        api.get<Reserva>(`/reservas/${id}`).then(r => r.data),
-
     crear: (data: NuevaReservaForm) =>
         api.post<Reserva>('/reservas', data).then(r => r.data),
 

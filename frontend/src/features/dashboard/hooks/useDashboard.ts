@@ -28,9 +28,6 @@ export function useDashboard(refreshSignal = 0) {
     const [HOY, setHOY] = useState<string>(
         () => new Date().toISOString().split('T')[0]
     )
-    const [horaServidor, setHoraServidor] = useState<number>(
-        () => new Date().getHours()
-    )
 
     // ── Carga paralela: habitaciones + reservas + tiempo ─────
     const cargar = useCallback(async () => {
@@ -45,7 +42,6 @@ export function useDashboard(refreshSignal = 0) {
             setHabitaciones(habs)
             setReservas(revs)
             setHOY(tiempo.fecha)
-            setHoraServidor(tiempo.hora)
         } catch (e: unknown) {
             // Si es sesión expirada, no mostrar error:
             // PrivateRoute ya reacciona al logout() del interceptor
@@ -82,7 +78,6 @@ export function useDashboard(refreshSignal = 0) {
         libre:          habitaciones.filter(h => h.estado === 'LIBRE').length,
         ocupada:        habitaciones.filter(h => h.estado === 'OCUPADA').length,
         limpieza:       habitaciones.filter(h => h.estado === 'LIMPIEZA').length,
-        mantenimiento:  habitaciones.filter(h => h.estado === 'MANTENIMIENTO').length,
         entradasHoy:    reservas.filter(r =>
             r.estado === 'CONFIRMADA' && r.fechaEntrada === HOY   // ← HOY del server
         ).length,
@@ -161,7 +156,6 @@ export function useDashboard(refreshSignal = 0) {
         habitacionesConReserva,
         stats,
         HOY,                   // ← expuesto para que RoomCard lo use
-        horaServidor,          // ← expuesto para el panel de detalle
         cargando, error, procesando,
         cargar,
         checkIn, checkOut, cancelar,

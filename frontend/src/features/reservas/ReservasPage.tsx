@@ -1,21 +1,10 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
-import { formatFecha } from '@/lib/format'
+import { formatFecha, diffNoches, capitalizar } from '@/lib/format'
+import { ESTADO_CFG } from '@/lib/estadoReserva'
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
 import { reservaService, Reserva } from '@/services/reservaService'
 
-const ESTADO_CFG = {
-    PENDIENTE:  { label: 'Pendiente',  cls: 'bg-purple-50 text-purple-700 border-purple-200' },
-    CONFIRMADA: { label: 'Confirmada', cls: 'bg-violet-50 text-violet-700 border-violet-200' },
-    CHECKIN:    { label: 'En hotel',   cls: 'bg-red-50    text-red-700    border-red-200'    },
-    CHECKOUT:   { label: 'Check-out',  cls: 'bg-gray-50   text-gray-500   border-gray-200'   },
-    CANCELADA:  { label: 'Cancelada',  cls: 'bg-gray-50   text-gray-400   border-gray-200'   },
-} as const
-
 type FiltroTab = 'TODAS' | 'ACTIVAS' | 'HISTORIAL'
-
-const calcNoches = (e: string, s: string) =>
-    Math.round((new Date(s + 'T00:00:00').getTime()
-        - new Date(e + 'T00:00:00').getTime()) / 86_400_000)
 
 interface Props {
     onNuevaReserva: () => void
@@ -194,7 +183,7 @@ export const ReservasPage = memo(function ReservasPage({
                         </thead>
                         <tbody>
                         {filtradas.map((r, idx) => {
-                            const noches = calcNoches(r.fechaEntrada, r.fechaSalida)
+                            const noches = diffNoches(r.fechaEntrada, r.fechaSalida)
                             const total  = noches * r.precioNoche
                             const cfg    = ESTADO_CFG[r.estado] ?? ESTADO_CFG.CONFIRMADA
 
@@ -212,8 +201,7 @@ export const ReservasPage = memo(function ReservasPage({
                       </span>
                                     </td>
                                     <td className="px-3 py-3 text-xs text-gray-400 capitalize">
-                                        {r.tipoHabitacion.charAt(0) +
-                                            r.tipoHabitacion.slice(1).toLowerCase()}
+                                        {capitalizar(r.tipoHabitacion)}
                                     </td>
                                     <td className="px-3 py-3 text-xs font-medium whitespace-nowrap">
                                         {r.nombreHuesped} {r.apellidoHuesped}

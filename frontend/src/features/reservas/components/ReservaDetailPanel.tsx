@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
-import { formatFecha } from '@/lib/format'
+import { formatFecha, formatSoles, capitalizar } from '@/lib/format'
+import { ESTADO_CFG } from '@/lib/estadoReserva'
 import {Reserva} from '@/services/reservaService'
 
 // ── Helpers de formato ────────────────────────────────────────
@@ -23,18 +24,6 @@ const formatLocalTime = (t: string | null | undefined): string => {
     if (partes.length < 2) return '—'
     return `${partes[0]}:${partes[1]}`
 }
-
-const formatSoles = (n: number | string) =>
-    `S/ ${Number(n).toLocaleString('es-PE', {minimumFractionDigits: 2})}`
-
-// ── Config de estados ─────────────────────────────────────────
-const ESTADO_CFG = {
-    PENDIENTE: {label: 'Pendiente', cls: 'bg-purple-50 text-purple-700 border-purple-200'},
-    CONFIRMADA: {label: 'Confirmada', cls: 'bg-violet-50 text-violet-700 border-violet-200'},
-    CHECKIN: {label: 'En hotel', cls: 'bg-red-50    text-red-700    border-red-200'},
-    CHECKOUT: {label: 'Check-out', cls: 'bg-gray-50   text-gray-500   border-gray-200'},
-    CANCELADA: {label: 'Cancelada', cls: 'bg-gray-50   text-gray-400   border-gray-200'},
-} as const
 
 // ── Subcomponente: fila de datos ──────────────────────────────
 const Campo = ({
@@ -138,8 +127,7 @@ export function ReservaDetailPanel({
                         Hab. {reserva.habitacionNumero}
                     </div>
                     <div className="text-xs text-gray-400 mt-0.5 capitalize">
-                        {reserva.tipoHabitacion.charAt(0) +
-                            reserva.tipoHabitacion.slice(1).toLowerCase()}
+                        {capitalizar(reserva.tipoHabitacion)}
                     </div>
                 </div>
                 {/* Botón cerrar — más grande en móvil para facilitar el toque */}

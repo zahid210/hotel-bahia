@@ -7,3 +7,13 @@ export const formatFecha = (d: string, conDia = false) => {
         year: 'numeric',
     })
 }
+
+export const formatSoles = (n: number | string) =>
+    `S/ ${Number(n).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`
+
+export const capitalizar = (s: string) =>
+    s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
+
+export const diffNoches = (e: string, s: string) =>
+    Math.round((new Date(s + 'T00:00:00').getTime()
+        - new Date(e + 'T00:00:00').getTime()) / 86_400_000)

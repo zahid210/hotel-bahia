@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { capitalizar } from '@/lib/format'
 import { HabitacionConReserva } from '../hooks/useDashboard'
 
 const ESTADO_CFG = {
@@ -106,7 +107,7 @@ export const RoomCard = memo(function RoomCard({
 
             {/* ── Tipo + precio ─────────────────────────────────────── */}
             <div className="text-xs text-gray-400 mt-0.5 leading-none truncate">
-                {habitacion.tipo.charAt(0) + habitacion.tipo.slice(1).toLowerCase()}
+                {capitalizar(habitacion.tipo)}
                 {' · '}S/{habitacion.precioNoche}
             </div>
 
