@@ -39,6 +39,6 @@ public class Usuario {
     }
 
     public enum Rol {
-        ADMIN, RECEPCIONISTA
+        ADMIN, RECEPCIONISTA, LIMPIEZA
     }
 }

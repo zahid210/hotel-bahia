@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/habitaciones")
-@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
+@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA', 'LIMPIEZA')")
 @RequiredArgsConstructor
 public class HabitacionController {
 

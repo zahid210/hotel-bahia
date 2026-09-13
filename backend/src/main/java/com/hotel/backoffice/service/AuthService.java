@@ -14,6 +14,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -65,8 +67,18 @@ public class AuthService {
             throw new IllegalArgumentException("El email ya está registrado.");
         }
 
-        Rol rol = (dto.rol() != null && dto.rol().equalsIgnoreCase("ADMIN"))
-                ? Rol.ADMIN : Rol.RECEPCIONISTA;
+        Rol rol;
+        if (dto.rol() == null || dto.rol().isBlank()) {
+            rol = Rol.RECEPCIONISTA;
+        } else {
+            try {
+                rol = Rol.valueOf(dto.rol().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                        "Rol inválido: debe ser ADMIN, RECEPCIONISTA o LIMPIEZA."
+                );
+            }
+        }
 
         Usuario nuevo = Usuario.builder()
                 .nombre(dto.nombre())
