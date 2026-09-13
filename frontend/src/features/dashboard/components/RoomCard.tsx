@@ -29,7 +29,7 @@ interface Props {
     habitacion:     HabitacionConReserva
     seleccionada:   boolean
     hoy:            string
-    onClick:        () => void
+    onClick:        (id: number) => void
     onMarcarLista?: (id: number) => void
 }
 
@@ -163,7 +163,7 @@ export const RoomCard = memo(function RoomCard({
     return (
         <button
             type="button"
-            onClick={onClick}
+            onClick={() => onClick(habitacion.id)}
             disabled={!esClickable}
             aria-label={`Habitación ${habitacion.numero} ${labelFinal}`}
             className={estilos}

@@ -4,6 +4,7 @@ import { useDashboard } from './hooks/useDashboard'
 import { RoomCard } from './components/RoomCard'
 import { ReservaDetailPanel } from '@/features/reservas/components/ReservaDetailPanel'
 import { NuevaReservaForm } from '@/features/reservas/NuevaReservaForm'
+import { Modal } from '@/components/Modal'
 
 type Filtro = 'TODAS' | 'LIBRE' | 'OCUPADA' | 'LIMPIEZA' | 'EXCEDIDAS'
 
@@ -114,11 +115,12 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                         { label: 'Entradas hoy',  value: stats.entradasHoy,    color: 'text-violet-600', filtro: null             },
                         { label: 'Salidas hoy',   value: stats.salidasHoy,     color: 'text-orange-600', filtro: null             },
                     ].map((s, i, arr) => {
-                        const activo = s.filtro && filtro === s.filtro
+                        const activo = !!s.filtro && filtro === s.filtro
                         return (
                             <div
                                 key={i}
                                 role={s.filtro ? 'button' : undefined}
+                                aria-pressed={s.filtro ? activo : undefined}
                                 tabIndex={s.filtro ? 0 : undefined}
                                 onClick={() => s.filtro && setFiltro(
                                     filtro === s.filtro ? 'TODAS' : s.filtro as Filtro
@@ -266,7 +268,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                                                 habitacion={hab}
                                                 seleccionada={seleccionadaId === hab.id}
                                                 hoy={HOY}
-                                                onClick={() => handleClickCard(hab.id)}
+                                                onClick={handleClickCard}
                                                 onMarcarLista={handleMarcarLista}
                                             />
                                         ))}
@@ -309,7 +311,10 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                     <div className="lg:hidden fixed inset-x-0 bottom-0 z-50
                     bg-white rounded-t-2xl border-t border-gray-200
                     shadow-2xl max-h-[85vh] overflow-y-auto
-                    animate-[slideUp_0.25s_ease]">
+                    animate-[slideUp_0.25s_ease]"
+                         role="dialog"
+                         aria-modal="true"
+                         aria-label={`Detalle de la reserva en habitación ${seleccionada.reservaActiva.habitacionNumero}`}>
                         {/* Handle visual — indica que se puede arrastrar */}
                         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
                             <div className="w-10 h-1 bg-gray-200 rounded-full" />
@@ -334,38 +339,20 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 </>
             )}
 
-            {/* ════════════════════════════════════════════════════
-          MODAL NUEVA RESERVA
-      ════════════════════════════════════════════════════ */}
-            {modalAbierto && (
-                <div
-                    className="fixed inset-0 bg-black/40 z-50 flex items-center
-                     justify-center p-4"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Nueva reserva"
-                    onClick={e => e.target === e.currentTarget && setModalAbierto(false)}
-                >
-                    <div className="bg-white rounded-xl border border-gray-100 w-full
-                          max-w-md p-6 max-h-[90vh] overflow-y-auto shadow-xl">
-                        <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-sm font-semibold">Nueva reserva</h2>
-                            <button
-                                onClick={() => setModalAbierto(false)}
-                                aria-label="Cerrar"
-                                className="text-gray-400 hover:text-gray-700 text-lg leading-none"
-                            >✕</button>
-                        </div>
-                        <NuevaReservaForm
-                            onSuccess={() => {
-                                setModalAbierto(false)
-                                onMensaje('Reserva confirmada correctamente')
-                                void onReservaCreada()
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
+            {/* ── Modal Nueva Reserva ──────────────────────────────── */}
+            <Modal
+                abierto={modalAbierto}
+                titulo="Nueva reserva"
+                onCerrar={() => setModalAbierto(false)}
+            >
+                <NuevaReservaForm
+                    onSuccess={() => {
+                        setModalAbierto(false)
+                        onMensaje('Reserva confirmada correctamente')
+                        void onReservaCreada()
+                    }}
+                />
+            </Modal>
         </div>
     )
 })

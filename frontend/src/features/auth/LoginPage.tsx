@@ -71,10 +71,11 @@ export function LoginPage({ onLogin }: Props) {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                            <label htmlFor="email" className="block text-xs font-medium text-gray-500 mb-1.5">
                                 Correo electrónico
                             </label>
                             <input
+                                id="email"
                                 {...register('email', {
                                     required: 'El email es obligatorio',
                                     pattern: { value: /\S+@\S+\.\S+/, message: 'Email inválido' }
@@ -91,10 +92,11 @@ export function LoginPage({ onLogin }: Props) {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                            <label htmlFor="password" className="block text-xs font-medium text-gray-500 mb-1.5">
                                 Contraseña
                             </label>
                             <input
+                                id="password"
                                 {...register('password', {
                                     required: 'La contraseña es obligatoria',
                                     minLength: { value: 6, message: 'Mínimo 6 caracteres' }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { reservaService, NuevaReservaForm as FormData } from '@/services/reservaService'
@@ -13,9 +13,10 @@ const HORAS = Array.from({ length: 24 }, (_, i) =>
 interface Props { onSuccess: () => void }
 
 export function NuevaReservaForm({ onSuccess }: Props) {
-    const [disponibles, setDisponibles] = useState<Habitacion[]>([])
-    const [enviando,    setEnviando]    = useState(false)
-    const [errorGlobal, setErrorGlobal] = useState<string | null>(null)
+    const [disponibles,  setDisponibles]  = useState<Habitacion[]>([])
+    const [cargandoHabs, setCargandoHabs] = useState(true)
+    const [enviando,     setEnviando]     = useState(false)
+    const [errorGlobal,  setErrorGlobal]  = useState<string | null>(null)
 
     const {
         register, handleSubmit,
@@ -44,8 +45,19 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                 if (!activo || esSesionExpirada(e)) return
                 setErrorGlobal(e instanceof Error ? e.message : 'Error de conexión')
             })
+            .finally(() => { if (activo) setCargandoHabs(false) })
         return () => { activo = false }
     }, [])
+
+    // Agrupar una sola vez por render (evita 4 filtros sobre la lista)
+    const { libres, enLimpieza } = useMemo(() => {
+        const libresList: Habitacion[] = []
+        const limpiezaList: Habitacion[] = []
+        for (const h of disponibles) {
+            (h.estado === 'LIBRE' ? libresList : limpiezaList).push(h)
+        }
+        return { libres: libresList, enLimpieza: limpiezaList }
+    }, [disponibles])
 
     // ── Submit ────────────────────────────────────────────────
     const onSubmit = async (data: FormData) => {
@@ -92,29 +104,36 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                 <label htmlFor="habitacionId" className={lbl}>Habitación *</label>
                 <select
                     id="habitacionId"
+                    disabled={cargandoHabs}
                     {...register('habitacionId', { required: 'Selecciona una habitación' })}
                     className={campo}
                 >
-                    <option value="">Seleccionar...</option>
+                    {cargandoHabs ? (
+                        <option value="">Cargando habitaciones...</option>
+                    ) : (
+                        <>
+                            <option value="">Seleccionar...</option>
 
-                    {disponibles.filter(h => h.estado === 'LIBRE').length > 0 && (
-                        <optgroup label="─ Disponibles">
-                            {disponibles.filter(h => h.estado === 'LIBRE').map(h => (
-                                <option key={h.id} value={h.id}>
-                                    Hab. {h.numero} — {h.tipo} — S/{h.precioNoche}/noche
-                                </option>
-                            ))}
-                        </optgroup>
-                    )}
+                            {libres.length > 0 && (
+                                <optgroup label="─ Disponibles">
+                                    {libres.map(h => (
+                                        <option key={h.id} value={h.id}>
+                                            Hab. {h.numero} — {h.tipo} — S/{h.precioNoche}/noche
+                                        </option>
+                                    ))}
+                                </optgroup>
+                            )}
 
-                    {disponibles.filter(h => h.estado === 'LIMPIEZA').length > 0 && (
-                        <optgroup label="─ En limpieza (entrada a partir de mañana)">
-                            {disponibles.filter(h => h.estado === 'LIMPIEZA').map(h => (
-                                <option key={h.id} value={h.id}>
-                                    Hab. {h.numero} — {h.tipo} — S/{h.precioNoche}/noche
-                                </option>
-                            ))}
-                        </optgroup>
+                            {enLimpieza.length > 0 && (
+                                <optgroup label="─ En limpieza (entrada a partir de mañana)">
+                                    {enLimpieza.map(h => (
+                                        <option key={h.id} value={h.id}>
+                                            Hab. {h.numero} — {h.tipo} — S/{h.precioNoche}/noche
+                                        </option>
+                                    ))}
+                                </optgroup>
+                            )}
+                        </>
                     )}
                 </select>
                 {errors.habitacionId && (

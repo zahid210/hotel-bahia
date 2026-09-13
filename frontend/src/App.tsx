@@ -1,6 +1,7 @@
-import { useState, useCallback, lazy, Suspense } from 'react'
+import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { PrivateRoute } from '@/components/PrivateRoute'
+import { Modal } from '@/components/Modal'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { ReservasPage } from '@/features/reservas/ReservasPage'
 import { NuevaReservaForm } from '@/features/reservas/NuevaReservaForm'
@@ -20,9 +21,22 @@ export default function App() {
   const [sidebarAbierto,  setSidebarAbierto]  = useState(false)
   const [versionReservas, setVersionReservas] = useState(0)
 
+  const timerToast = useRef<number | undefined>(undefined)
+
   const mostrarMensaje = useCallback((texto: string) => {
     setMensaje(texto)
-    setTimeout(() => setMensaje(null), 3000)
+    // Reinicia el temporizador: si llega un 2º mensaje, el toast dura 3s
+    // desde el último y el anterior no lo cierra prematuramente.
+    if (timerToast.current !== undefined) window.clearTimeout(timerToast.current)
+    timerToast.current = window.setTimeout(() => {
+      setMensaje(null)
+      timerToast.current = undefined
+    }, 3000)
+  }, [])
+
+  // Limpieza del timer al desmontar
+  useEffect(() => () => {
+    if (timerToast.current !== undefined) window.clearTimeout(timerToast.current)
   }, [])
 
   const abrirModal = useCallback(() => setModalAbierto(true), [])
@@ -180,37 +194,19 @@ export default function App() {
           </main>
 
           {/* ── Modal Nueva Reserva ──────────────────────────────── */}
-          {modalAbierto && (
-              <div
-                  className="fixed inset-0 bg-black/40 z-50 flex items-center
-                       justify-center p-4"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="Nueva reserva"
-                  onClick={e => e.target === e.currentTarget && setModalAbierto(false)}
-              >
-                <div className="bg-white rounded-xl border border-gray-100
-                            w-full max-w-md p-6 max-h-[90vh]
-                            overflow-y-auto shadow-xl">
-                  <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-sm font-semibold">Nueva reserva</h2>
-                    <button
-                        onClick={() => setModalAbierto(false)}
-                        aria-label="Cerrar"
-                        className="text-gray-400 hover:text-gray-700
-                             text-lg leading-none"
-                    >✕</button>
-                  </div>
-                  <NuevaReservaForm
-                      onSuccess={() => {
-                        setModalAbierto(false)
-                        setVersionReservas(v => v + 1)
-                        mostrarMensaje('Reserva confirmada correctamente')
-                      }}
-                  />
-                </div>
-              </div>
-          )}
+          <Modal
+              abierto={modalAbierto}
+              titulo="Nueva reserva"
+              onCerrar={() => setModalAbierto(false)}
+          >
+            <NuevaReservaForm
+                onSuccess={() => {
+                  setModalAbierto(false)
+                  setVersionReservas(v => v + 1)
+                  mostrarMensaje('Reserva confirmada correctamente')
+                }}
+            />
+          </Modal>
 
           {/* ── Toast ───────────────────────────────────────────── */}
           {mensaje && (
