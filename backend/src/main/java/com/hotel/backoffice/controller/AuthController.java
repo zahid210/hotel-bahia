@@ -2,12 +2,16 @@ package com.hotel.backoffice.controller;
 
 import com.hotel.backoffice.dto.request.*;
 import com.hotel.backoffice.dto.response.AuthResponseDTO;
+import com.hotel.backoffice.entity.Usuario;
+import com.hotel.backoffice.exception.ResourceNotFoundException;
+import com.hotel.backoffice.repository.UsuarioRepository;
 import com.hotel.backoffice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +19,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthService        authService;
+    private final UsuarioRepository  usuarioRepo;
+
+    public record MeResponse(String email, String nombre, String rol) {}
 
     @PostMapping("/login")
     public AuthResponseDTO login(@Valid @RequestBody LoginRequestDTO dto) {
@@ -29,8 +36,12 @@ public class AuthController {
         return authService.register(dto);
     }
 
+    // Usado como healthcheck autenticado y para revalidar la sesión
     @GetMapping("/me")
-    public ResponseEntity<String> me() {
-        return ResponseEntity.ok("Token válido ✓");
+    public MeResponse me(Authentication auth) {
+        Usuario u = usuarioRepo.findByEmail(auth.getName())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuario no encontrado: " + auth.getName()));
+        return new MeResponse(u.getEmail(), u.getNombre(), u.getRol().name());
     }
 }

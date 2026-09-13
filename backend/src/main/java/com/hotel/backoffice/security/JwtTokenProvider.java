@@ -20,6 +20,14 @@ public class JwtTokenProvider {
     public JwtTokenProvider(
             @Value("${app.jwt.secret}")         String secret,
             @Value("${app.jwt.expiration-ms}")  long expirationMs) {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "app.jwt.secret no configurado: define la variable JWT_SECRET "
+                            + "(resp. en application-local.yml para el perfil local)."
+            );
+        }
+        // Keys.hmacShaKeyFor exige HTTPSecureKey >= 32 bytes; lanza
+        // WeakKeyException si el secreto es demasiado corto.
         this.secretKey    = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
     }
@@ -48,7 +56,9 @@ public class JwtTokenProvider {
         } catch (MalformedJwtException e) {
             log.warn("Token mal formado");
         } catch (JwtException e) {
-            log.warn("Token inválido: {}", e.getMessage());
+            // No se loguea e.getMessage(): puede contener datos del token
+            // (claims/header) inyectados por el cliente.
+            log.warn("Token inválido: {}", e.getClass().getSimpleName());
         }
         return null;
     }

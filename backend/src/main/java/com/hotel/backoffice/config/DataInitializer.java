@@ -6,6 +6,8 @@ import com.hotel.backoffice.entity.Usuario;
 import com.hotel.backoffice.repository.HabitacionRepository;
 import com.hotel.backoffice.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Component
 @Profile({"local", "docker"})
 @RequiredArgsConstructor
@@ -22,6 +25,10 @@ public class DataInitializer implements CommandLineRunner {
     private final HabitacionRepository habitRepo;
     private final UsuarioRepository    usuarioRepo;
     private final PasswordEncoder      encoder;
+
+    @Value("${app.admin.email:zahidmatos@hotel.com}")   private String adminEmail;
+    @Value("${app.admin.nombre:Zahid Matos}")           private String adminNombre;
+    @Value("${app.admin.password:}")                    private String adminPassword;
 
     @Override
     public void run(String... args) {
@@ -92,13 +99,18 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (usuarioRepo.count() == 0) {
-            usuarioRepo.save(Usuario.builder()
-                    .nombre("Zahid Matos")
-                    .email("zahidmatos@hotel.com")
-                    .password(encoder.encode("hotel_bahia"))
-                    .rol(Usuario.Rol.ADMIN)
-                    .activo(true)
-                    .build());
+            if (adminPassword == null || adminPassword.isBlank()) {
+                log.warn("No se creó el usuario administrador inicial: "
+                        + "define APP_ADMIN_PASSWORD (perfil local/docker).");
+            } else {
+                usuarioRepo.save(Usuario.builder()
+                        .nombre(adminNombre)
+                        .email(adminEmail)
+                        .password(encoder.encode(adminPassword))
+                        .rol(Usuario.Rol.ADMIN)
+                        .activo(true)
+                        .build());
+            }
         }
     }
 

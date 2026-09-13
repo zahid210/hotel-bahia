@@ -20,3 +20,8 @@ app:
   jwt:
     secret: local-dev-secret-key-for-hotel-bahia-not-for-production-use-only-32chars!!
     expiration-ms: 86400000
+  admin:
+    email:    zahidmatos@hotel.com
+    nombre:   Zahid Matos
+    # Solo dev: si la BD está vacía se crea el admin con esta password
+    password: hotel_bahia

@@ -48,9 +48,13 @@ services:
       DATABASE_URL:           jdbc:mariadb://db:3306/${DB_NAME:-hotel_bahia}
       DATABASE_USERNAME:      ${DB_USER:-hotel}
       DATABASE_PASSWORD:      ${DB_PASSWORD:-hotel_bahia}
-      JWT_SECRET:             ${JWT_SECRET:-local-dev-secret-key-for-hotel-bahia-not-for-production-use-only-32chars!!}
+      # Obligatorio: sin JWT_SECRET el stack no arranca (no hay default conocido)
+      JWT_SECRET:             ${JWT_SECRET:?Define JWT_SECRET en tu .env (ver .env.example)}
       JWT_EXPIRATION_MS:      ${JWT_EXPIRATION_MS:-86400000}
       APP_TIMEZONE:           ${APP_TIMEZONE:-America/Lima}
+      APP_ADMIN_EMAIL:        ${APP_ADMIN_EMAIL:-zahidmatos@hotel.com}
+      APP_ADMIN_NOMBRE:       ${APP_ADMIN_NOMBRE:-Zahid Matos}
+      APP_ADMIN_PASSWORD:     ${APP_ADMIN_PASSWORD:-hotel_bahia}
     ports:
       - "8080:8080"
     healthcheck:

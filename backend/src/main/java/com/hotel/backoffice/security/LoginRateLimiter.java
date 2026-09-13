@@ -3,10 +3,10 @@ package com.hotel.backoffice.security;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Component
 public class LoginRateLimiter {
@@ -14,6 +14,7 @@ public class LoginRateLimiter {
     private static final int     MAX_INTENTOS = 5;
     private static final Duration VENTANA      = Duration.ofMinutes(15);
 
+    // ConcurrentLinkedDeque: operaciones addLast/pollFirst lineales → thread-safe
     private final Map<String, Deque<Long>> intentos = new ConcurrentHashMap<>();
 
     public boolean bloqueado(String email) {
@@ -35,8 +36,13 @@ public class LoginRateLimiter {
     }
 
     public void registrarFallo(String email) {
-        intentos.computeIfAbsent(normalizar(email), k -> new ArrayDeque<>())
-                .addLast(System.currentTimeMillis());
+        Deque<Long> cola =
+                intentos.computeIfAbsent(normalizar(email), k -> new ConcurrentLinkedDeque<>());
+        cola.addLast(System.currentTimeMillis());
+        // Cota de memoria: una vez bloqueado ya no interesa acumular más fallos
+        while (cola.size() > MAX_INTENTOS) {
+            cola.pollFirst();
+        }
     }
 
     public void limpiar(String email) {

@@ -31,6 +31,7 @@ public class HabitacionService {
         Habitacion h = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Habitación no encontrada: " + id));
         h.setEstado(EstadoHabitacion.valueOf(nuevoEstado.toUpperCase()));
-        return HabitacionResponseDTO.from(repo.save(h));
+        // Entidad gestionada: el dirty checking persiste el cambio al commit
+        return HabitacionResponseDTO.from(h);
     }
 }

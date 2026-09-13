@@ -17,10 +17,12 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                frontendUrl
+        // Orígenes EXACTOS (no wildcards): en dev el navegador habla con
+        // Vite (5173) y en el clúster con el mismo origen del backend.
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                frontendUrl.trim()
         ));
 
         config.setAllowedMethods(List.of(
