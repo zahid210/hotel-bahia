@@ -5,8 +5,8 @@
 #
 # Servicios:
 #   db       → MariaDB (puerto 3307 en el host, sin conflicto con el 3306 local)
-#   backend  → Spring Boot (API en /api/v1/*, puerto 8080)
-#   frontend → nginx: sirve el build de React y hace proxy de /api al backend
+#   backend  → Spring Boot: sirve la web y la API /api/v1/* en :8080
+#              (el frontend compilado va embebido en el jar, sin nginx)
 #
 # Ajusta los valores reproducibles en un archivo .env (ver .env.example).
 # ════════════════════════════════════════════════════════════════
@@ -33,7 +33,11 @@ services:
       start_period: 10s
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        VITE_API_URL: /api/v1
     container_name: hotel-bahia-backend
     restart: unless-stopped
     depends_on:
@@ -50,32 +54,11 @@ services:
     ports:
       - "8080:8080"
     healthcheck:
-      # nc: solo verifica que el puerto 8080 acepta conexiones (evita
-      # el 401 de /auth/me sin token)
-      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
-
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: /api/v1
-    container_name: hotel-bahia-frontend
-    restart: unless-stopped
-    depends_on:
-      backend:
-        condition: service_started
-    ports:
-      - "80:80"
-    healthcheck:
-      # Usa 127.0.0.1: en Alpine "localhost" puede resolver a otra IP
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
 volumes:
   dbdata:

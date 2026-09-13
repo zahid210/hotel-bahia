@@ -1,0 +1,13 @@
+# Contexto de build: raíz del repo (backend/Dockerfile necesita frontend/).
+# Excluye lo que no debe entrar a la imagen.
+.git
+.gitignore
+.env
+*.md
+*.log
+
+backend/target
+backend/src/main/resources/application-local.yml
+
+frontend/node_modules
+frontend/dist

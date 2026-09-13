@@ -41,7 +41,12 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // ── Rutas públicas ──────────────────────────
-                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/login",
+                                "/", "/index.html",
+                                "/favicon.*",
+                                "/assets/**"
+                        ).permitAll()
                         // ── Todo lo demás requiere autenticación ─────
                         .anyRequest().authenticated()
                 )
