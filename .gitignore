@@ -27,6 +27,7 @@ frontend/.env.test.local
 # === Docker ===
 pgdata/
 dbdata/
+.env
 
 # === Misc ===
 *.log

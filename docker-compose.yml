@@ -1,23 +1,79 @@
+# ════════════════════════════════════════════════════════════════
+# Hotel Bahía — Stack autoservido con Docker Compose
+#
+#   docker compose up -d --build
+#
+# Servicios:
+#   db       → MariaDB (puerto 3307 en el host, sin conflicto con el 3306 local)
+#   backend  → Spring Boot (API en /api/v1/*, puerto 8080)
+#   frontend → nginx: sirve el build de React y hace proxy de /api al backend
+#
+# Ajusta los valores reproducibles en un archivo .env (ver .env.example).
+# ════════════════════════════════════════════════════════════════
+
 services:
   db:
-    image: mysql:8
+    image: mariadb:11
     container_name: hotel-bahia-db
     restart: unless-stopped
-    # Puerto 3307 en el host (el 3306 del sistema suele estar ocupado
-    # por un MySQL/MariaDB local). Si usas este contenedor, apunta
-    # application-local.yml a jdbc:mariadb://localhost:3307/hotel_bahia
     ports:
       - "3307:3306"
     environment:
-      MYSQL_DATABASE: hotel_bahia
-      MYSQL_USER: hotel
-      MYSQL_PASSWORD: hotel_bahia
-      MYSQL_ROOT_PASSWORD: root_local
+      MYSQL_DATABASE:      ${DB_NAME:-hotel_bahia}
+      MYSQL_USER:          ${DB_USER:-hotel}
+      MYSQL_PASSWORD:      ${DB_PASSWORD:-hotel_bahia}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_local}
     volumes:
       - dbdata:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_local"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
+
+  backend:
+    build: ./backend
+    container_name: hotel-bahia-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DATABASE_URL:           jdbc:mariadb://db:3306/${DB_NAME:-hotel_bahia}
+      DATABASE_USERNAME:      ${DB_USER:-hotel}
+      DATABASE_PASSWORD:      ${DB_PASSWORD:-hotel_bahia}
+      JWT_SECRET:             ${JWT_SECRET:-local-dev-secret-key-for-hotel-bahia-not-for-production-use-only-32chars!!}
+      JWT_EXPIRATION_MS:      ${JWT_EXPIRATION_MS:-86400000}
+      APP_TIMEZONE:           ${APP_TIMEZONE:-America/Lima}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      # nc: solo verifica que el puerto 8080 acepta conexiones (evita
+      # el 401 de /auth/me sin token)
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api/v1
+    container_name: hotel-bahia-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "80:80"
+    healthcheck:
+      # Usa 127.0.0.1: en Alpine "localhost" puede resolver a otra IP
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 10s
       timeout: 5s
       retries: 10
 

@@ -16,7 +16,7 @@ WORKDIR /app
 RUN addgroup -S hotel && adduser -S hotel -G hotel
 USER hotel
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY --chown=hotel:hotel --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 

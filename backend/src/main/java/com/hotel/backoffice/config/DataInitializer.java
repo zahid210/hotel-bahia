@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Component
-@Profile("local")
+@Profile({"local", "docker"})
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
