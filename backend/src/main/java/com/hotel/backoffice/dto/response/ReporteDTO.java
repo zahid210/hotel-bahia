@@ -12,6 +12,8 @@ public class ReporteDTO {
             int        checkoutsRealizados,
             int        cancelaciones,
             BigDecimal ingresoTotal,       // suma de totalEstancia de CHECKOUT
+                                           // (incluye consumo de habitación)
+            BigDecimal ingresoConsumo,     // parte del ingreso por servicio de habitación
             BigDecimal ingresoPromedioPorNoche,
             double     ocupacionPromedio,  // % promedio del período
             long       nochesVendidas      // suma de noches facturables

@@ -4,6 +4,7 @@ import com.hotel.backoffice.dto.response.ReporteDTO.*;
 import com.hotel.backoffice.entity.Reserva;
 import com.hotel.backoffice.entity.Reserva.EstadoReserva;
 import com.hotel.backoffice.repository.HabitacionRepository;
+import com.hotel.backoffice.repository.PedidoRepository;
 import com.hotel.backoffice.repository.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ReporteService {
 
     private final ReservaRepository    reservaRepo;
     private final HabitacionRepository habitacionRepo;
+    private final PedidoRepository     pedidoRepo;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -116,12 +118,21 @@ public class ReporteService {
                 ? (double) ocupacionesTotales / (totalHabs * diasPeriodo) * 100
                 : 0;
 
+        // Consumo de servicio de habitación servido (ENTREGADO),
+        // contado por la fecha en que la reserva llegó a CHECKOUT,
+        // consistente con ingresoTotal (que ya lo incluye vía totalEstancia).
+        BigDecimal ingresoConsumo = pedidoRepo.sumarConsumoEntre(
+                inicio.atStartOfDay(),
+                fin.plusDays(1).atStartOfDay()
+        );
+
         return new ResumenPeriodo(
                 enPeriodo.size(),
                 (int) reservasActivas,
                 facturadas.size(),
                 (int) cancelaciones,
                 ingresoTotal,
+                ingresoConsumo,
                 ingresoPorNoche,
                 Math.min(Math.round(ocupacionPromedio * 10.0) / 10.0, 100),
                 nochesVendidas

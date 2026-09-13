@@ -2,3 +2,10 @@ app:
   jwt:
     secret: test-secret-key-for-automated-tests-at-least-32-characters!!
     expiration-ms: 86400000
+
+spring:
+  jpa:
+    hibernate:
+      # Base usa "validate": aquí creamos solo las tablas/columnas
+      # que faltan (menú, pedidos, consumo) sin tocar los datos.
+      ddl-auto: update

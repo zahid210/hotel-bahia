@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/reportes")
-@PreAuthorize("hasAnyRole('ADMIN', 'RECEPCIONISTA')")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class ReporteController {
 

@@ -66,6 +66,13 @@ public class Reserva {
     @Builder.Default
     private BigDecimal cargoHorasExtra = BigDecimal.ZERO;
 
+    // ── Servicio de habitación ─────────────────────────────────
+    // Consumo acumulado de los pedidos ENTREGADO. Se suma al total
+    // que se cobra al hacer checkout (ver calcularTotalEstancia()).
+    @Column(name = "total_consumo", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalConsumo = BigDecimal.ZERO;
+
     // ── Campos de negocio estándar ────────────────────────────
     @Column(name = "num_huespedes", nullable = false)
     @Builder.Default
@@ -93,6 +100,8 @@ public class Reserva {
             this.horaSalidaAcordada = LocalTime.of(12, 0);
         if (this.cargoHorasExtra == null)
             this.cargoHorasExtra = BigDecimal.ZERO;
+        if (this.totalConsumo == null)
+            this.totalConsumo = BigDecimal.ZERO;
         if (this.horasExtra == null)
             this.horasExtra = 0;
         this.createdAt = LocalDateTime.now();
@@ -220,7 +229,12 @@ public class Reserva {
                 ? this.cargoHorasExtra
                 : BigDecimal.ZERO;
 
-        return totalNoches.add(extra)
+        // Consumos de servicio de habitación (pedidos ENTREGADO)
+        BigDecimal consumo = (this.totalConsumo != null)
+                ? this.totalConsumo
+                : BigDecimal.ZERO;
+
+        return totalNoches.add(extra).add(consumo)
                 .setScale(2, RoundingMode.HALF_UP);
     }
 

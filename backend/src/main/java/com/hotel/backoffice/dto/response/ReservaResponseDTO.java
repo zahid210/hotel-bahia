@@ -37,7 +37,8 @@ public record ReservaResponseDTO(
 
         // ── Totales calculados ────────────────────────────────────
         Long          noches,             // días entre entrada y salida
-        BigDecimal    totalEstancia       // noches × precio + cargoExtra
+        BigDecimal    totalEstancia,      // noches × precio + cargoExtra + consumos
+        BigDecimal    totalConsumo        // pedidos de servicio de habitación
 ) {
     public static ReservaResponseDTO from(Reserva r) {
         // ── Noches facturables (basadas en horas reales) ──────────
@@ -74,7 +75,10 @@ public record ReservaResponseDTO(
 
                 // Noches facturables — ya no es solo fechaSalida - fechaEntrada
                 nochesFacturables,
-                r.calcularTotalEstancia()
+                r.calcularTotalEstancia(),
+                r.getTotalConsumo() != null
+                        ? r.getTotalConsumo()
+                        : java.math.BigDecimal.ZERO
         );
     }
 }
