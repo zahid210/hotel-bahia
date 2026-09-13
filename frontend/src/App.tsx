@@ -9,8 +9,34 @@ import { NuevaReservaForm } from '@/features/reservas/NuevaReservaForm'
 const ReportesPage = lazy(() =>
     import('@/features/reportes/ReportesPage').then(m => ({ default: m.ReportesPage }))
 )
+const PedidosPage = lazy(() =>
+    import('@/features/pedidos/PedidosPage').then(m => ({ default: m.PedidosPage }))
+)
+const MenuPage = lazy(() =>
+    import('@/features/menu/MenuPage').then(m => ({ default: m.MenuPage }))
+)
+const UsuariosPage = lazy(() =>
+    import('@/features/usuarios/UsuariosPage').then(m => ({ default: m.UsuariosPage }))
+)
 
-type Pagina = 'dashboard' | 'reservas' | 'reportes'
+type Pagina = 'dashboard' | 'reservas' | 'pedidos' | 'menu' | 'reportes' | 'usuarios'
+type Rol = 'ADMIN' | 'RECEPCIONISTA' | 'LIMPIEZA'
+
+interface NavItem {
+    id:    Pagina
+    icon:  string
+    label: string
+    roles: Rol[]
+}
+
+const TITULOS: Record<Pagina, string> = {
+    dashboard: 'Estado de habitaciones',
+    reservas:  'Reservas',
+    pedidos:   'Pedidos y consumo',
+    menu:      'Menú del hotel',
+    reportes:  'Reportes',
+    usuarios:  'Usuarios',
+}
 
 // ── App principal ─────────────────────────────────────────────
 export default function App() {
@@ -41,16 +67,24 @@ export default function App() {
 
   const abrirModal = useCallback(() => setModalAbierto(true), [])
 
-  const navItems: { id: Pagina; icon: string; label: string }[] = [
-    { id: 'dashboard', icon: '▦', label: 'Dashboard' },
-    { id: 'reservas',  icon: '☰', label: 'Reservas'  },
-    { id: 'reportes',  icon: '◎', label: 'Reportes'  },
+  // ── Navegación según rol ────────────────────────────────────
+  // LIMPIEZA solo ve el dashboard (estado de habitaciones y marcar listas).
+  // Reportes/Usuarios son exclusivos de ADMIN.
+  const navItems: NavItem[] = [
+    { id: 'dashboard', icon: '▦', label: 'Dashboard', roles: ['ADMIN', 'RECEPCIONISTA', 'LIMPIEZA'] },
+    { id: 'reservas',  icon: '☰', label: 'Reservas',  roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'pedidos',   icon: '≡', label: 'Pedidos',   roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'menu',      icon: '✦', label: 'Menú',      roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'reportes',  icon: '◎', label: 'Reportes',  roles: ['ADMIN'] },
+    { id: 'usuarios',  icon: '▼', label: 'Usuarios',  roles: ['ADMIN'] },
   ]
 
   const handleNavClick = (id: Pagina) => {
     setPagina(id)
     setSidebarAbierto(false)  // cierra el drawer en móvil al navegar
   }
+
+  const esLimpieza = rol === 'LIMPIEZA'
 
   return (
       <PrivateRoute onLogin={() => mostrarMensaje('Sesión iniciada')}>
@@ -88,7 +122,9 @@ export default function App() {
             </div>
 
             <nav className="p-2 flex-1">
-              {navItems.map(item => (
+              {navItems
+                  .filter(item => item.roles.includes((rol ?? 'ADMIN') as Rol))
+                  .map(item => (
                   <button
                       key={item.id}
                       onClick={() => handleNavClick(item.id)}
@@ -103,17 +139,19 @@ export default function App() {
                   </button>
               ))}
 
-              <div className="border-t border-gray-100 mt-2 pt-2">
-                <button
-                    onClick={() => { abrirModal(); setSidebarAbierto(false) }}
-                    className="w-full text-left px-3 py-2 rounded-md text-sm
+              {!esLimpieza && (
+                  <div className="border-t border-gray-100 mt-2 pt-2">
+                    <button
+                        onClick={() => { abrirModal(); setSidebarAbierto(false) }}
+                        className="w-full text-left px-3 py-2 rounded-md text-sm
                            text-gray-500 hover:bg-gray-50 hover:text-gray-900
                            transition-colors flex items-center gap-2"
-                >
-                  <span className="text-xs opacity-70">+</span>
-                  Nueva reserva
-                </button>
-              </div>
+                    >
+                      <span className="text-xs opacity-70">+</span>
+                      Nueva reserva
+                    </button>
+                  </div>
+              )}
             </nav>
 
             {/* Usuario */}
@@ -158,9 +196,7 @@ export default function App() {
                   ☰
                 </button>
                 <h1 className="text-sm font-medium">
-                  {pagina === 'dashboard' ? 'Estado de habitaciones'
-                      : pagina === 'reservas' ? 'Reservas'
-                          : 'Reportes'}
+                  {TITULOS[pagina] ?? 'Back-office'}
                 </h1>
               </div>
             </header>
@@ -172,22 +208,31 @@ export default function App() {
                       refreshSignal={versionReservas}
                   />
               )}
-              {pagina === 'reservas' && (
+              {pagina === 'reservas' && !esLimpieza && (
                   <ReservasPage
                       onNuevaReserva={abrirModal}
                       onMensaje={mostrarMensaje}
                       refreshSignal={versionReservas}
                   />
               )}
-              {pagina === 'reportes' && (
-                  <Suspense fallback={
-                      <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
-                        <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
-                                         rounded-full animate-spin" />
-                        Cargando reportes...
-                      </div>
-                  }>
+              {pagina === 'pedidos' && !esLimpieza && (
+                  <Suspense fallback={<Fallback texto="Cargando pedidos..." />}>
+                    <PedidosPage onMensaje={mostrarMensaje} />
+                  </Suspense>
+              )}
+              {pagina === 'menu' && !esLimpieza && (
+                  <Suspense fallback={<Fallback texto="Cargando menú..." />}>
+                    <MenuPage onMensaje={mostrarMensaje} />
+                  </Suspense>
+              )}
+              {pagina === 'reportes' && rol === 'ADMIN' && (
+                  <Suspense fallback={<Fallback texto="Cargando reportes..." />}>
                     <ReportesPage />
+                  </Suspense>
+              )}
+              {pagina === 'usuarios' && rol === 'ADMIN' && (
+                  <Suspense fallback={<Fallback texto="Cargando usuarios..." />}>
+                    <UsuariosPage onMensaje={mostrarMensaje} />
                   </Suspense>
               )}
             </div>
@@ -219,5 +264,15 @@ export default function App() {
           )}
         </div>
       </PrivateRoute>
+  )
+}
+
+function Fallback({ texto }: { texto: string }) {
+  return (
+      <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
+        <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
+                         rounded-full animate-spin" />
+        {texto}
+      </div>
   )
 }

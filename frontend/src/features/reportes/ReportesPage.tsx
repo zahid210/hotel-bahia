@@ -233,7 +233,10 @@ export function ReportesPage() {
                         <StatCard
                             label="Ingreso total"
                             valor={S(reporte.resumen.ingresoTotal)}
-                            sub={`${reporte.resumen.nochesVendidas} noches vendidas`}
+                            sub={
+                                `${reporte.resumen.nochesVendidas} noches vendidas · ` +
+                                `${S(reporte.resumen.ingresoConsumo)} en consumo`
+                            }
                             color="text-green-600"
                         />
                         <StatCard

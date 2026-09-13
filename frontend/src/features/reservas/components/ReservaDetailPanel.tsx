@@ -278,6 +278,13 @@ export function ReservaDetailPanel({
                                 mono
                             />
                         )}
+                        {Number(reserva.totalConsumo ?? 0) > 0 && (
+                            <Campo
+                                label="Consumo (habitación)"
+                                valor={formatSoles(Number(reserva.totalConsumo))}
+                                mono
+                            />
+                        )}
                     </div>
                     <div className="flex justify-between items-baseline pt-2 mt-1.5
                   border-t border-gray-200">

@@ -7,6 +7,7 @@ export interface ResumenPeriodo {
     checkoutsRealizados:      number
     cancelaciones:            number
     ingresoTotal:             number
+    ingresoConsumo:           number
     ingresoPromedioPorNoche:  number
     ocupacionPromedio:        number
     nochesVendidas:           number

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, memo } from 'react'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
+import { useAuthStore } from '@/store/useAuthStore'
 import { useDashboard } from './hooks/useDashboard'
 import { RoomCard } from './components/RoomCard'
 import { ReservaDetailPanel } from '@/features/reservas/components/ReservaDetailPanel'
@@ -23,7 +24,15 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
         marcarLista, onReservaCreada,
     } = useDashboard(refreshSignal)
 
-    const [filtro,         setFiltro]         = useState<Filtro>('TODAS')
+    // ── Rol desde el store persistido ──────────────────────────
+    // LIMPIEZA: vista enfocada en habitaciones por limpiar.
+    // No puede abrir reservas ni crear reservas nuevas.
+    const rol       = useAuthStore(s => s.rol)
+    const esLimpieza = rol === 'LIMPIEZA'
+
+    const [filtro,         setFiltro]         = useState<Filtro>(
+        esLimpieza ? 'LIMPIEZA' : 'TODAS'
+    )
     const [seleccionadaId, setSeleccionadaId] = useState<number | null>(null)
     const [modalAbierto,   setModalAbierto]   = useState(false)
 
@@ -45,11 +54,13 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
         , [filtradas])
 
     // ── Click en card ─────────────────────────────────────────
+    // LIMPIEZA no abre el detalle de la reserva (no gestiona check-in/out)
     const handleClickCard = useCallback((id: number) => {
+        if (esLimpieza) return
         const hab = habitacionesConReserva.find(h => h.id === id)
         if (!hab?.reservaActiva) return
         setSeleccionadaId(prev => prev === id ? null : id)
-    }, [habitacionesConReserva])
+    }, [habitacionesConReserva, esLimpieza])
 
     // ── Marcar lista con feedback ─────────────────────────────
     const handleMarcarLista = useCallback(async (habitacionId: number) => {
@@ -206,13 +217,15 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                                    border-t-gray-600 rounded-full animate-spin" />
                                 : '↻'}
                         </button>
-                        <button
-                            onClick={() => setModalAbierto(true)}
-                            className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
-                         rounded-lg hover:bg-gray-800 transition-colors"
-                        >
-                            + Nueva reserva
-                        </button>
+                        {!esLimpieza && (
+                            <button
+                                onClick={() => setModalAbierto(true)}
+                                className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
+                             rounded-lg hover:bg-gray-800 transition-colors"
+                            >
+                                + Nueva reserva
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -280,7 +293,9 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
 
                     {!cargando && pisosConHabitaciones.length > 0 && (
                         <p className="text-xs text-gray-300 text-center pb-2">
-                            Clic en habitación con huésped · Botón azul en Limpieza para liberar
+                            {esLimpieza
+                                ? '"✓ Lista" = habitación limpiada y disponible'
+                                : 'Clic en habitación con huésped · Botón azul en Limpieza para liberar'}
                         </p>
                     )}
                 </div>

@@ -32,6 +32,7 @@ export interface Reserva {
     // ── Totales calculados por el backend ───────────────────
     noches:         number
     totalEstancia:  number
+    totalConsumo:   number   // pedidos de servicio de habitación
 }
 
 export interface NuevaReservaForm {
