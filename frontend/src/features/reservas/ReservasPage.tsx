@@ -1,5 +1,5 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
-import { formatFecha, diffNoches, capitalizar } from '@/lib/format'
+import { formatFecha, formatSoles, capitalizar } from '@/lib/format'
 import { ESTADO_CFG } from '@/lib/estadoReserva'
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
 import { reservaService, Reserva } from '@/services/reservaService'
@@ -183,9 +183,9 @@ export const ReservasPage = memo(function ReservasPage({
                         </thead>
                         <tbody>
                         {filtradas.map((r, idx) => {
-                            const noches = diffNoches(r.fechaEntrada, r.fechaSalida)
-                            const total  = noches * r.precioNoche
-                            const cfg    = ESTADO_CFG[r.estado] ?? ESTADO_CFG.CONFIRMADA
+                            // Noches y total vienen calculados por el backend
+                            // (incluyen horas reales y cargo por late checkout)
+                            const cfg = ESTADO_CFG[r.estado] ?? ESTADO_CFG.CONFIRMADA
 
                             return (
                                 <tr
@@ -216,10 +216,10 @@ export const ReservasPage = memo(function ReservasPage({
                                         {formatFecha(r.fechaSalida)}
                                     </td>
                                     <td className="px-3 py-3 text-xs font-mono text-center text-gray-600">
-                                        {noches}
+                                        {r.noches}
                                     </td>
                                     <td className="px-3 py-3 text-xs font-mono whitespace-nowrap text-gray-700">
-                                        S/ {total.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                        {formatSoles(r.totalEstancia)}
                                     </td>
                                     <td className="px-3 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5

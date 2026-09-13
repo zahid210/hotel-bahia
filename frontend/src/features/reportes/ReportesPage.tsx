@@ -392,6 +392,7 @@ export function ReportesPage() {
                                             <span className="flex gap-4 text-gray-500">
                         <span>{t.reservas} res.</span>
                         <span>{t.nochesVendidas}N</span>
+                        <span>{pct(t.ocupacionPromedio)} oc.</span>
                         <span className="font-mono font-medium text-gray-700">
                           {S(t.ingresoTotal)}
                         </span>

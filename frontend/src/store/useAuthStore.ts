@@ -29,6 +29,14 @@ export const useAuthStore = create<AuthState>()(
         }),
         {
             name: 'hotel-auth',   // clave en localStorage
+            // Persistir solo datos de sesión (nunca acciones/estado auxiliar)
+            partialize: (s) => ({
+                token:  s.token,
+                email:  s.email,
+                nombre: s.nombre,
+                rol:    s.rol,
+                isAuth: s.isAuth,
+            }),
         }
     )
 )

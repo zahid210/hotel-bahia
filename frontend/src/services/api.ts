@@ -31,7 +31,10 @@ api.interceptors.response.use(
         const url    = error.config?.url ?? ''
         const status = error.response?.status
 
-        if ((status === 401 || status === 403) && !url.includes('/auth/login')) {
+        // Solo 401 = token inválido/expirado → cerrar sesión.
+        // Un 403 (SIN_PERMISOS) NO invalida el token: se propaga como error
+        // normal para que el usuario vea el mensaje del backend.
+        if (status === 401 && !url.includes('/auth/login')) {
             // 1. Limpia el store — PrivateRoute reacciona y muestra Login
             useAuthStore.getState().logout()
 

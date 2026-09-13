@@ -25,6 +25,7 @@ export interface RendimientoTipo {
     reservas:         number
     nochesVendidas:   number
     ingresoTotal:     number
+    ocupacionPromedio: number
 }
 
 export interface HabitacionTop {

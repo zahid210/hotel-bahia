@@ -1,5 +1,5 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { habitacionService, Habitacion } from '@/services/habitacionService'
 import { reservaService, Reserva } from '@/services/reservaService'
 import { getServerTime } from '@/services/api'
@@ -29,8 +29,13 @@ export function useDashboard(refreshSignal = 0) {
         () => new Date().toISOString().split('T')[0]
     )
 
+    // Contador de peticiones: descarta respuestas obsoletas si se disparan
+    // dos cargas solapadas (botón ↻ + refreshSignal), como en ReportesPage.
+    const secuencia = useRef(0)
+
     // ── Carga paralela: habitaciones + reservas + tiempo ─────
     const cargar = useCallback(async () => {
+        const id = ++secuencia.current
         try {
             setCargando(true)
             setError(null)
@@ -39,6 +44,7 @@ export function useDashboard(refreshSignal = 0) {
                 reservaService.listarTodas(),
                 getServerTime(),
             ])
+            if (id !== secuencia.current) return
             setHabitaciones(habs)
             setReservas(revs)
             setHOY(tiempo.fecha)
@@ -46,9 +52,10 @@ export function useDashboard(refreshSignal = 0) {
             // Si es sesión expirada, no mostrar error:
             // PrivateRoute ya reacciona al logout() del interceptor
             if (esSesionExpirada(e)) return
+            if (id !== secuencia.current) return
             setError(e instanceof Error ? e.message : 'Error de conexión')
         } finally {
-            setCargando(false)
+            if (id === secuencia.current) setCargando(false)
         }
     }, [])
 
