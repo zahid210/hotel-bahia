@@ -2,8 +2,10 @@ package com.hotel.backoffice.config;
 
 import com.hotel.backoffice.entity.Habitacion;
 import com.hotel.backoffice.entity.Habitacion.*;
+import com.hotel.backoffice.entity.MenuItem;
 import com.hotel.backoffice.entity.Usuario;
 import com.hotel.backoffice.repository.HabitacionRepository;
+import com.hotel.backoffice.repository.MenuItemRepository;
 import com.hotel.backoffice.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +24,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    private final HabitacionRepository habitRepo;
+private final HabitacionRepository habitRepo;
     private final UsuarioRepository    usuarioRepo;
-    private final PasswordEncoder      encoder;
+    private final MenuItemRepository  menuRepo;
+    private final PasswordEncoder     encoder;
 
     @Value("${app.admin.email:zahidmatos@hotel.com}")   private String adminEmail;
     @Value("${app.admin.nombre:Zahid Matos}")           private String adminNombre;
@@ -98,6 +101,36 @@ public class DataInitializer implements CommandLineRunner {
             ));
         }
 
+        if (menuRepo.count() == 0) {
+            menuRepo.saveAll(List.of(
+                    // ── Desayunos ──────────────────────────────
+                    plato("Desayuno continental", "Pan, mantequilla, café o té y jugo", "Desayuno", 10.00),
+                    plato("Desayuno americano", "Huevos fritos/revueltos, pan, jamón y café", "Desayuno", 15.00),
+                    plato("Desayuno con frutas", "Porción de frutas de estación con yogurt", "Desayuno", 12.00),
+
+                    // ── Almuerzos / Cenas ──────────────────────
+                    plato("Lomo saltado", "Porción de lomo, arroz y papas fritas", "Almuerzo", 25.00),
+                    plato("Ceviche de pescado", "Pescado fresco con limón y camote", "Almuerzo", 28.00),
+                    plato("Aji de gallina", "Pollo deshilachado con arroz y papa", "Almuerzo", 22.00),
+                    plato("Pollo a la brasa + papas", "Con ensalada y gaseosa personal", "Almuerzo", 24.00),
+                    plato("Arroz con mariscos", "Arroz con mariscos salteados", "Almuerzo", 30.00),
+                    plato("Milanesa de pollo", "Con arroz, papa frita y ensalada", "Cena", 22.00),
+                    plato("Tortilla de verduras", "Con arroz y ensalada", "Cena", 18.00),
+
+                    // ── Bebidas ────────────────────────────────
+                    plato("Gaseosa personal", "Inca Kola, Coca-Cola o Sprite", "Bebidas", 4.00),
+                    plato("Agua mineral", "Botella 625 ml", "Bebidas", 3.00),
+                    plato("Jugo natural", "Papaya, maracuyá, piña o naranja", "Bebidas", 8.00),
+                    plato("Café", "Café pasado o instantáneo", "Bebidas", 4.00),
+                    plato("Té", "Manzanilla, hierba luisa o cedrón", "Bebidas", 3.00),
+
+                    // ── Snacks ─────────────────────────────────
+                    plato("Sándwich simple", "Jamón o queso, opción tostado", "Snacks", 12.00),
+                    plato("Porción de papas fritas", "Con salsas", "Snacks", 8.00),
+                    plato("Fruta de estación", "2 unidades o porción", "Snacks", 5.00)
+            ));
+        }
+
         if (usuarioRepo.count() == 0) {
             if (adminPassword == null || adminPassword.isBlank()) {
                 log.warn("No se creó el usuario administrador inicial: "
@@ -121,6 +154,17 @@ public class DataInitializer implements CommandLineRunner {
                 .numero(num).piso(piso).tipo(tipo).capacidad(cap)
                 .precioNoche(BigDecimal.valueOf(precio))
                 .estado(EstadoHabitacion.LIBRE)
+                .build();
+    }
+
+    // Plato del menú inicial
+    private MenuItem plato(String nombre, String descripcion, String categoria, double precio) {
+        return MenuItem.builder()
+                .nombre(nombre)
+                .descripcion(descripcion)
+                .categoria(categoria)
+                .precio(BigDecimal.valueOf(precio))
+                .disponible(true)
                 .build();
     }
 }
