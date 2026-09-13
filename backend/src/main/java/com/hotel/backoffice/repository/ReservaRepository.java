@@ -23,7 +23,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
     @EntityGraph(attributePaths = {"habitacion", "huesped"})
     Optional<Reserva> findByIdAndEstado(UUID id, EstadoReserva estado);
 
-    // --- QUERY EXISTENTE: Para evitar solapamiento de fechas ---
+    // --- Antes de crear una reserva: evitar solapamiento de fechas ---
     @Query("""
         SELECT r FROM Reserva r
         JOIN FETCH r.habitacion
@@ -39,21 +39,13 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("salida")   LocalDate salida
     );
 
-    // --- NUEVA QUERY 1: Filtrar por estado (Ej: ver solo las 'CONFIRMADA') ---
+    // --- Filtrar por estado (Ej: ver solo las 'CONFIRMADA') ---
     @EntityGraph(attributePaths = {"habitacion", "huesped"})
     List<Reserva> findByEstadoOrderByFechaEntradaDesc(EstadoReserva estado);
 
-    // --- NUEVA QUERY 2: Reservas activas (Uso de JOIN FETCH para optimizar) ---
-    @Query("""
-        SELECT r FROM Reserva r
-        JOIN FETCH r.habitacion
-        JOIN FETCH r.huesped
-        WHERE r.estado NOT IN ('CHECKOUT', 'CANCELADA')
-        ORDER BY r.fechaEntrada ASC
-    """)
-    List<Reserva> findReservasActivas();
+    // --- Reportes: filtrar en BD en vez de cargar todo ---
 
-    // --- Queries para reportes: filtrar en BD en vez de cargar todo ---
+    // Reservas del período (todo menos canceladas) con solapamiento de fechas
     @Query("""
         SELECT r FROM Reserva r
         JOIN FETCH r.habitacion
@@ -68,8 +60,20 @@ public interface ReservaRepository extends JpaRepository<Reserva, UUID> {
             @Param("fin")    LocalDate fin
     );
 
-    long countByEstadoIn(List<EstadoReserva> estados);
+    // N.º de reservas "activas" (en hotel o confirmadas) que se solapan
+    // con el período, para que el resumen no mezcle datos globales.
+    @Query("""
+        SELECT COUNT(r) FROM Reserva r
+        WHERE r.estado IN ('CHECKIN', 'CONFIRMADA')
+          AND r.fechaEntrada <= :fin
+          AND r.fechaSalida  >= :inicio
+    """)
+    long countActivasEnPeriodo(
+            @Param("inicio") LocalDate inicio,
+            @Param("fin")    LocalDate fin
+    );
 
+    // N.º de reservas canceladas dentro del período
     @Query("""
         SELECT COUNT(r) FROM Reserva r
         WHERE r.estado = 'CANCELADA'

@@ -35,24 +35,31 @@ public class ReporteService {
             );
         }
 
-        List<Reserva> enPeriodo   = reservaRepo.findEnPeriodo(inicio, fin);
-        int           totalHabs   = (int) habitacionRepo.count();
+        List<Reserva> enPeriodo    = reservaRepo.findEnPeriodo(inicio, fin);
+        int           totalHabs    = (int) habitacionRepo.count();
+        int           diasPeriodo  = (int) ChronoUnit.DAYS.between(inicio, fin) + 1;
 
-        // Solo checkouts para cálculo de ingresos reales
-        List<Reserva> facturadas  = enPeriodo.stream()
+        // Solo checkouts para cálculo de ingresos reales (ya cobrados)
+        List<Reserva> facturadas = enPeriodo.stream()
                 .filter(r -> r.getEstado().equals(EstadoReserva.CHECKOUT))
                 .toList();
+
+        // Capacidad por tipo de habitación (para ocupación por tipo)
+        Map<String, Long> habsPorTipo = habitacionRepo.countPorTipo().stream()
+                .collect(Collectors.toMap(
+                        fila -> ((Enum<?>) fila[0]).name(),
+                        fila -> (Long) fila[1]
+                ));
 
         return new ReporteCompleto(
                 inicio.format(FMT),
                 fin.format(FMT),
                 calcularResumen(
-                        (int) reservaRepo.countByEstadoIn(
-                                List.of(EstadoReserva.CHECKIN, EstadoReserva.CONFIRMADA)),
-                        (int) reservaRepo.countCanceladasEnPeriodo(inicio, fin),
-                        facturadas, enPeriodo, totalHabs, inicio, fin),
+                        reservaRepo.countActivasEnPeriodo(inicio, fin),
+                        reservaRepo.countCanceladasEnPeriodo(inicio, fin),
+                        facturadas, enPeriodo, totalHabs, inicio, fin, diasPeriodo),
                 calcularOcupacionPorDia(enPeriodo, totalHabs, inicio, fin),
-                calcularRendimientoPorTipo(facturadas),
+                calcularRendimientoPorTipo(facturadas, enPeriodo, habsPorTipo, diasPeriodo, inicio, fin),
                 calcularTopHabitaciones(facturadas),
                 totalHabs
         );
@@ -60,28 +67,30 @@ public class ReporteService {
 
     // ── Resumen del período ───────────────────────────────────
     private ResumenPeriodo calcularResumen(
-            int reservasActivas,
-            int cancelaciones,
+            long reservasActivas,
+            long cancelaciones,
             List<Reserva> facturadas,
             List<Reserva> enPeriodo,
             int totalHabs,
             LocalDate inicio,
-            LocalDate fin) {
+            LocalDate fin,
+            int diasPeriodo) {
 
         BigDecimal ingresoTotal = facturadas.stream()
                 .map(Reserva::calcularTotalEstancia)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        // Noches facturables + noches extra por late checkout (el cargo
+        // de horas extra ya está dentro de ingresoTotal, así el promedio
+        // por noche no queda inflado).
         long nochesVendidas = facturadas.stream()
-                .mapToLong(Reserva::calcularNochesFacturables)
+                .mapToLong(r -> r.calcularNochesFacturables() + horasExtraDe(r))
                 .sum();
 
         BigDecimal ingresoPorNoche = nochesVendidas > 0
                 ? ingresoTotal.divide(
-                BigDecimal.valueOf(nochesVendidas), 2, RoundingMode.HALF_UP)
+                        BigDecimal.valueOf(nochesVendidas), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
-
-        long diasPeriodo = ChronoUnit.DAYS.between(inicio, fin) + 1;
 
         // CHECKIN = ocupada ahora / CHECKOUT = estuvo ocupada en el período
         List<Reserva> ocupacionReal = enPeriodo.stream()
@@ -109,9 +118,9 @@ public class ReporteService {
 
         return new ResumenPeriodo(
                 enPeriodo.size(),
-                reservasActivas,
+                (int) reservasActivas,
                 facturadas.size(),
-                cancelaciones,
+                (int) cancelaciones,
                 ingresoTotal,
                 ingresoPorNoche,
                 Math.min(Math.round(ocupacionPromedio * 10.0) / 10.0, 100),
@@ -132,8 +141,8 @@ public class ReporteService {
                         || r.getEstado() == EstadoReserva.CHECKOUT)
                 .toList();
 
-        int     dias          = (int) ChronoUnit.DAYS.between(inicio, fin) + 1;
-        LocalDate finExclusivo = fin.plusDays(1);
+        int       dias          = (int) ChronoUnit.DAYS.between(inicio, fin) + 1;
+        LocalDate finExclusivo  = fin.plusDays(1);
 
         // Arreglo de diferencias: por cada reserva sumamos los días que ocupa
         long[]       ocupadas = new long[dias];
@@ -151,17 +160,24 @@ public class ReporteService {
             int desdeIdx = (int) ChronoUnit.DAYS.between(inicio, desde);
             int hastaIdx = (int) ChronoUnit.DAYS.between(inicio, hasta);
 
-            long noches = r.calcularNochesFacturables();
-            BigDecimal valorNoche = noches > 0
-                    ? r.calcularTotalEstancia()
-                    .divide(BigDecimal.valueOf(noches), 4, RoundingMode.HALF_UP)
-                    : BigDecimal.ZERO;
-
             ocupadas[desdeIdx]++;
-            ingreso[desdeIdx] = ingreso[desdeIdx].add(valorNoche);
             if (hastaIdx < dias) {
                 ocupadas[hastaIdx]--;
-                ingreso[hastaIdx] = ingreso[hastaIdx].subtract(valorNoche);
+            }
+
+            // Ingreso diario SOLO de estancias ya cobradas (CHECKOUT),
+            // para que el total de la gráfica coincida con el resumen.
+            if (r.getEstado() == EstadoReserva.CHECKOUT) {
+                long noches = r.calcularNochesFacturables() + horasExtraDe(r);
+                BigDecimal valorNoche = noches > 0
+                        ? r.calcularTotalEstancia()
+                        .divide(BigDecimal.valueOf(noches), 4, RoundingMode.HALF_UP)
+                        : BigDecimal.ZERO;
+
+                ingreso[desdeIdx] = ingreso[desdeIdx].add(valorNoche);
+                if (hastaIdx < dias) {
+                    ingreso[hastaIdx] = ingreso[hastaIdx].subtract(valorNoche);
+                }
             }
         }
 
@@ -192,7 +208,30 @@ public class ReporteService {
 
     // ── Rendimiento por tipo de habitación ────────────────────
     private List<RendimientoTipo> calcularRendimientoPorTipo(
-            List<Reserva> facturadas) {
+            List<Reserva> facturadas,
+            List<Reserva> enPeriodo,
+            Map<String, Long> habsPorTipo,
+            int diasPeriodo,
+            LocalDate inicio,
+            LocalDate fin) {
+
+        // Noches de ocupación real por tipo (CHECKIN + CHECKOUT), acotadas al período
+        Map<String, Long> nochesOcupPorTipo = new HashMap<>();
+        for (Reserva r : enPeriodo) {
+            if (r.getEstado() != EstadoReserva.CHECKIN
+                    && r.getEstado() != EstadoReserva.CHECKOUT) {
+                continue;
+            }
+            LocalDate desde = r.getFechaEntrada().isBefore(inicio)
+                    ? inicio : r.getFechaEntrada();
+            LocalDate hasta = r.getFechaSalida().isAfter(fin)
+                    ? fin.plusDays(1) : r.getFechaSalida();
+            long noches = Math.max(ChronoUnit.DAYS.between(desde, hasta), 0);
+            if (noches == 0) continue;
+
+            String tipo = r.getHabitacion().getTipo().name();
+            nochesOcupPorTipo.merge(tipo, noches, Long::sum);
+        }
 
         Map<String, List<Reserva>> porTipo = facturadas.stream()
                 .collect(Collectors.groupingBy(
@@ -205,19 +244,26 @@ public class ReporteService {
                     List<Reserva> lista = e.getValue();
 
                     long noches = lista.stream()
-                            .mapToLong(Reserva::calcularNochesFacturables)
+                            .mapToLong(r -> r.calcularNochesFacturables() + horasExtraDe(r))
                             .sum();
 
                     BigDecimal ingreso = lista.stream()
                             .map(Reserva::calcularTotalEstancia)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+                    long capacidad      = habsPorTipo.getOrDefault(tipo, 0L);
+                    double ocupacionPct = capacidad > 0 && diasPeriodo > 0
+                            ? Math.min(100.0,
+                            (double) nochesOcupPorTipo.getOrDefault(tipo, 0L)
+                                    / (capacidad * diasPeriodo) * 100)
+                            : 0;
+
                     return new RendimientoTipo(
                             tipo,
                             lista.size(),
                             noches,
                             ingreso,
-                            0
+                            Math.round(ocupacionPct * 10.0) / 10.0
                     );
                 })
                 .sorted(Comparator.comparing(RendimientoTipo::ingresoTotal).reversed())
@@ -238,7 +284,7 @@ public class ReporteService {
                     Reserva primera = lista.getFirst();
 
                     long noches = lista.stream()
-                            .mapToLong(Reserva::calcularNochesFacturables)
+                            .mapToLong(r -> r.calcularNochesFacturables() + horasExtraDe(r))
                             .sum();
 
                     BigDecimal ingreso = lista.stream()
@@ -256,5 +302,11 @@ public class ReporteService {
                 .sorted(Comparator.comparing(HabitacionTop::ingresoTotal).reversed())
                 .limit(10)
                 .toList();
+    }
+
+    // ── Utilidades ────────────────────────────────────────────
+    private int horasExtraDe(Reserva r) {
+        Integer h = r.getHorasExtra();
+        return h == null ? 0 : h;
     }
 }

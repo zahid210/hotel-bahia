@@ -70,8 +70,9 @@ public class ReservaService {
             );
         }
 
-        // 2. Obtener habitación
-        Habitacion hab = habitacionRepo.findById(dto.habitacionId())
+        // 2. Obtener habitación (con lock pesimista para evitar que dos
+        //    reservas solapadas se creen a la vez sobre la misma habitación)
+        Habitacion hab = habitacionRepo.findWithLockById(dto.habitacionId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Habitación no encontrada")
                 );
@@ -85,14 +86,12 @@ public class ReservaService {
         }
 
         // 3. Validar estado de habitación
+        //    Nota: una habitación OCUPADA (con huésped hoy) sí puede reservarse
+        //    para fechas futuras sin solapamiento; eso lo decide `findConflictos`
+        //    por rango de fechas abajo, no el estado físico.
         if (hab.getEstado() == EstadoHabitacion.MANTENIMIENTO) {
             throw new HabitacionNoDisponibleException(
                     "La habitación está en mantenimiento y no puede reservarse."
-            );
-        }
-        if (hab.getEstado() == EstadoHabitacion.OCUPADA) {
-            throw new HabitacionNoDisponibleException(
-                    "La habitación está ocupada actualmente."
             );
         }
         if (hab.getEstado() == EstadoHabitacion.LIMPIEZA
