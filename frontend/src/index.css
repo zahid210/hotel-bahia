@@ -2,12 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
-* { box-sizing: border-box; }
+/* ── Base Apple ─────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html { scroll-behavior: smooth; }
 
 body {
-  /* 'DM Sans' no se cargaba: usa la pila estándar del sistema */
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu,
-    'Helvetica Neue', Arial, sans-serif;
-  background-color: #f9f9f8;
-  color: #1a1a1a;
+  font-family: theme('fontFamily.sans');
+  background-color: theme('colors.fog');
+  color: theme('colors.ink');
+  line-height: 1.45;
+}
+
+/* Selección azul Apple */
+::selection {
+  background-color: rgba(0, 113, 227, 0.15);
+  color: theme('colors.ink');
+}
+
+/* Focus ring por defecto: azul Apple */
+:focus-visible {
+  outline: 2px solid theme('colors.apple.DEFAULT');
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Scrollbars minimalistas — tono neutro Apple */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+
+/* ── Componentes reutilizables ──────────────────────────────────── */
+@layer components {
+
+  /* ── Tarjeta blanca Apple ──────────────────────────────── */
+  .t-card {
+    @apply rounded-2xl border border-gray-200/70 bg-white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05),
+                0 4px 16px rgba(0, 0, 0, 0.03);
+  }
+
+  /* ── Input estilo Apple ────────────────────────────────── */
+  .t-input {
+    @apply w-full rounded-xl border border-gray-200 bg-white px-3 py-2
+           text-[13px] text-ink placeholder:text-gray-400
+           transition-all duration-150;
+  }
+  .t-input:focus {
+    @apply border-apple outline-none ring-2 ring-apple/20;
+  }
+
+  /* ── Select / Date input (hack para quitar caret nativo gris) ── */
+  .t-input[type="date"]::-webkit-calendar-picker-indicator,
+  select.t-input {
+    @apply cursor-pointer;
+    filter: invert(0.3);
+  }
+
+  /* ── Labels ────────────────────────────────────────────── */
+  .t-label {
+    @apply mb-1 block text-[11px] font-medium uppercase tracking-wide text-gray-500;
+  }
+
+  /* ── Tabla (thead / tbody base) ────────────────────────── */
+  .t-th {
+    @apply px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-gray-400 whitespace-nowrap;
+  }
+  .t-td {
+    @apply px-4 py-3 text-xs whitespace-nowrap;
+  }
+
+  /* ── Controles segmentados estilo iOS ──────────────────── */
+  .t-seg {
+    @apply inline-flex items-center gap-1 rounded-full bg-gray-100 p-0.5;
+  }
+  .t-seg-btn {
+    @apply cursor-pointer rounded-full px-3 py-1 text-[12px] font-medium
+           text-gray-500 transition-all duration-150;
+  }
+  .t-seg-btn:hover {
+    @apply text-gray-900;
+  }
+  .t-seg-btn--active {
+    @apply bg-white text-gray-900 shadow-sm;
+  }
+
+  /* ── Botones ───────────────────────────────────────────── */
+  .t-btn,
+  .t-btn-primary,
+  .t-btn-secondary,
+  .t-btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-full
+           px-4 py-1.5 text-[13px] font-medium transition-all duration-150
+           active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+  }
+
+  .t-btn-primary {
+    background-color: theme('colors.apple.DEFAULT');
+    color: theme('colors.white');
+  }
+  .t-btn-primary:hover {
+    background-color: theme('colors.apple.dark');
+  }
+
+  .t-btn-secondary {
+    @apply border border-gray-200 bg-white text-gray-600;
+  }
+  .t-btn-secondary:hover {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  .t-btn-ghost {
+    @apply px-3 text-gray-500;
+  }
+  .t-btn-ghost:hover {
+    @apply bg-gray-100 text-gray-900;
+  }
+
+  /* ── Badge / Píldora de estado ─────────────────────────── */
+  .t-badge {
+    @apply inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium;
+  }
 }

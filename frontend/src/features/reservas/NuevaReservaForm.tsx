@@ -81,19 +81,17 @@ export function NuevaReservaForm({ onSuccess }: Props) {
     }
 
     // ── Estilos reutilizables ─────────────────────────────────
-    const campo = `w-full px-3 py-2 border border-gray-200 rounded-md text-sm
-    bg-gray-50 focus:outline-none focus:border-gray-900 focus:bg-white
-    transition-colors placeholder:text-gray-300`
-    const lbl   = `block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1`
-    const err   = `text-xs text-red-500 mt-1`
+    const campo = 't-input'
+    const lbl   = 't-label'
+    const err   = 'text-[11px] text-red-500 mt-1.5'
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
             {/* Error global */}
             {errorGlobal && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md
-                        text-red-700 text-sm flex gap-2">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl
+                        text-red-700 text-[12px] flex gap-2">
                     <span className="flex-shrink-0">⚠</span>
                     <span>{errorGlobal}</span>
                 </div>
@@ -246,8 +244,8 @@ export function NuevaReservaForm({ onSuccess }: Props) {
             </div>
 
             {/* ── Aviso de política de medianoche ────────────────── */}
-            <div className="flex items-start gap-2 p-3 bg-amber-50 border
-                      border-amber-200 rounded-md">
+            <div className="flex items-start gap-2 p-3 bg-amber-50/70 border
+                      border-amber-200/70 rounded-xl">
                 <span className="text-amber-500 flex-shrink-0 mt-0.5 text-xs">⚠</span>
                 <p className="text-xs text-amber-700 leading-relaxed">
                     <strong>Política del hotel:</strong> si el huésped permanece después
@@ -282,9 +280,7 @@ export function NuevaReservaForm({ onSuccess }: Props) {
             <button
                 type="submit"
                 disabled={enviando}
-                className="w-full py-2.5 bg-gray-900 text-white text-sm font-medium
-                   rounded-md hover:bg-gray-800 disabled:opacity-50
-                   transition-colors"
+                className="t-btn-primary w-full py-2.5"
             >
                 {enviando
                     ? <span className="flex items-center justify-center gap-2">

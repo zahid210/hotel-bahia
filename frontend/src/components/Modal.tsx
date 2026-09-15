@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 // - Mueve el foco al botón "Cerrar" al abrir
 // - aria-labelledby / aria-modal / role="dialog"
 // - Bloquea el scroll del fondo mientras está abierto
+// - Estilo Apple: blur backdrop, rounded-2xl, sombra modal suave
 interface Props {
     abierto: boolean
     titulo:  string
@@ -40,21 +41,30 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
 
     return (
         <div
-            className="fixed inset-0 bg-black/40 z-50 flex items-center
-                 justify-center p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4
+                 animate-fadeIn"
             role="dialog"
             aria-modal="true"
             aria-labelledby={tituloId}
             onClick={e => e.target === e.currentTarget && onCerrar()}
         >
-            <div className="bg-white rounded-xl border border-gray-100 w-full max-w-md p-6 max-h-[90vh] overflow-y-auto shadow-xl">
-                <div className="flex items-center justify-between mb-5">
-                    <h2 id={tituloId} className="text-sm font-semibold">{titulo}</h2>
+            {/* Backdrop Apple — blur + tint */}
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+
+            <div className="relative bg-white rounded-2xl border border-gray-200/60
+                          w-full max-w-md p-6 max-h-[90vh] overflow-y-auto
+                          shadow-modal animate-slideUp">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 id={tituloId} className="text-[15px] font-semibold text-ink">
+                        {titulo}
+                    </h2>
                     <button
                         ref={cerrarRef}
                         onClick={onCerrar}
                         aria-label="Cerrar"
-                        className="text-gray-400 hover:text-gray-700 text-lg leading-none"
+                        className="w-7 h-7 flex items-center justify-center rounded-full
+                                   bg-gray-100 text-gray-500 hover:bg-gray-200
+                                   hover:text-ink text-xs transition-colors leading-none"
                     >✕</button>
                 </div>
                 {children}

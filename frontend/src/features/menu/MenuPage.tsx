@@ -130,27 +130,24 @@ export function MenuPage({ onMensaje }: Props) {
     }
 
     if (cargando && items.length === 0) return (
-        <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
-      <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
+        <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
+      <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
                        rounded-full animate-spin" />
             Cargando tienda...
         </div>
     )
 
     return (
-        <div className="flex flex-col h-full min-h-0 gap-3">
+        <div className="flex flex-col h-full min-h-0 gap-4">
 
             {/* ── Controles ─────────────────────────────────────── */}
-            <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
-                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+            <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0">
+                <div className="t-seg flex-wrap">
                     {(['TODAS', ...CATEGORIAS] as string[]).map(c => (
                         <button
                             key={c}
                             onClick={() => setFiltroCat(c)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition-all
-                ${filtroCat === c
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`t-seg-btn ${filtroCat === c ? 't-seg-btn--active' : ''}`}
                         >
                             {c === 'TODAS' ? 'Todo' : capitalizar(LABEL_CATEGORIA[c] ?? c)}
                         </button>
@@ -163,24 +160,20 @@ export function MenuPage({ onMensaje }: Props) {
                     onChange={e => setBusqueda(e.target.value)}
                     placeholder="Buscar producto..."
                     aria-label="Buscar en la tienda"
-                    className="flex-1 min-w-40 px-3 py-1.5 border border-gray-200 rounded-lg
-                      text-xs bg-gray-50 focus:outline-none focus:border-gray-400
-                      focus:bg-white placeholder:text-gray-300 transition-colors"
+                    className="t-input flex-1 min-w-40"
                 />
 
                 <button
                     onClick={() => cargar().then(() => onMensaje('Tienda actualizada'))}
                     aria-label="Actualizar tienda"
                     title="Actualizar tienda"
-                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
-                      text-gray-500 hover:bg-gray-50 transition-colors"
+                    className="t-btn-ghost min-w-[32px]"
                 >↻</button>
 
                 {esAdmin && (
                     <button
                         onClick={abrirCrear}
-                        className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
-                          rounded-lg hover:bg-gray-800 transition-colors"
+                        className="t-btn-primary"
                     >
                         + Producto
                     </button>
@@ -188,72 +181,65 @@ export function MenuPage({ onMensaje }: Props) {
             </div>
 
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg
-                        text-red-700 text-sm">⚠ {error}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
+                        text-red-700 text-[13px]">⚠ {error}</div>
             )}
 
-            {/* ── Tabla ─────────────────────────────────────────── */}
-            <div className="flex-1 min-h-0 overflow-auto border border-gray-100 rounded-lg">
+            {/* ── Tabla ─────────────────────────────────────── */}
+            <div className="flex-1 min-h-0 overflow-auto t-card">
                 {filtradas.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-gray-400 gap-2">
-                        <div className="text-3xl opacity-20">○</div>
-                        <div className="text-sm">No hay productos</div>
+                        <div className="text-3xl opacity-10">○</div>
+                        <div className="text-[13px]">No hay productos</div>
                     </div>
                 ) : (
-                    <table className="w-full text-sm border-collapse">
+                    <table className="w-full border-collapse text-[13px]">
                         <thead className="sticky top-0 z-10">
-                        <tr className="bg-gray-50 border-b border-gray-100">
+                        <tr className="bg-fog/80 backdrop-blur-sm border-b border-gray-200/60">
                             {['Producto', 'Descripción', 'Categoría', 'Precio', 'Estado', '']
                                 .map((col, i) => (
-                                    <th key={i}
-                                        className="px-3 py-2.5 text-left text-xs font-medium
-                                     text-gray-400 uppercase tracking-wide whitespace-nowrap">
-                                        {col}
-                                    </th>
+                                    <th key={i} className="t-th">{col}</th>
                                 ))}
                         </tr>
                         </thead>
-                        <tbody>
-                        {filtradas.map((item, idx) => (
+                        <tbody className="divide-y divide-gray-100/80">
+                        {filtradas.map(item => (
                             <tr
                                 key={item.id}
-                                className={`border-b border-gray-50 transition-colors
-                      ${idx % 2 === 0
-                                        ? 'bg-white hover:bg-gray-50'
-                                        : 'bg-gray-50/40 hover:bg-gray-100/60'}`}
+                                className="bg-white hover:bg-gray-50/80 transition-colors"
                             >
-                                <td className="px-3 py-3 text-xs font-medium whitespace-nowrap">
+                                <td className="t-td font-medium whitespace-nowrap text-ink">
                                     {item.nombre}
                                 </td>
-                                <td className="px-3 py-3 text-xs text-gray-400 max-w-64 truncate">
+                                <td className="t-td text-gray-400 max-w-64 truncate">
                                     {item.descripcion ?? '—'}
                                 </td>
-                                <td className="px-3 py-3">
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs
-                                        bg-gray-100 text-gray-600 font-medium">
+                                <td className="t-td">
+                    <span className="t-badge bg-gray-100 text-gray-600 border-transparent">
                         {capitalizar(LABEL_CATEGORIA[item.categoria] ?? item.categoria)}
-                      </span>
+                    </span>
                                 </td>
-                                <td className="px-3 py-3 text-xs font-mono whitespace-nowrap">
+                                <td className="t-td font-mono whitespace-nowrap">
                                     {formatSoles(item.precio)}
                                 </td>
-                                <td className="px-3 py-3">
+                                <td className="t-td">
                                     {item.disponible ? (
-                                        <span className="text-xs text-green-600 font-medium">
+                                        <span className="text-[11px] text-green-600 font-medium flex items-center gap-1.5">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                                             Disponible
                                         </span>
                                     ) : (
-                                        <span className="text-xs text-gray-400">Agotado</span>
+                                        <span className="text-[11px] text-gray-400">Agotado</span>
                                     )}
                                 </td>
-                                <td className="px-3 py-3 text-right whitespace-nowrap">
+                                <td className="t-td text-right">
                                     {esAdmin && (
                                         <>
                                             <button
                                                 onClick={() => abrirEditar(item)}
                                                 title="Editar producto"
-                                                className="px-2 py-1 text-xs text-gray-400
-                                     hover:text-gray-900 transition-colors"
+                                                className="px-2 py-1 text-[12px] text-apple
+                                     hover:underline transition-colors"
                                             >
                                                 Editar
                                             </button>
@@ -265,7 +251,7 @@ export function MenuPage({ onMensaje }: Props) {
                                                 }}
                                                 disabled={eliminandoId === item.id}
                                                 title="Retirar de la tienda"
-                                                className="px-2 py-1 text-xs text-gray-400
+                                                className="px-2 py-1 text-[12px] text-gray-400
                                      hover:text-red-500 transition-colors disabled:opacity-40"
                                             >
                                                 {eliminandoId === item.id ? '...' : 'Quitar'}
@@ -280,7 +266,7 @@ export function MenuPage({ onMensaje }: Props) {
                 )}
             </div>
 
-            <div className="text-xs text-gray-400 text-right flex-shrink-0">
+            <div className="text-[11px] text-gray-400 text-right flex-shrink-0">
                 {filtradas.length} de {items.length} productos
             </div>
 
@@ -290,10 +276,9 @@ export function MenuPage({ onMensaje }: Props) {
                 titulo={editando ? 'Editar producto' : 'Nuevo producto'}
                 onCerrar={() => setModalAbierto(false)}
             >
-                <div className="space-y-3">
+                <div className="space-y-4">
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1"
-                               htmlFor="mi-nombre">
+                        <label className="t-label" htmlFor="mi-nombre">
                             Nombre del producto *
                         </label>
                         <input
@@ -301,14 +286,12 @@ export function MenuPage({ onMensaje }: Props) {
                             value={form.nombre}
                             onChange={e => setForm({ ...form, nombre: e.target.value })}
                             autoFocus
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-gray-400"
+                            className="t-input"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1"
-                               htmlFor="mi-desc">
+                        <label className="t-label" htmlFor="mi-desc">
                             Descripción
                         </label>
                         <textarea
@@ -316,23 +299,20 @@ export function MenuPage({ onMensaje }: Props) {
                             value={form.descripcion ?? ''}
                             onChange={e => setForm({ ...form, descripcion: e.target.value })}
                             rows={2}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-gray-400 resize-none"
+                            className="t-input resize-none"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1"
-                                   htmlFor="mi-cat">
+                            <label className="t-label" htmlFor="mi-cat">
                                 Categoría *
                             </label>
                             <select
                                 id="mi-cat"
                                 value={form.categoria}
                                 onChange={e => setForm({ ...form, categoria: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                                 bg-white focus:outline-none focus:border-gray-400"
+                                className="t-input"
                             >
                                 {CATEGORIAS.map(c => (
                                     <option key={c} value={c}>
@@ -342,8 +322,7 @@ export function MenuPage({ onMensaje }: Props) {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1"
-                                   htmlFor="mi-precio">
+                            <label className="t-label" htmlFor="mi-precio">
                                 Precio (S/) *
                             </label>
                             <input
@@ -353,40 +332,37 @@ export function MenuPage({ onMensaje }: Props) {
                                 step="0.5"
                                 value={form.precio || ''}
                                 onChange={e => setForm({ ...form, precio: Number(e.target.value) })}
-                                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                                 focus:outline-none focus:border-gray-400"
+                                className="t-input"
                             />
                         </div>
                     </div>
 
-                    <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                    <label className="flex items-center gap-2 text-[13px] text-gray-600 cursor-pointer">
                         <input
                             type="checkbox"
                             checked={form.disponible}
                             onChange={e => setForm({ ...form, disponible: e.target.checked })}
-                            className="w-4 h-4 accent-gray-900"
+                            className="w-4 h-4 accent-apple"
                         />
                         Disponible para pedidos
                     </label>
 
                     {errorForm && (
-                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg
-                                text-red-700 text-xs">⚠ {errorForm}</div>
+                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl
+                                text-red-700 text-[12px]">⚠ {errorForm}</div>
                     )}
 
                     <div className="flex justify-end gap-2 pt-1">
                         <button
                             onClick={() => setModalAbierto(false)}
-                            className="px-4 py-2 text-xs text-gray-500 hover:text-gray-900
-                             transition-colors"
+                            className="t-btn-ghost"
                         >
                             Cancelar
                         </button>
                         <button
                             onClick={guardar}
                             disabled={guardando}
-                            className="px-4 py-2 bg-gray-900 text-white text-xs font-medium
-                             rounded-lg hover:bg-gray-800 disabled:opacity-40"
+                            className="t-btn-primary min-w-[92px]"
                         >
                             {guardando ? 'Guardando...' : 'Guardar'}
                         </button>

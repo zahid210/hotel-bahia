@@ -12,7 +12,7 @@ type Filtro = 'TODOS' | 'PENDIENTE' | 'ENTREGADO' | 'CANCELADO'
 const CONST_ESTADO = {
     PENDIENTE: { label: 'Pendiente', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
     ENTREGADO: { label: 'Entregado', cls: 'bg-green-50 text-green-700 border-green-200' },
-    CANCELADO: { label: 'Cancelado', cls: 'bg-gray-50 text-gray-500 border-gray-200' },
+    CANCELADO: { label: 'Cancelado', cls: 'bg-gray-100 text-gray-500 border-gray-200' },
 } as const
 
 const horaCorta = (iso: string) => {
@@ -32,7 +32,6 @@ export function PedidosPage({ onMensaje }: Props) {
     const [busqueda,  setBusqueda]  = useState('')
     const [accionId,  setAccionId]  = useState<string | null>(null)
 
-    // ── Modal nuevo pedido ────────────────────────────────────
     const [modalAbierto, setModalAbierto] = useState(false)
     const [reservas,     setReservas]     = useState<Reserva[]>([])
     const [menu,         setMenu]         = useState<MenuItem[]>([])
@@ -59,7 +58,7 @@ export function PedidosPage({ onMensaje }: Props) {
     useEffect(() => { void cargar() }, [cargar])
 
     const stats = useMemo(() => ({
-        todos:    pedidos.length,
+        todos:     pedidos.length,
         pendiente: pedidos.filter(p => p.estado === 'PENDIENTE').length,
         entregado: pedidos.filter(p => p.estado === 'ENTREGADO').length,
         cancelado: pedidos.filter(p => p.estado === 'CANCELADO').length,
@@ -76,7 +75,6 @@ export function PedidosPage({ onMensaje }: Props) {
         return lista
     }, [pedidos, filtro, busqueda])
 
-    // ── Abrir modal de nuevo pedido: precarga reservas (CHECKIN) y tienda ──
     const abrirNuevo = async () => {
         setModalAbierto(true)
         setReservaSel('')
@@ -166,40 +164,38 @@ export function PedidosPage({ onMensaje }: Props) {
     }, [menu, catSel])
 
     if (cargando && pedidos.length === 0) return (
-        <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
-      <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
+        <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
+      <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
                        rounded-full animate-spin" />
             Cargando pedidos...
         </div>
     )
 
     return (
-        <div className="flex flex-col h-full min-h-0 gap-3">
+        <div className="flex flex-col h-full min-h-0 gap-4">
 
-            {/* ── Stats ─────────────────────────────────────────── */}
-            <div className="grid grid-cols-4 border border-gray-100
-                      rounded-lg overflow-hidden flex-shrink-0">
+            {/* ── Stats ─────────────────────────────────────── */}
+            <div className="grid grid-cols-4 gap-3 flex-shrink-0">
                 {[
-                    { label: 'Total',      value: stats.todos,     color: 'text-gray-800'   },
+                    { label: 'Total',      value: stats.todos,     color: 'text-ink'   },
                     { label: 'Pendiente',  value: stats.pendiente, color: 'text-amber-600'  },
                     { label: 'Entregados', value: stats.entregado, color: 'text-green-600'  },
                     { label: 'Cancelados', value: stats.cancelado, color: 'text-gray-400'   },
                 ].map((s, i) => (
-                    <div key={i}
-                         className={`p-3 bg-gray-50 ${i < 3 ? 'border-r border-gray-100' : ''}`}>
-                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">
+                    <div key={i} className="t-card p-3.5">
+                        <div className="t-label mb-1">
                             {s.label}
                         </div>
-                        <div className={`text-xl font-mono font-medium ${s.color}`}>
+                        <div className={`text-[20px] font-semibold font-mono tracking-tight ${s.color}`}>
                             {s.value}
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* ── Controles ─────────────────────────────────────── */}
-            <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
-                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+            {/* ── Controles ─────────────────────────────────── */}
+            <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0">
+                <div className="t-seg">
                     {([
                         { id: 'TODOS',    label: 'Todos' },
                         { id: 'PENDIENTE', label: `Pendientes (${stats.pendiente})` },
@@ -209,10 +205,7 @@ export function PedidosPage({ onMensaje }: Props) {
                         <button
                             key={t.id}
                             onClick={() => setFiltro(t.id)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition-all
-                ${filtro === t.id
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`t-seg-btn ${filtro === t.id ? 't-seg-btn--active' : ''}`}
                         >
                             {t.label}
                         </button>
@@ -225,71 +218,60 @@ export function PedidosPage({ onMensaje }: Props) {
                     onChange={e => setBusqueda(e.target.value)}
                     placeholder="Buscar por habitación o huésped..."
                     aria-label="Buscar pedidos"
-                    className="flex-1 min-w-40 px-3 py-1.5 border border-gray-200 rounded-lg
-                      text-xs bg-gray-50 focus:outline-none focus:border-gray-400
-                      focus:bg-white placeholder:text-gray-300 transition-colors"
+                    className="t-input flex-1 min-w-40"
                 />
 
                 <button
                     onClick={() => cargar().then(() => onMensaje('Pedidos actualizados'))}
                     aria-label="Actualizar pedidos"
                     title="Actualizar pedidos"
-                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
-                      text-gray-500 hover:bg-gray-50 transition-colors"
+                    className="t-btn-ghost min-w-[32px]"
                 >↻</button>
 
                 <button
                     onClick={abrirNuevo}
-                    className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
-                      rounded-lg hover:bg-gray-800 transition-colors"
+                    className="t-btn-primary"
                 >
                     + Pedido
                 </button>
             </div>
 
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg
-                        text-red-700 text-sm">⚠ {error}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
+                        text-red-700 text-[13px]">⚠ {error}</div>
             )}
 
-            {/* ── Tabla ─────────────────────────────────────────── */}
-            <div className="flex-1 min-h-0 overflow-auto border border-gray-100 rounded-lg">
+            {/* ── Tabla ─────────────────────────────────────── */}
+            <div className="flex-1 min-h-0 overflow-auto t-card">
                 {filtrados.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-gray-400 gap-2">
-                        <div className="text-3xl opacity-20">○</div>
-                        <div className="text-sm">No hay pedidos</div>
+                        <div className="text-3xl opacity-10">○</div>
+                        <div className="text-[13px]">No hay pedidos</div>
                     </div>
                 ) : (
-                    <table className="w-full text-sm border-collapse">
+                    <table className="w-full border-collapse text-[13px]">
                         <thead className="sticky top-0 z-10">
-                        <tr className="bg-gray-50 border-b border-gray-100">
+                        <tr className="bg-fog/80 backdrop-blur-sm border-b border-gray-200/60">
                             {['Hora', 'Hab.', 'Huésped', 'Detalle', 'Total', 'Registró', 'Estado', '']
                                 .map((col, i) => (
-                                    <th key={i}
-                                        className="px-3 py-2.5 text-left text-xs font-medium
-                                     text-gray-400 uppercase tracking-wide whitespace-nowrap">
-                                        {col}
-                                    </th>
+                                    <th key={i} className="t-th">{col}</th>
                                 ))}
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-gray-100/80">
                         {filtrados.map(p => (
                             <tr key={p.id}
-                                className="border-b border-gray-50 bg-white hover:bg-gray-50
-                                           transition-colors">
-                                <td className="px-3 py-3 text-xs font-mono text-gray-400 whitespace-nowrap">
+                                className="bg-white hover:bg-gray-50/80 transition-colors">
+                                <td className="t-td font-mono text-gray-400">
                                     {horaCorta(p.createdAt)}
                                 </td>
-                                <td className="px-3 py-3">
-                      <span className="font-mono font-semibold text-xs">
-                        {p.habitacionNumero}
-                      </span>
+                                <td className="t-td font-mono font-semibold text-ink">
+                                    {p.habitacionNumero}
                                 </td>
-                                <td className="px-3 py-3 text-xs font-medium whitespace-nowrap">
+                                <td className="t-td font-medium whitespace-nowrap text-ink">
                                     {p.nombreHuesped}
                                 </td>
-                                <td className="px-3 py-3 text-xs text-gray-500 max-w-56">
+                                <td className="t-td text-gray-500 max-w-56">
                                     {p.items.map(i =>
                                         `${i.cantidad}× ${i.nombre}`
                                     ).join(' · ')}
@@ -297,27 +279,25 @@ export function PedidosPage({ onMensaje }: Props) {
                                         <span className="text-gray-300"> — “{p.notas}”</span>
                                     )}
                                 </td>
-                                <td className="px-3 py-3 text-xs font-mono font-medium whitespace-nowrap">
+                                <td className="t-td font-mono font-medium whitespace-nowrap">
                                     {formatSoles(p.total)}
                                 </td>
-                                <td className="px-3 py-3 text-xs text-gray-400">
+                                <td className="t-td text-gray-400">
                                     {p.creadoPor}
                                 </td>
-                                <td className="px-3 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5
-                                        rounded-full text-xs font-medium border
-                                        ${CONST_ESTADO[p.estado].cls}`}>
+                                <td className="t-td">
+                    <span className={`t-badge ${CONST_ESTADO[p.estado].cls}`}>
                         {LABEL_ESTADO[p.estado]}
-                      </span>
+                    </span>
                                 </td>
-                                <td className="px-3 py-3 text-right whitespace-nowrap">
+                                <td className="t-td text-right">
                                     {p.estado === 'PENDIENTE' && (
                                         <>
                                             <button
                                                 onClick={() => void cambiarEstado(p, 'ENTREGADO')}
                                                 disabled={accionId === p.id}
-                                                className="px-2 py-1 text-xs text-green-600
-                                     hover:text-green-700 transition-colors disabled:opacity-40"
+                                                className="px-2 py-1 text-[12px] text-green-600
+                                     hover:underline transition-colors disabled:opacity-40"
                                             >
                                                 Entregar
                                             </button>
@@ -328,7 +308,7 @@ export function PedidosPage({ onMensaje }: Props) {
                                                     }
                                                 }}
                                                 disabled={accionId === p.id}
-                                                className="px-2 py-1 text-xs text-gray-400
+                                                className="px-2 py-1 text-[12px] text-gray-400
                                      hover:text-red-500 transition-colors disabled:opacity-40"
                                             >
                                                 Cancelar
@@ -343,7 +323,7 @@ export function PedidosPage({ onMensaje }: Props) {
                                                 )) void cambiarEstado(p, 'CANCELADO')
                                             }}
                                             disabled={accionId === p.id}
-                                            className="px-2 py-1 text-xs text-gray-400
+                                            className="px-2 py-1 text-[12px] text-gray-400
                                      hover:text-red-500 transition-colors disabled:opacity-40"
                                         >
                                             Cancelar
@@ -357,7 +337,7 @@ export function PedidosPage({ onMensaje }: Props) {
                 )}
             </div>
 
-            <div className="text-xs text-gray-400 text-right flex-shrink-0">
+            <div className="text-[11px] text-gray-400 text-right flex-shrink-0">
                 {filtrados.length} de {pedidos.length} pedidos
             </div>
 
@@ -367,19 +347,16 @@ export function PedidosPage({ onMensaje }: Props) {
                 titulo="Nuevo pedido"
                 onCerrar={() => setModalAbierto(false)}
             >
-                <div className="space-y-3">
-                    {/* Reserva activa */}
+                <div className="space-y-4">
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1"
-                               htmlFor="ped-reserva">
+                        <label className="t-label" htmlFor="ped-reserva">
                             Huésped (reserva con check-in) *
                         </label>
                         <select
                             id="ped-reserva"
                             value={reservaSel}
                             onChange={e => setReservaSel(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             bg-white focus:outline-none focus:border-gray-400"
+                            className="t-input"
                         >
                             <option value="">Selecciona...</option>
                             {reservas.map(r => (
@@ -389,44 +366,40 @@ export function PedidosPage({ onMensaje }: Props) {
                             ))}
                         </select>
                         {reservas.length === 0 && (
-                            <div className="text-xs text-amber-600 mt-1">
+                            <div className="text-[12px] text-amber-600 mt-1.5">
                                 No hay reservas con check-in activo para registrar consumo.
                             </div>
                         )}
                     </div>
 
-                    {/* Producto + cantidad */}
                     <div>
-                        <div className="text-xs text-gray-400 mb-1">Productos *</div>
-                        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg mb-2 flex-wrap">
+                        <div className="t-label mb-1">Productos *</div>
+                        <div className="t-seg flex-wrap mb-3">
                             {(['TODAS', ...CATEGORIAS] as string[]).map(c => (
                                 <button
                                     key={c}
                                     onClick={() => setCatSel(c)}
-                                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all
-                      ${catSel === c
-                                            ? 'bg-white text-gray-900 shadow-sm'
-                                            : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`t-seg-btn ${catSel === c ? 't-seg-btn--active' : ''}`}
                                 >
                                     {c === 'TODAS' ? 'Todo' : capitalizar(LABEL_CATEGORIA[c] ?? c)}
                                 </button>
                             ))}
                         </div>
-                        <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
+                        <div className="max-h-48 overflow-y-auto rounded-2xl border border-gray-200/60 divide-y divide-gray-100/80">
                             {menuFiltrado.length === 0 ? (
-                                <div className="p-4 text-xs text-gray-400 text-center">
+                                <div className="p-4 text-[12px] text-gray-400 text-center">
                                     Sin productos disponibles
                                 </div>
                             ) : menuFiltrado.map(m => {
                                 const cant = cantidades[m.id] ?? 0
                                 return (
                                     <div key={m.id}
-                                         className="flex items-center justify-between px-3 py-2 text-sm">
+                                         className="flex items-center justify-between px-3.5 py-2.5 bg-white">
                                         <div className="min-w-0">
-                                            <div className="text-xs font-medium truncate">
+                                            <div className="text-[13px] font-medium truncate text-ink">
                                                 {m.nombre}
                                             </div>
-                                            <div className="text-xs text-gray-400 font-mono">
+                                            <div className="text-[11px] text-gray-400 font-mono">
                                                 {formatSoles(m.precio)}
                                             </div>
                                         </div>
@@ -435,36 +408,35 @@ export function PedidosPage({ onMensaje }: Props) {
                                                 onClick={() => agregar(m.id, -1)}
                                                 disabled={cant === 0}
                                                 aria-label={`Quitar ${m.nombre}`}
-                                                className="w-6 h-6 rounded-md border border-gray-200
+                                                className="w-7 h-7 rounded-full border border-gray-200
                                      text-gray-500 hover:bg-gray-50 disabled:opacity-30
-                                     text-sm leading-none"
+                                     text-[14px] leading-none transition-colors"
                                             >−</button>
-                                            <span className="w-5 text-center text-xs font-mono">
+                                            <span className="w-5 text-center text-[12px] font-mono">
                                                 {cant || ''}
                                             </span>
                                             <button
                                                 onClick={() => agregar(m.id, 1)}
                                                 aria-label={`Agregar ${m.nombre}`}
-                                                className="w-6 h-6 rounded-md border border-gray-200
-                                     text-gray-500 hover:bg-gray-50 text-sm leading-none"
+                                                className="w-7 h-7 rounded-full border border-gray-200
+                                     text-gray-500 hover:bg-gray-50 text-[14px] leading-none
+                                     transition-colors"
                                             >+</button>
                                         </div>
                                     </div>
                                 )
                             })}
                         </div>
-                        <div className="flex justify-between items-center mt-2 text-xs">
+                        <div className="flex justify-between items-center mt-2.5 text-[12px]">
                             <span className="text-gray-400">Total estimado</span>
-                            <span className="font-mono font-semibold">
+                            <span className="font-mono font-semibold text-ink">
                                 {formatSoles(totalEstimado)}
                             </span>
                         </div>
                     </div>
 
-                    {/* Notas */}
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1"
-                               htmlFor="ped-notas">
+                        <label className="t-label" htmlFor="ped-notas">
                             Notas
                         </label>
                         <input
@@ -472,29 +444,26 @@ export function PedidosPage({ onMensaje }: Props) {
                             value={notas}
                             onChange={e => setNotas(e.target.value)}
                             placeholder="Ej. sin sal, habitación 203..."
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-gray-400"
+                            className="t-input"
                         />
                     </div>
 
                     {errorForm && (
-                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg
-                                text-red-700 text-xs">⚠ {errorForm}</div>
+                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl
+                                text-red-700 text-[12px]">⚠ {errorForm}</div>
                     )}
 
                     <div className="flex justify-end gap-2 pt-1">
                         <button
                             onClick={() => setModalAbierto(false)}
-                            className="px-4 py-2 text-xs text-gray-500 hover:text-gray-900
-                             transition-colors"
+                            className="t-btn-ghost"
                         >
                             Cancelar
                         </button>
                         <button
                             onClick={crear}
                             disabled={guardando}
-                            className="px-4 py-2 bg-gray-900 text-white text-xs font-medium
-                             rounded-lg hover:bg-gray-800 disabled:opacity-40"
+                            className="t-btn-primary"
                         >
                             {guardando ? 'Registrando...' : 'Registrar pedido'}
                         </button>

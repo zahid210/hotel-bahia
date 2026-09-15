@@ -5,22 +5,22 @@ import { HabitacionConReserva } from '../hooks/useDashboard'
 const ESTADO_CFG = {
     LIBRE: {
         label: 'Libre',
-        bg: 'bg-green-50', border: 'border-green-200',
+        bg: 'bg-green-50/80', border: 'border-green-200/60',
         dot: 'bg-green-500', text: 'text-green-700',
     },
     OCUPADA: {
         label: 'Ocupada',
-        bg: 'bg-red-50', border: 'border-red-200',
+        bg: 'bg-red-50/80', border: 'border-red-200/60',
         dot: 'bg-red-500', text: 'text-red-700',
     },
     MANTENIMIENTO: {
         label: 'Mantenimiento',
-        bg: 'bg-amber-50', border: 'border-amber-200',
+        bg: 'bg-amber-50/80', border: 'border-amber-200/60',
         dot: 'bg-amber-500', text: 'text-amber-700',
     },
     LIMPIEZA: {
         label: 'Limpieza',
-        bg: 'bg-blue-50', border: 'border-blue-200',
+        bg: 'bg-blue-50/80', border: 'border-blue-200/60',
         dot: 'bg-blue-500', text: 'text-blue-700',
     },
 } as const
@@ -47,73 +47,63 @@ export const RoomCard = memo(function RoomCard({
     const saleHoy =
         habitacion.estado === 'OCUPADA' &&
         res?.fechaSalida === hoy &&
-        !habitacion.excedida    // ← "sale hoy" solo si no está ya excedida
+        !habitacion.excedida
 
     const esClickable = !!res
     const esAccionLista =
         habitacion.estado === 'LIMPIEZA' && !res && !!onMarcarLista
 
-    // ── Config visual según si está excedida ─────────────────
-    // Excedida usa ámbar para diferenciarse del rojo de "ocupada normal"
-    const bgFinal     = habitacion.excedida ? 'bg-amber-50'     : cfg.bg
-    const dotFinal    = habitacion.excedida ? 'bg-amber-500'    : cfg.dot
-    const textFinal   = habitacion.excedida ? 'text-amber-700'  : cfg.text
-    const labelFinal  = habitacion.excedida ? 'Excedida'        : cfg.label
+    const bgFinal     = habitacion.excedida ? 'bg-amber-50/80'   : cfg.bg
+    const dotFinal    = habitacion.excedida ? 'bg-amber-500'      : cfg.dot
+    const textFinal   = habitacion.excedida ? 'text-amber-700'    : cfg.text
+    const labelFinal  = habitacion.excedida ? 'Excedida'          : cfg.label
 
     const estilos = [
-        'relative rounded-lg border p-3 transition-all duration-150 select-none text-left',
+        'relative rounded-[16px] border p-3.5 transition-all duration-150 select-none text-left',
         bgFinal,
-        // Borde por prioridad: seleccionada > excedida > urgente > normal
         seleccionada
-            ? 'border-gray-900 ring-2 ring-gray-900 ring-offset-1 shadow-sm'
+            ? 'border-apple ring-2 ring-apple/30 shadow-soft'
             : habitacion.excedida
-                ? 'border-amber-400 ring-1 ring-amber-300'
+                ? 'border-amber-300/60'
                 : saleHoy
-                    ? 'border-orange-400 ring-1 ring-orange-300'
+                    ? 'border-orange-300/60'
                     : pendienteCheckIn
-                        ? 'border-violet-400 ring-1 ring-violet-300'
-                        : cfg.border,
+                        ? 'border-violet-300/60'
+                        : [cfg.border, 'shadow-card'],
         esClickable
-            ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-sm'
+            ? 'cursor-pointer hover:shadow-soft hover:-translate-y-0.5'
             : 'cursor-default',
     ].join(' ')
 
     const contenido = (
         <>
-        {/* ── Franja superior según estado ─────────────────────── */}
+            {/* Franja superior según estado */}
             {habitacion.excedida && (
-                <div className="absolute top-0 inset-x-0 h-1
-                        bg-amber-400 rounded-t-lg" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400 rounded-t-[16px]" />
             )}
             {!habitacion.excedida && saleHoy && (
-                <div className="absolute top-0 inset-x-0 h-1
-                        bg-orange-400 rounded-t-lg" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400 rounded-t-[16px]" />
             )}
             {!habitacion.excedida && pendienteCheckIn && (
-                <div className="absolute top-0 inset-x-0 h-1
-                        bg-violet-400 rounded-t-lg" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400 rounded-t-[16px]" />
             )}
 
-            {/* Punto de selección */}
             {seleccionada && (
                 <span className="absolute top-2 right-2 w-2 h-2
-                         rounded-full bg-gray-900" />
+                         rounded-full bg-apple animate-pulse" />
             )}
 
-            {/* ── Número ───────────────────────────────────────────── */}
-            <div className="font-mono font-bold text-base leading-none text-gray-900">
+            <div className="font-semibold text-[15px] leading-none text-ink tracking-tight">
                 {habitacion.numero}
             </div>
 
-            {/* ── Tipo + precio ─────────────────────────────────────── */}
-            <div className="text-xs text-gray-400 mt-0.5 leading-none truncate">
+            <div className="text-[11px] text-gray-400 mt-1 leading-none truncate">
                 {capitalizar(habitacion.tipo)}
                 {' · '}S/{habitacion.precioNoche}
             </div>
 
-            {/* ── Badge de estado ───────────────────────────────────── */}
             <div className={`inline-flex items-start gap-1.5 mt-2
-                        text-xs font-medium leading-tight ${textFinal}`}>
+                        text-[11px] font-medium leading-tight ${textFinal}`}>
         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0
                           mt-0.5 ${dotFinal}`} />
                 <span className="break-words">
@@ -123,32 +113,29 @@ export const RoomCard = memo(function RoomCard({
         </span>
             </div>
 
-            {/* ── Huésped ───────────────────────────────────────────── */}
             {res && (
-                <div className="mt-1 text-xs text-gray-500 truncate leading-tight">
+                <div className="mt-1.5 text-[11px] text-gray-500 truncate leading-tight">
                     {res.nombreHuesped} {res.apellidoHuesped}
                 </div>
             )}
 
-            {/* ── Indicadores de urgencia ───────────────────────────── */}
             {habitacion.excedida && (
-                <div className="mt-1 text-xs font-semibold text-amber-600">
+                <div className="mt-1 text-[11px] font-semibold text-amber-600">
                     ⚠ Superó fecha de salida
                 </div>
             )}
             {!habitacion.excedida && saleHoy && (
-                <div className="mt-1 text-xs font-semibold text-orange-500">
+                <div className="mt-1 text-[11px] font-semibold text-orange-500">
                     Sale hoy ↗
                 </div>
             )}
 
-            {/* ── Botón lista en limpieza ───────────────────────────── */}
             {esAccionLista && (
                 <button
                     onClick={() => onMarcarLista(habitacion.id)}
-                    className="mt-2.5 w-full py-1.5 text-xs font-medium text-blue-600
-                     border border-blue-200 rounded-md bg-white
-                     hover:bg-blue-50 active:scale-95 transition-all"
+                    className="mt-2.5 w-full py-1.5 text-[11px] font-medium text-apple
+                     border border-apple/30 rounded-full bg-white
+                     hover:bg-apple/5 active:scale-[0.98] transition-all duration-150"
                 >
                     ✓ Lista
                 </button>

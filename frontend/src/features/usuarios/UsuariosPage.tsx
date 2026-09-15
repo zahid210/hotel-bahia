@@ -20,9 +20,9 @@ type RolState = typeof ROLES[number]
 type ModalTipo = 'crear' | 'editar' | 'password' | null
 
 const CONST_ROL: Record<RolState, string> = {
-    ADMIN: 'bg-gray-900 text-white',
-    RECEPCIONISTA: 'bg-blue-50 text-blue-700',
-    LIMPIEZA: 'bg-teal-50 text-teal-700',
+    ADMIN: 'bg-ink text-white border-transparent',
+    RECEPCIONISTA: 'bg-blue-50 text-blue-700 border-blue-200',
+    LIMPIEZA: 'bg-teal-50 text-teal-700 border-teal-200',
 }
 
 export function UsuariosPage({ onMensaje }: Props) {
@@ -162,116 +162,106 @@ export function UsuariosPage({ onMensaje }: Props) {
     }
 
     if (cargando && usuarios.length === 0) return (
-        <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
-      <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
+        <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
+      <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
                        rounded-full animate-spin" />
             Cargando usuarios...
         </div>
     )
 
     return (
-        <div className="flex flex-col h-full min-h-0 gap-3">
+        <div className="flex flex-col h-full min-h-0 gap-4">
 
-            {/* ── Controles ─────────────────────────────────────── */}
-            <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
+            {/* ── Controles ─────────────────────────────────── */}
+            <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0">
                 <input
                     type="text"
                     value={busqueda}
                     onChange={e => setBusqueda(e.target.value)}
                     placeholder="Buscar por nombre, email o rol..."
                     aria-label="Buscar usuarios"
-                    className="flex-1 min-w-40 px-3 py-1.5 border border-gray-200 rounded-lg
-                      text-xs bg-gray-50 focus:outline-none focus:border-gray-400
-                      focus:bg-white placeholder:text-gray-300 transition-colors"
+                    className="t-input flex-1 min-w-40"
                 />
 
                 <button
                     onClick={() => cargar().then(() => onMensaje('Usuarios actualizados'))}
                     aria-label="Actualizar usuarios"
                     title="Actualizar usuarios"
-                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
-                      text-gray-500 hover:bg-gray-50 transition-colors"
+                    className="t-btn-ghost min-w-[32px]"
                 >↻</button>
 
                 <button
                     onClick={abrirCrear}
-                    className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
-                      rounded-lg hover:bg-gray-800 transition-colors"
+                    className="t-btn-primary"
                 >
                     + Usuario
                 </button>
             </div>
 
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg
-                        text-red-700 text-sm">⚠ {error}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
+                        text-red-700 text-[13px]">⚠ {error}</div>
             )}
 
-            {/* ── Tabla ─────────────────────────────────────────── */}
-            <div className="flex-1 min-h-0 overflow-auto border border-gray-100 rounded-lg">
+            {/* ── Tabla ─────────────────────────────────────── */}
+            <div className="flex-1 min-h-0 overflow-auto t-card">
                 {filtrados.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-gray-400 gap-2">
-                        <div className="text-3xl opacity-20">○</div>
-                        <div className="text-sm">No hay usuarios</div>
+                        <div className="text-3xl opacity-10">○</div>
+                        <div className="text-[13px]">No hay usuarios</div>
                     </div>
                 ) : (
-                    <table className="w-full text-sm border-collapse">
+                    <table className="w-full border-collapse text-[13px]">
                         <thead className="sticky top-0 z-10">
-                        <tr className="bg-gray-50 border-b border-gray-100">
+                        <tr className="bg-fog/80 backdrop-blur-sm border-b border-gray-200/60">
                             {['Nombre', 'Email', 'Rol', 'Estado', '']
                                 .map((col, i) => (
-                                    <th key={i}
-                                        className="px-3 py-2.5 text-left text-xs font-medium
-                                     text-gray-400 uppercase tracking-wide whitespace-nowrap">
-                                        {col}
-                                    </th>
+                                    <th key={i} className="t-th">{col}</th>
                                 ))}
                         </tr>
                         </thead>
-                        <tbody>
-                        {filtrados.map((u, idx) => (
+                        <tbody className="divide-y divide-gray-100/80">
+                        {filtrados.map(u => (
                             <tr key={u.id}
-                                className={`border-b border-gray-50 transition-colors
-                      ${idx % 2 === 0
-                                        ? 'bg-white hover:bg-gray-50'
-                                        : 'bg-gray-50/40 hover:bg-gray-100/60'}`}>
-                                <td className="px-3 py-3 text-xs font-medium whitespace-nowrap">
+                                className="bg-white hover:bg-gray-50/80 transition-colors">
+                                <td className="t-td font-medium whitespace-nowrap text-ink">
                                     {u.nombre}
                                 </td>
-                                <td className="px-3 py-3 text-xs font-mono text-gray-400">
+                                <td className="t-td font-mono text-gray-400">
                                     {u.email}
                                 </td>
-                                <td className="px-3 py-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs
-                                        font-medium ${CONST_ROL[u.rol]}`}>
+                                <td className="t-td">
+                    <span className={`t-badge ${CONST_ROL[u.rol]}`}>
                         {capitalizar(LABEL_ROL[u.rol])}
-                      </span>
+                    </span>
                                 </td>
-                                <td className="px-3 py-3">
+                                <td className="t-td">
                                     {u.activo ? (
-                                        <span className="text-xs text-green-600 font-medium">
+                                        <span className="text-[11px] text-green-600 font-medium flex items-center gap-1.5">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                                             Activo
                                         </span>
                                     ) : (
-                                        <span className="text-xs text-red-500 font-medium">
+                                        <span className="text-[11px] text-red-500 font-medium flex items-center gap-1.5">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                                             Inactivo
                                         </span>
                                     )}
                                 </td>
-                                <td className="px-3 py-3 text-right whitespace-nowrap">
+                                <td className="t-td text-right whitespace-nowrap">
                                     <button
                                         onClick={() => abrirEditar(u)}
                                         title="Editar usuario"
-                                        className="px-2 py-1 text-xs text-gray-400
-                                     hover:text-gray-900 transition-colors"
+                                        className="px-2 py-1 text-[12px] text-apple
+                                     hover:underline transition-colors"
                                     >
                                         Editar
                                     </button>
                                     <button
                                         onClick={() => abrirPassword(u)}
                                         title="Cambiar contraseña"
-                                        className="px-2 py-1 text-xs text-gray-400
-                                     hover:text-gray-900 transition-colors"
+                                        className="px-2 py-1 text-[12px] text-apple
+                                     hover:underline transition-colors"
                                     >
                                         Contraseña
                                     </button>
@@ -283,11 +273,11 @@ export function UsuariosPage({ onMensaje }: Props) {
                 )}
             </div>
 
-            <div className="text-xs text-gray-400 text-right flex-shrink-0">
+            <div className="text-[11px] text-gray-400 text-right flex-shrink-0">
                 {filtrados.length} de {usuarios.length} usuarios
             </div>
 
-            {/* ── Modal crear ───────────────────────────────────── */}
+            {/* ── Modales ─────────────────────────────────────── */}
             <Modal abierto={modalTipo === 'crear'} titulo="Nuevo usuario"
                    onCerrar={() => setModalTipo(null)}>
                 <FormUsuario
@@ -303,7 +293,6 @@ export function UsuariosPage({ onMensaje }: Props) {
                 />
             </Modal>
 
-            {/* ── Modal editar ──────────────────────────────────── */}
             <Modal abierto={modalTipo === 'editar'} titulo="Editar usuario"
                    onCerrar={() => setModalTipo(null)}>
                 <FormUsuario
@@ -319,7 +308,6 @@ export function UsuariosPage({ onMensaje }: Props) {
                 />
             </Modal>
 
-            {/* ── Modal contraseña ──────────────────────────────── */}
             <Modal abierto={modalTipo === 'password'}
                    titulo={seleccion ? `Contraseña de ${seleccion.nombre}` : 'Cambiar contraseña'}
                    onCerrar={() => setModalTipo(null)}>
@@ -337,9 +325,8 @@ export function UsuariosPage({ onMensaje }: Props) {
                 />
             </Modal>
 
-            {/* Nota restrictiva para rol no-ADMIN (nunca debería pasar) */}
             {miRol !== 'ADMIN' && (
-                <div className="text-xs text-gray-400 text-right">
+                <div className="text-[11px] text-gray-400 text-right">
                     Solo un administrador puede gestionar usuarios.
                 </div>
             )}
@@ -374,11 +361,11 @@ function FormUsuario({
         onChange({ nombre, email, rol, activo: activo ?? true, password, ...p })
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             {!soloPassword && (
                 <>
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1" htmlFor="us-nombre">
+                        <label className="t-label" htmlFor="us-nombre">
                             Nombre completo *
                         </label>
                         <input
@@ -386,13 +373,12 @@ function FormUsuario({
                             value={nombre}
                             onChange={e => set({ nombre: e.target.value })}
                             autoFocus
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-gray-400"
+                            className="t-input"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1" htmlFor="us-email">
+                        <label className="t-label" htmlFor="us-email">
                             Email *
                         </label>
                         <input
@@ -400,21 +386,19 @@ function FormUsuario({
                             type="email"
                             value={email}
                             onChange={e => set({ email: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-gray-400"
+                            className="t-input"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1" htmlFor="us-rol">
+                        <label className="t-label" htmlFor="us-rol">
                             Rol *
                         </label>
                         <select
                             id="us-rol"
                             value={rol}
                             onChange={e => set({ rol: e.target.value as RolState })}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             bg-white focus:outline-none focus:border-gray-400"
+                            className="t-input"
                         >
                             {ROLES.map(r => (
                                 <option key={r} value={r}>{LABEL_ROL[r]}</option>
@@ -425,19 +409,19 @@ function FormUsuario({
             )}
 
             {mostrarActivo && (
-                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <label className="flex items-center gap-2 text-[13px] text-gray-600 cursor-pointer">
                     <input
                         type="checkbox"
                         checked={activo ?? true}
                         onChange={e => set({ activo: e.target.checked })}
-                        className="w-4 h-4 accent-gray-900"
+                        className="w-4 h-4 accent-apple"
                     />
                     Usuario activo (puede iniciar sesión)
                 </label>
             )}
 
             <div>
-                <label className="block text-xs text-gray-400 mb-1" htmlFor="us-pass">
+                <label className="t-label" htmlFor="us-pass">
                         {soloPassword ? `Nueva contraseña * (mínimo 6 caracteres)`
                             : mostrarPassword ? 'Contraseña * (mínimo 6 caracteres)'
                                 : 'Nueva contraseña' }
@@ -447,29 +431,26 @@ function FormUsuario({
                     type="password"
                     value={password}
                     onChange={e => set({ password: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
-                             focus:outline-none focus:border-gray-400"
+                    className="t-input"
                 />
             </div>
 
             {errorForm && (
-                <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg
-                        text-red-700 text-xs">⚠ {errorForm}</div>
+                <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl
+                        text-red-700 text-[12px]">⚠ {errorForm}</div>
             )}
 
             <div className="flex justify-end gap-2 pt-1">
                 <button
                     onClick={onCerrar}
-                    className="px-4 py-2 text-xs text-gray-500 hover:text-gray-900
-                             transition-colors"
+                    className="t-btn-ghost"
                 >
                     Cancelar
                 </button>
                 <button
                     onClick={onGuardar}
                     disabled={guardando}
-                    className="px-4 py-2 bg-gray-900 text-white text-xs font-medium
-                             rounded-lg hover:bg-gray-800 disabled:opacity-40"
+                    className="t-btn-primary min-w-[110px]"
                 >
                     {guardando ? 'Guardando...' : accionTexto}
                 </button>

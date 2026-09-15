@@ -35,7 +35,7 @@ const Campo = ({
     destacado?: boolean
 }) => (
     <div className="flex justify-between items-baseline py-1.5
-                  border-b border-gray-50 last:border-0">
+                  border-b border-gray-100 last:border-0">
         <span className="text-xs text-gray-400 flex-shrink-0 mr-2">{label}</span>
         <span className={[
             'text-xs text-right',
@@ -135,9 +135,8 @@ export function ReservaDetailPanel({
                     onClick={onClose}
                     aria-label="Cerrar panel"
                     className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center
-               rounded-md border border-gray-200 text-gray-400
-               hover:text-gray-700 hover:bg-gray-50 text-sm
-               transition-colors"
+               rounded-full border border-gray-200 text-gray-400 hover:text-gray-700
+               hover:bg-gray-50 text-[12px] transition-colors"
                 >✕</button>
             </div>
 
@@ -168,7 +167,7 @@ export function ReservaDetailPanel({
                     </div>
                 </div>
 
-                <div className="h-px bg-gray-100 mx-5"/>
+                <div className="h-px bg-gray-200/50 mx-5"/>
 
                 {/* ── Fechas acordadas ─────────────────────────────────── */}
                 <div className="px-5 py-3">
@@ -197,7 +196,7 @@ export function ReservaDetailPanel({
                     <Campo label="Noches" valor={Number(reserva.noches ?? 1)} mono />
                 </div>
 
-                <div className="h-px bg-gray-100 mx-5"/>
+                <div className="h-px bg-gray-200/50 mx-5"/>
 
                 {/* ── Timestamps reales (Nivel 1) ───────────────────────
             Solo se muestran si ya ocurrieron                    */}
@@ -222,7 +221,7 @@ export function ReservaDetailPanel({
                                 />
                             )}
                         </div>
-                        <div className="h-px bg-gray-100 mx-5"/>
+                        <div className="h-px bg-gray-200/50 mx-5"/>
                     </>
                 )}
 
@@ -230,8 +229,8 @@ export function ReservaDetailPanel({
                     Aparece solo si hubo días extra (pasó la medianoche)        */}
                 {horasExtra > 0 && (
                     <>
-                        <div className="mx-5 my-3 p-3 bg-orange-50 border
-                    border-orange-200 rounded-lg">
+                        <div className="mx-5 my-3 p-3.5 bg-orange-50/70 border
+                    border-orange-200/70 rounded-2xl">
                             <div className="text-xs font-semibold text-orange-700 mb-2">
                                 ⚠ Día(s) adicional(es) — superó medianoche
                             </div>
@@ -259,12 +258,12 @@ export function ReservaDetailPanel({
                                 </span>
                             </div>
                         </div>
-                        <div className="h-px bg-gray-100 mx-5"/>
+                        <div className="h-px bg-gray-200/50 mx-5"/>
                     </>
                 )}
 
                 {/* ── Resumen económico ────────────────────────────────────── */}
-                <div className="mx-5 my-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="mx-5 my-3 p-3.5 bg-fog/70 rounded-2xl border border-gray-200/60">
                     <div className="space-y-1">
                         <Campo
                             label={`${reserva.noches ?? 1} noche${Number(reserva.noches) > 1 ? 's' : ''} × ${formatSoles(Number(reserva.precioNoche))}`}
@@ -325,10 +324,7 @@ export function ReservaDetailPanel({
                             <button
                                 onClick={handleCheckIn}
                                 disabled={isBusy}
-                                className="w-full py-2.5 bg-gray-900 text-white text-sm
-                           font-medium rounded-lg hover:bg-gray-800
-                           disabled:opacity-50 transition-colors
-                           flex items-center justify-center gap-2"
+                                className="t-btn-primary w-full py-2.5"
                             >
                                 {isBusy
                                     ? <><span className={spinnerCls}/> Procesando...</>
@@ -336,7 +332,7 @@ export function ReservaDetailPanel({
                             </button>
 
                             {confirmandoCancelacion ? (
-                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <div className="p-3 bg-red-50/70 border border-red-200/70 rounded-2xl">
                                     <p className="text-xs text-red-700 mb-2.5 leading-relaxed">
                                         ¿Confirmar cancelación? No se puede deshacer.
                                     </p>
@@ -344,9 +340,9 @@ export function ReservaDetailPanel({
                                         <button
                                             onClick={handleCancelar}
                                             disabled={isBusy}
-                                            className="flex-1 py-1.5 bg-red-600 text-white text-xs
-                                 font-medium rounded-md hover:bg-red-700
-                                 disabled:opacity-50"
+                                            className="flex-1 py-1.5 bg-red-500 text-white text-xs
+                                 font-medium rounded-full hover:bg-red-600
+                                 disabled:opacity-50 transition-colors"
                                         >
                                             Sí, cancelar
                                         </button>
@@ -354,7 +350,7 @@ export function ReservaDetailPanel({
                                             onClick={() => setConfirmandoCancelacion(false)}
                                             className="flex-1 py-1.5 border border-gray-200
                                  text-gray-600 text-xs font-medium
-                                 rounded-md hover:bg-gray-50"
+                                 rounded-full hover:bg-gray-50"
                                         >
                                             No
                                         </button>
@@ -367,9 +363,8 @@ export function ReservaDetailPanel({
                                         setConfirmandoCancelacion(true)
                                     }}
                                     className="w-full py-2 border border-gray-200 text-gray-500
-                             text-xs font-medium rounded-lg hover:bg-gray-50
-                             hover:text-red-500 hover:border-red-200
-                             transition-colors"
+                             text-xs font-medium rounded-full hover:bg-gray-50
+                             hover:text-red-500 hover:border-red-200 transition-colors"
                                 >
                                     Cancelar reserva
                                 </button>
@@ -405,13 +400,13 @@ export function ReservaDetailPanel({
                                 onClick={handleCheckOut}
                                 disabled={isBusy}
                                 className={[
-                                    'w-full py-2.5 text-sm font-medium rounded-lg',
-                                    'disabled:opacity-50 transition-colors',
+                                    'w-full py-2.5 text-sm font-medium rounded-full',
+                                    'disabled:opacity-50 transition-all duration-150',
                                     'flex items-center justify-center gap-2',
-                                    // Botón ámbar si está excedida para reforzar urgencia
+                                    'active:scale-[0.98]',
                                     excedida
                                         ? 'bg-amber-500 text-white hover:bg-amber-600'
-                                        : 'bg-gray-900 text-white hover:bg-gray-800',
+                                        : 't-btn-primary py-2.5',
                                 ].join(' ')}
                             >
                                 {isBusy
@@ -425,16 +420,16 @@ export function ReservaDetailPanel({
 
                     {/* CHECKOUT → Solo lectura con resumen */}
                     {reserva.estado === 'CHECKOUT' && (
-                        <div className="w-full py-2.5 text-center text-xs text-gray-400
-                            bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="w-full py-2.5 text-center text-[11px] text-gray-400
+                            bg-fog/60 rounded-full border border-gray-200/60">
                             Estancia completada ✓
                         </div>
                     )}
 
                     {/* CANCELADA */}
                     {reserva.estado === 'CANCELADA' && (
-                        <div className="w-full py-2.5 text-center text-xs text-gray-400
-                            bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="w-full py-2.5 text-center text-[11px] text-gray-400
+                            bg-fog/60 rounded-full border border-gray-200/60">
                             Reserva cancelada
                         </div>
                     )}

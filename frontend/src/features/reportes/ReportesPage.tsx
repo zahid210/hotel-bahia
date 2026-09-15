@@ -43,7 +43,7 @@ type Periodo = 'hoy' | 'semana' | 'mes' | 'custom'
 
 // ── Tarjeta de stat ───────────────────────────────────────────
 function StatCard({
-                      label, valor, sub, color = 'text-gray-900',
+                      label, valor, sub, color = 'text-ink',
                   }: {
     label: string
     valor: string | number
@@ -51,15 +51,15 @@ function StatCard({
     color?: string
 }) {
     return (
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-            <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">
+        <div className="t-card p-4">
+            <div className="t-label mb-1">
                 {label}
             </div>
-            <div className={`text-2xl font-mono font-medium ${color}`}>
+            <div className={`text-[22px] font-semibold font-mono tracking-tight ${color}`}>
                 {valor}
             </div>
             {sub && (
-                <div className="text-xs text-gray-400 mt-1">{sub}</div>
+                <div className="text-[11px] text-gray-400 mt-1.5">{sub}</div>
             )}
         </div>
     )
@@ -146,8 +146,8 @@ export function ReportesPage() {
         <div className="flex flex-col gap-5 h-full min-h-0 overflow-y-auto pb-6">
 
             {/* ── Selector de período ─────────────────────────────── */}
-            <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
-                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+            <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0">
+                <div className="t-seg">
                     {([
                         { id: 'hoy',    label: 'Hoy'        },
                         { id: 'semana', label: 'Esta semana' },
@@ -157,10 +157,7 @@ export function ReportesPage() {
                         <button
                             key={t.id}
                             onClick={() => setPeriodo(t.id)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition-all
-                ${periodo === t.id
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`t-seg-btn ${periodo === t.id ? 't-seg-btn--active' : ''}`}
                         >
                             {t.label}
                         </button>
@@ -174,22 +171,19 @@ export function ReportesPage() {
                             type="date" value={fechaIni}
                             onChange={e => setFechaIni(e.target.value)}
                             aria-label="Fecha inicio del reporte"
-                            className="px-2 py-1.5 border border-gray-200 rounded-md text-xs
-                         bg-gray-50 focus:outline-none focus:border-gray-900"
+                            className="t-input w-auto py-1"
                         />
-                        <span className="text-xs text-gray-400">→</span>
+                        <span className="text-[12px] text-gray-400">→</span>
                         <input
                             type="date" value={fechaFin}
                             onChange={e => setFechaFin(e.target.value)}
                             aria-label="Fecha fin del reporte"
-                            className="px-2 py-1.5 border border-gray-200 rounded-md text-xs
-                         bg-gray-50 focus:outline-none focus:border-gray-900"
+                            className="t-input w-auto py-1"
                         />
                         <button
                             onClick={handleCustom}
                             disabled={!fechaIni || !fechaFin}
-                            className="px-3 py-1.5 bg-gray-900 text-white text-xs rounded-md
-                         hover:bg-gray-800 disabled:opacity-40"
+                            className="t-btn-primary"
                         >
                             Aplicar
                         </button>
@@ -201,11 +195,10 @@ export function ReportesPage() {
                     disabled={cargando}
                     aria-label="Actualizar reporte"
                     title="Actualizar reporte"
-                    className="ml-auto px-3 py-1.5 border border-gray-200 rounded-lg
-                     text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-40"
+                    className="t-btn-ghost ml-auto min-w-[32px]"
                 >
                     {cargando ? (
-                        <span className="w-3 h-3 border-2 border-gray-300 border-t-gray-600
+                        <span className="w-3 h-3 border-2 border-gray-200 border-t-apple
                              rounded-full animate-spin inline-block" />
                     ) : '↻'}
                 </button>
@@ -213,8 +206,8 @@ export function ReportesPage() {
 
             {/* Error */}
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg
-                        text-red-700 text-sm">⚠ {error}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
+                        text-red-700 text-[13px]">⚠ {error}</div>
             )}
 
             {/* Skeleton mientras carga */}
@@ -229,7 +222,7 @@ export function ReportesPage() {
             {reporte && (
                 <>
                     {/* ── KPIs principales ─────────────────────────────── */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-shrink-0">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-shrink-0">
                         <StatCard
                             label="Ingreso total"
                             valor={S(reporte.resumen.ingresoTotal)}
@@ -266,8 +259,7 @@ export function ReportesPage() {
 
                     {/* ── Gráfica de ocupación diaria ──────────────────── */}
                     {reporte.ocupacionPorDia.length > 0 && (
-                        <div className="bg-white border border-gray-100 rounded-lg p-5
-                            flex-shrink-0">
+                        <div className="t-card p-5 flex-shrink-0">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
                                     <div className="text-sm font-medium">Ocupación diaria</div>
@@ -335,7 +327,7 @@ export function ReportesPage() {
 
                         {/* Pie chart: ingresos por tipo */}
                         {reporte.rendimientoPorTipo.length > 0 ? (
-                            <div className="bg-white border border-gray-100 rounded-lg p-5">
+                            <div className="t-card p-5">
                                 <div className="text-sm font-medium mb-4">
                                     Ingresos por tipo de habitación
                                 </div>
@@ -405,7 +397,7 @@ export function ReportesPage() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-white border border-gray-100 rounded-lg p-5
+                            <div className="t-card p-5
                               flex items-center justify-center">
                                 <div className="text-center text-gray-400">
                                     <div className="text-3xl opacity-20 mb-2">○</div>
@@ -418,7 +410,7 @@ export function ReportesPage() {
                         )}
 
                         {/* Top habitaciones */}
-                        <div className="bg-white border border-gray-100 rounded-lg p-5">
+                        <div className="t-card p-5">
                             <div className="text-sm font-medium mb-4">
                                 Top habitaciones por ingreso
                             </div>

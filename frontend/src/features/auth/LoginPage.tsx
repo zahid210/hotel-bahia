@@ -32,46 +32,45 @@ export function LoginPage({ onLogin }: Props) {
         }
     }
 
-    const campo = `
-    w-full px-4 py-3 border border-gray-200 rounded-lg text-sm
-    bg-gray-50 focus:outline-none focus:border-gray-900 focus:bg-white
-    transition-colors placeholder:text-gray-300
-  `
+    const lbl = 't-label'
+    const campo = 't-input'
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-fog flex items-center justify-center p-5 antialiased">
 
             <div className="w-full max-w-sm relative z-10">
-                {/* Header */}
-                <div className="mb-8 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12
-                          bg-gray-900 rounded-xl mb-4">
-                        <span className="text-white text-lg font-bold font-mono">H</span>
+                {/* Logo y título */}
+                <div className="mb-10 text-center">
+                    <div className="inline-flex items-center justify-center w-14 h-14
+                          bg-ink rounded-[16px] mb-5 shadow-soft">
+                        <span className="text-white text-lg font-bold">H</span>
                     </div>
-                    <h1 className="text-xl font-semibold text-gray-900">Hotel Bahia</h1>
-                    <p className="text-sm text-gray-400 mt-1">Panel de recepción</p>
+                    <h1 className="text-[22px] font-semibold tracking-tight text-ink">
+                        Hotel Bahía
+                    </h1>
+                    <p className="text-[13px] text-gray-400 mt-1">
+                        Panel de recepción
+                    </p>
                 </div>
 
-                {/* Card */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
-                    <h2 className="text-sm font-medium text-gray-700 mb-6">
+                {/* Card de login */}
+                <div className="t-card p-8">
+                    <h2 className="text-[15px] font-semibold text-ink mb-6">
                         Iniciar sesión
                     </h2>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-                        {/* Error global */}
                         {error && (
                             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200
-                              rounded-lg text-red-700 text-xs">
+                              rounded-xl text-red-700 text-[12px]">
                                 <span>⚠</span>
                                 <span>{error}</span>
                             </div>
                         )}
 
-                        {/* Email */}
                         <div>
-                            <label htmlFor="email" className="block text-xs font-medium text-gray-500 mb-1.5">
+                            <label htmlFor="email" className={lbl}>
                                 Correo electrónico
                             </label>
                             <input
@@ -86,13 +85,12 @@ export function LoginPage({ onLogin }: Props) {
                                 autoComplete="email"
                             />
                             {errors.email && (
-                                <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                                <p className="text-[11px] text-red-500 mt-1.5">{errors.email.message}</p>
                             )}
                         </div>
 
-                        {/* Password */}
                         <div>
-                            <label htmlFor="password" className="block text-xs font-medium text-gray-500 mb-1.5">
+                            <label htmlFor="password" className={lbl}>
                                 Contraseña
                             </label>
                             <input
@@ -107,17 +105,14 @@ export function LoginPage({ onLogin }: Props) {
                                 autoComplete="current-password"
                             />
                             {errors.password && (
-                                <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+                                <p className="text-[11px] text-red-500 mt-1.5">{errors.password.message}</p>
                             )}
                         </div>
 
-                        {/* Submit */}
                         <button
                             type="submit"
                             disabled={cargando}
-                            className="w-full py-3 bg-gray-900 text-white text-sm font-medium
-                         rounded-lg hover:bg-gray-800 disabled:opacity-50
-                         transition-colors mt-2"
+                            className="t-btn-primary w-full py-2.5 mt-1"
                         >
                             {cargando ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -130,6 +125,9 @@ export function LoginPage({ onLogin }: Props) {
                     </form>
                 </div>
 
+                <p className="text-center text-[11px] text-gray-300 mt-6">
+                    © {new Date().getFullYear()} Hotel Bahía
+                </p>
             </div>
         </div>
     )

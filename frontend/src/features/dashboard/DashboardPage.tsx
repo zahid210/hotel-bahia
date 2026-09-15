@@ -24,9 +24,6 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
         marcarLista, onReservaCreada,
     } = useDashboard(refreshSignal)
 
-    // ── Rol desde el store persistido ──────────────────────────
-    // LIMPIEZA: vista enfocada en habitaciones por limpiar.
-    // No puede abrir reservas ni crear reservas nuevas.
     const rol       = useAuthStore(s => s.rol)
     const esLimpieza = rol === 'LIMPIEZA'
 
@@ -36,25 +33,21 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
     const [seleccionadaId, setSeleccionadaId] = useState<number | null>(null)
     const [modalAbierto,   setModalAbierto]   = useState(false)
 
-    // ── Habitación seleccionada — siempre del estado más fresco ──
     const seleccionada = useMemo(
         () => habitacionesConReserva.find(h => h.id === seleccionadaId) ?? null,
         [habitacionesConReserva, seleccionadaId]
     )
 
-    // ── Lista filtrada por piso ───────────────────────────────
     const filtradas = useMemo(() => {
         if (filtro === 'TODAS')      return habitacionesConReserva
         if (filtro === 'EXCEDIDAS')  return habitacionesConReserva.filter(h => h.excedida)
         return habitacionesConReserva.filter(h => h.estado === filtro)
     }, [habitacionesConReserva, filtro])
-    // ── Pisos presentes en el resultado filtrado ──────────────
+
     const pisosConHabitaciones = useMemo(() =>
             PISOS.filter(p => filtradas.some(h => h.piso === p))
         , [filtradas])
 
-    // ── Click en card ─────────────────────────────────────────
-    // LIMPIEZA no abre el detalle de la reserva (no gestiona check-in/out)
     const handleClickCard = useCallback((id: number) => {
         if (esLimpieza) return
         const hab = habitacionesConReserva.find(h => h.id === id)
@@ -62,7 +55,6 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
         setSeleccionadaId(prev => prev === id ? null : id)
     }, [habitacionesConReserva, esLimpieza])
 
-    // ── Marcar lista con feedback ─────────────────────────────
     const handleMarcarLista = useCallback(async (habitacionId: number) => {
         try {
             await marcarLista(habitacionId)
@@ -74,8 +66,6 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
         }
     }, [marcarLista, habitacionesConReserva, onMensaje])
 
-    // ── Acciones de reserva con feedback ─────────────────────
-    // El panel lateral muestra el toast de éxito de cada acción
     const handleCheckIn = useCallback(async (reservaId: string) => {
         return await checkIn(reservaId)
     }, [checkIn])
@@ -94,38 +84,36 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
         return actualizada
     }, [cancelar, onMensaje])
 
-    // ── Render ────────────────────────────────────────────────
     if (error) return (
         <div className="flex items-center gap-3 p-4 bg-red-50 border
-                    border-red-200 rounded-lg text-red-700 text-sm">
+                    border-red-200 rounded-2xl text-red-700 text-[13px]">
             <span>⚠</span>
             <span>{error}</span>
-            <button onClick={cargar} className="ml-auto underline text-xs">
+            <button onClick={cargar} className="ml-auto text-apple hover:underline text-[12px] font-medium">
                 Reintentar
             </button>
         </div>
     )
 
     return (
-        <div className="flex gap-4 h-full min-h-0">
+        <div className="flex gap-5 h-full min-h-0">
 
             {/* ════════════════════════════════════════════════════
           ÁREA PRINCIPAL
       ════════════════════════════════════════════════════ */}
-            <div className="flex-1 min-w-0 flex flex-col gap-3 min-h-0">
+            <div className="flex-1 min-w-0 flex flex-col gap-4 min-h-0">
 
-                {/* ── Stats bar ─────────────────────────────────────── */}
-                <div className="grid grid-cols-4 lg:grid-cols-7 border border-gray-100
-                        rounded-lg overflow-hidden flex-shrink-0">
+                {/* ── Stats: tarjetas individuales estilo Apple ─────────── */}
+                <div className="grid grid-cols-4 lg:grid-cols-7 gap-3 flex-shrink-0">
                     {[
                         { label: 'Libres',        value: stats.libre,          color: 'text-green-600',  filtro: 'LIBRE'          },
                         { label: 'Ocupadas',      value: stats.ocupada,        color: 'text-red-600',    filtro: 'OCUPADA'        },
                         { label: 'Limpieza',      value: stats.limpieza,       color: 'text-blue-600',   filtro: 'LIMPIEZA'       },
                         { label: 'Excedidas',    value: stats.excedidas, color: 'text-amber-600',  filtro: 'EXCEDIDAS'},
-                        { label: 'Ocupación',     value: `${stats.ocupacion}%`,color: 'text-gray-800',   filtro: null             },
+                        { label: 'Ocupación',     value: `${stats.ocupacion}%`,color: 'text-ink',   filtro: null             },
                         { label: 'Entradas hoy',  value: stats.entradasHoy,    color: 'text-violet-600', filtro: null             },
                         { label: 'Salidas hoy',   value: stats.salidasHoy,     color: 'text-orange-600', filtro: null             },
-                    ].map((s, i, arr) => {
+                    ].map((s, i) => {
                         const activo = !!s.filtro && filtro === s.filtro
                         return (
                             <div
@@ -145,18 +133,17 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                                     }
                                     : undefined}
                                 className={[
-                                    'p-3 transition-colors',
-                                    i < arr.length - 1 ? 'border-r border-gray-100' : '',
-                                    s.filtro ? 'cursor-pointer' : '',
-                                    s.filtro ? 'focus-visible:outline-2 focus-visible:outline-gray-900' : '',
-                                    activo ? 'bg-gray-900' : s.filtro ? 'bg-gray-50 hover:bg-gray-100' : 'bg-gray-50',
+                                    't-card p-3.5 flex flex-col justify-center transition-all duration-150',
+                                    s.filtro ? 'cursor-pointer hover:bg-gray-50' : '',
+                                    s.filtro ? 'focus-visible:ring-2 focus-visible:ring-apple focus-visible:outline-none' : '',
+                                    activo ? 'ring-2 ring-apple border-apple/40' : '',
                                 ].join(' ')}
                             >
-                                <div className="text-xs text-gray-400 uppercase tracking-wide mb-1">
+                                <div className="t-label mb-1">
                                     {s.label}
                                 </div>
-                                <div className={`text-xl font-mono font-medium
-                  ${activo ? 'text-white' : s.color}`}>
+                                <div className={`text-[20px] font-semibold leading-none font-mono tracking-tight
+                  ${activo ? 'text-apple' : s.color}`}>
                                     {s.value}
                                 </div>
                             </div>
@@ -165,18 +152,14 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 </div>
 
                 {/* ── Controles ─────────────────────────────────────── */}
-                <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
-                    {/* Filtros */}
-                    <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0">
+                    <div className="t-seg">
                         {(['TODAS', 'LIBRE', 'OCUPADA', 'LIMPIEZA', 'EXCEDIDAS'] as Filtro[])
                             .map(f => (
                                 <button
                                     key={f}
                                     onClick={() => setFiltro(f)}
-                                    className={`px-3 py-1 rounded-md text-xs font-medium transition-all
-                                        ${filtro === f
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`t-seg-btn ${filtro === f ? 't-seg-btn--active' : ''}`}
                                 >
                                     {f === 'TODAS'    ? 'Todas'    :
                                         f === 'EXCEDIDAS'? 'Excedidas':
@@ -185,43 +168,38 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                             ))}
                     </div>
 
-                    {/* Leyenda */}
-                    <div className="hidden lg:flex items-center gap-3 text-xs text-gray-400">
+                    <div className="hidden lg:flex items-center gap-3 text-[11px] text-gray-400 ml-1">
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-orange-400 rounded" />
+              <span className="w-3 h-0.5 bg-orange-400 rounded-full" />
               Sale hoy
             </span>
                         <span className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-violet-400 rounded" />
+              <span className="w-3 h-0.5 bg-violet-400 rounded-full" />
               Check-in pendiente
             </span>
                         <span className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-blue-400 rounded" />
-              "✓ Lista" = marcar disponible
+              <span className="w-3 h-0.5 bg-apple rounded-full" />
+              Marcar lista
             </span>
                     </div>
 
-                    {/* Acciones */}
                     <div className="ml-auto flex gap-2">
                         <button
                             onClick={cargar}
                             disabled={cargando}
                             title="Actualizar todo"
                             aria-label="Actualizar todo"
-                            className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
-                         text-gray-500 hover:bg-gray-50 disabled:opacity-40
-                         transition-colors flex items-center justify-center min-w-[32px]"
+                            className="t-btn-ghost min-w-[32px]"
                         >
                             {cargando
-                                ? <span className="w-3 h-3 border-2 border-gray-300
-                                   border-t-gray-600 rounded-full animate-spin" />
+                                ? <span className="w-3 h-3 border-2 border-gray-200
+                                   border-t-apple rounded-full animate-spin" />
                                 : '↻'}
                         </button>
                         {!esLimpieza && (
                             <button
                                 onClick={() => setModalAbierto(true)}
-                                className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
-                             rounded-lg hover:bg-gray-800 transition-colors"
+                                className="t-btn-primary"
                             >
                                 + Nueva reserva
                             </button>
@@ -230,22 +208,22 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 </div>
 
                 {/* ── Grid por pisos ────────────────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto space-y-5 pr-1">
+                <div className="flex-1 min-h-0 overflow-y-auto space-y-6 pr-1">
                     {cargando && habitacionesConReserva.length === 0 ? (
                         <div className="flex items-center justify-center h-48
-                            text-gray-400 text-sm gap-2">
+                            text-gray-400 text-[13px] gap-2">
               <span className="w-4 h-4 border-2 border-gray-200
-                               border-t-gray-500 rounded-full animate-spin" />
+                               border-t-apple rounded-full animate-spin" />
                             Cargando habitaciones...
                         </div>
                     ) : pisosConHabitaciones.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-48
                             text-gray-400 gap-2">
-                            <div className="text-4xl opacity-20">▧</div>
-                            <div className="text-sm">No hay habitaciones en este estado</div>
+                            <div className="text-4xl opacity-10">▧</div>
+                            <div className="text-[13px]">No hay habitaciones en este estado</div>
                             <button
                                 onClick={() => setFiltro('TODAS')}
-                                className="text-xs text-gray-500 underline mt-1"
+                                className="text-apple text-[12px] font-medium hover:underline mt-1"
                             >
                                 Ver todas
                             </button>
@@ -255,25 +233,20 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                             const delPiso = filtradas.filter(h => h.piso === piso)
                             return (
                                 <div key={piso}>
-                                    {/* Cabecera de piso */}
-                                    <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-semibold text-gray-400
+                                    <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[11px] font-semibold text-gray-400
                                      uppercase tracking-wider">
                       Piso {piso}
                     </span>
-                                        <span className="text-xs text-gray-300">
+                                        <span className="text-[11px] text-gray-300">
                       ({delPiso.length})
                     </span>
-                                        <div className="flex-1 h-px bg-gray-100" />
+                                        <div className="flex-1 h-px bg-gray-200/60" />
                                     </div>
 
-                                    {/* ── Grid escalable: minmax(90px, 1fr) ─────────
-                      Con 20 hab. en 1200px → ~12 por fila × 2 filas
-                      Con 25 hab. en 912px  → ~10 por fila × 3 filas
-                      Nunca se rompe independientemente del volumen  */}
                                     <div
                                         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}
-                                        className="grid gap-2"
+                                        className="grid gap-2.5"
                                     >
                                         {delPiso.map(hab => (
                                             <RoomCard
@@ -292,22 +265,20 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                     )}
 
                     {!cargando && pisosConHabitaciones.length > 0 && (
-                        <p className="text-xs text-gray-300 text-center pb-2">
+                        <p className="text-[11px] text-gray-300 text-center pb-2">
                             {esLimpieza
-                                ? '"✓ Lista" = habitación limpiada y disponible'
-                                : 'Clic en habitación con huésped · Botón azul en Limpieza para liberar'}
+                                ? 'Botón "✓ Lista" = habitación limpiada y disponible'
+                                : 'Clic en habitación con huésped · Botón "✓ Lista" en limpieza para liberar'}
                         </p>
                     )}
                 </div>
             </div>
 
             {/* ════════════════════════════════════════════════════
-    PANEL LATERAL — Desktop: columna derecha
-    Móvil: bottom sheet deslizante desde abajo
-════════════════════════════════════════════════════ */}
+    PANEL LATERAL
+══════════════════════════════════════════════════════ */}
             {seleccionada?.reservaActiva && (
                 <>
-                    {/* ── Desktop: panel fijo a la derecha ─────────────── */}
                     <div className="hidden lg:block flex-shrink-0
                     animate-[slideIn_0.2s_ease]">
                         <ReservaDetailPanel
@@ -322,17 +293,16 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                         />
                     </div>
 
-                    {/* ── Móvil: bottom sheet ───────────────────────────── */}
+                    {/* Móvil: bottom sheet */}
                     <div className="lg:hidden fixed inset-x-0 bottom-0 z-50
-                    bg-white rounded-t-2xl border-t border-gray-200
-                    shadow-2xl max-h-[85vh] overflow-y-auto
+                    bg-white rounded-t-[24px] border-t border-gray-200
+                    shadow-modal max-h-[85vh] overflow-y-auto
                     animate-[slideUp_0.25s_ease]"
                          role="dialog"
                          aria-modal="true"
                          aria-label={`Detalle de la reserva en habitación ${seleccionada.reservaActiva.habitacionNumero}`}>
-                        {/* Handle visual — indica que se puede arrastrar */}
                         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-                            <div className="w-10 h-1 bg-gray-200 rounded-full" />
+                            <div className="w-10 h-1 bg-gray-300 rounded-full" />
                         </div>
                         <ReservaDetailPanel
                             reserva={seleccionada.reservaActiva}
@@ -346,9 +316,8 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                         />
                     </div>
 
-                    {/* ── Overlay oscuro en móvil ───────────────────────── */}
                     <div
-                        className="lg:hidden fixed inset-0 bg-black/40 z-40"
+                        className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
                         onClick={() => setSeleccionadaId(null)}
                     />
                 </>
