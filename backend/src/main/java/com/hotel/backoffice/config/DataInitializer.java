@@ -6,6 +6,7 @@ import com.hotel.backoffice.entity.MenuItem;
 import com.hotel.backoffice.entity.Usuario;
 import com.hotel.backoffice.repository.HabitacionRepository;
 import com.hotel.backoffice.repository.MenuItemRepository;
+import com.hotel.backoffice.repository.PedidoItemRepository;
 import com.hotel.backoffice.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class DataInitializer implements CommandLineRunner {
 private final HabitacionRepository habitRepo;
     private final UsuarioRepository    usuarioRepo;
     private final MenuItemRepository  menuRepo;
+    private final PedidoItemRepository pedidoItemRepo;
     private final PasswordEncoder     encoder;
 
     @Value("${app.admin.email:zahidmatos@hotel.com}")   private String adminEmail;
@@ -101,34 +103,35 @@ private final HabitacionRepository habitRepo;
             ));
         }
 
-        if (menuRepo.count() == 0) {
-            menuRepo.saveAll(List.of(
-                    // ── Desayunos ──────────────────────────────
-                    plato("Desayuno continental", "Pan, mantequilla, café o té y jugo", "Desayuno", 10.00),
-                    plato("Desayuno americano", "Huevos fritos/revueltos, pan, jamón y café", "Desayuno", 15.00),
-                    plato("Desayuno con frutas", "Porción de frutas de estación con yogurt", "Desayuno", 12.00),
+        // ── Menú de bocaditos (snacks/cuartos/galletas/gaseosas) ─────
+        // Idempotente: si ya existe algún bocadito (categorías nuevas),
+        // se asume el menú actualizado y no se toca nada.
+        // Cuando se detecta el menú viejo de comidas (Desayuno/Almuerzo/Cena),
+        // se reemplaza retirando los ítems no usados y deshabilitando los que
+        // ya figuran en pedidos (FK de historial), como hace MenuService.
+        List<String> categoriasBocadito = List.of("SNACKS", "GALLETAS",
+                "DULCES", "GASEOSAS", "BEBIDAS");
+        boolean yaMigrado = menuRepo.count() > 0 && menuRepo.findAll().stream()
+                .anyMatch(m -> categoriasBocadito.contains(m.getCategoria()));
 
-                    // ── Almuerzos / Cenas ──────────────────────
-                    plato("Lomo saltado", "Porción de lomo, arroz y papas fritas", "Almuerzo", 25.00),
-                    plato("Ceviche de pescado", "Pescado fresco con limón y camote", "Almuerzo", 28.00),
-                    plato("Aji de gallina", "Pollo deshilachado con arroz y papa", "Almuerzo", 22.00),
-                    plato("Pollo a la brasa + papas", "Con ensalada y gaseosa personal", "Almuerzo", 24.00),
-                    plato("Arroz con mariscos", "Arroz con mariscos salteados", "Almuerzo", 30.00),
-                    plato("Milanesa de pollo", "Con arroz, papa frita y ensalada", "Cena", 22.00),
-                    plato("Tortilla de verduras", "Con arroz y ensalada", "Cena", 18.00),
-
-                    // ── Bebidas ────────────────────────────────
-                    plato("Gaseosa personal", "Inca Kola, Coca-Cola o Sprite", "Bebidas", 4.00),
-                    plato("Agua mineral", "Botella 625 ml", "Bebidas", 3.00),
-                    plato("Jugo natural", "Papaya, maracuyá, piña o naranja", "Bebidas", 8.00),
-                    plato("Café", "Café pasado o instantáneo", "Bebidas", 4.00),
-                    plato("Té", "Manzanilla, hierba luisa o cedrón", "Bebidas", 3.00),
-
-                    // ── Snacks ─────────────────────────────────
-                    plato("Sándwich simple", "Jamón o queso, opción tostado", "Snacks", 12.00),
-                    plato("Porción de papas fritas", "Con salsas", "Snacks", 8.00),
-                    plato("Fruta de estación", "2 unidades o porción", "Snacks", 5.00)
-            ));
+        if (!yaMigrado) {
+            int eliminados = 0, deshabilitados = 0;
+            for (MenuItem m : menuRepo.findAll()) {
+                if (pedidoItemRepo.existsByMenuItemId(m.getId())) {
+                    m.setDisponible(false);
+                    menuRepo.save(m);
+                    deshabilitados++;
+                } else {
+                    menuRepo.delete(m);
+                    eliminados++;
+                }
+            }
+            if (eliminados + deshabilitados > 0) {
+                log.info("Menú migrado comidas → bocaditos: "
+                        + "{} retirados, {} deshabilitados por historial.",
+                        eliminados, deshabilitados);
+            }
+            menuRepo.saveAll(menuBocaditos());
         }
 
         if (usuarioRepo.count() == 0) {
@@ -147,6 +150,47 @@ private final HabitacionRepository habitRepo;
         }
     }
 
+    // Bocaditos del menú (snacks, cuates, galletas, dulces, gaseosas, bebidas)
+    private List<MenuItem> menuBocaditos() {
+        return List.of(
+                // ── Snacks (bocaditos salados) ────────────────
+                bocadito("Cuates", "Bolsa 100 g", "SNACKS", 3.50),
+                bocadito("Chizitos", "Bolsa 100 g", "SNACKS", 2.50),
+                bocadito("Papitas fritas", "Bolsa 150 g", "SNACKS", 5.00),
+                bocadito("Gusanitos", "Bolsa 100 g", "SNACKS", 2.50),
+                bocadito("Canchita serrana", "Bolsa 120 g", "SNACKS", 4.00),
+                bocadito("Maní confitado", "Bolsa 150 g", "SNACKS", 3.00),
+
+                // ── Galletas ───────────────────────────────────
+                bocadito("Galleta soda", "Paquete 2 unidades", "GALLETAS", 1.50),
+                bocadito("Galleta vainilla", "Paquete 2 unidades", "GALLETAS", 2.00),
+                bocadito("Galleta rellena de cacao", "Paquete 2 unidades", "GALLETAS", 2.50),
+                bocadito("Galleta con mermelada", "Paquete 2 unidades", "GALLETAS", 2.00),
+                bocadito("Galleta integral", "Paquete 2 unidades", "GALLETAS", 2.00),
+
+                // ── Dulces ─────────────────────────────────────
+                bocadito("Chocolate oscuro", "Barra 50 g", "DULCES", 3.50),
+                bocadito("Caramelos surtidos", "Frasco 30 g", "DULCES", 2.00),
+                bocadito("Chupetines", "Unidad", "DULCES", 1.00),
+                bocadito("Chocotejas", "Unidad", "DULCES", 3.00),
+                bocadito("Toffee", "Bolsa 50 g", "DULCES", 1.50),
+
+                // ── Gaseosas ───────────────────────────────────
+                bocadito("Inca Kola personal", "Botella 500 ml fría", "GASEOSAS", 4.00),
+                bocadito("Coca-Cola personal", "Botella 500 ml fría", "GASEOSAS", 4.00),
+                bocadito("Sprite personal", "Botella 500 ml fría", "GASEOSAS", 4.00),
+                bocadito("Kola Real personal", "Botella 500 ml fría", "GASEOSAS", 3.50),
+                bocadito("Guaraná personal", "Botella 500 ml fría", "GASEOSAS", 3.50),
+
+                // ── Otras bebidas ──────────────────────────────
+                bocadito("Agua mineral", "Botella 625 ml fría", "BEBIDAS", 2.50),
+                bocadito("Jugo de naranja", "Vaso 350 ml", "BEBIDAS", 5.00),
+                bocadito("Gatorade", "Botella 500 ml fría", "BEBIDAS", 7.00),
+                bocadito("Café instantáneo", "Taza con azúcar a elección", "BEBIDAS", 3.00),
+                bocadito("Agua de cebada", "Vaso 350 ml", "BEBIDAS", 2.00)
+        );
+    }
+
     // Sin parámetro de estado — todas arrancan en LIBRE por defecto
     private Habitacion hab(String num, int piso, TipoHabitacion tipo,
                            int cap, double precio) {
@@ -157,8 +201,8 @@ private final HabitacionRepository habitRepo;
                 .build();
     }
 
-    // Plato del menú inicial
-    private MenuItem plato(String nombre, String descripcion, String categoria, double precio) {
+    // Bocadito del menú inicial (snacks, galletas, dulces, gaseosas, bebidas)
+    private MenuItem bocadito(String nombre, String descripcion, String categoria, double precio) {
         return MenuItem.builder()
                 .nombre(nombre)
                 .descripcion(descripcion)

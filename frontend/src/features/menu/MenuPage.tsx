@@ -16,8 +16,8 @@ interface Props {
 }
 
 const FORM_VACIO: MenuItemForm = {
-    nombre: '', descripcion: '',
-    categoria: 'DESAYUNO', precio: 0, disponible: true,
+    nombre: '', descripcion: null,
+    categoria: 'SNACKS', precio: 0, disponible: true,
 }
 
 export function MenuPage({ onMensaje }: Props) {
@@ -85,7 +85,7 @@ export function MenuPage({ onMensaje }: Props) {
 
     const guardar = async () => {
         const nombre = form.nombre.trim()
-        if (!nombre) return setErrorForm('El nombre del plato es obligatorio')
+        if (!nombre) return setErrorForm('El nombre del producto es obligatorio')
         if (!form.categoria) return setErrorForm('Selecciona una categoría')
         if (form.precio <= 0) return setErrorForm('El precio debe ser mayor a 0')
 
@@ -97,13 +97,13 @@ export function MenuPage({ onMensaje }: Props) {
                     ...form, nombre,
                     descripcion: (form.descripcion ?? '').trim() || null,
                 })
-                onMensaje('Plato actualizado')
+                onMensaje('Producto actualizado')
             } else {
                 await menuService.crear({
                     ...form, nombre,
                     descripcion: (form.descripcion ?? '').trim() || null,
                 })
-                onMensaje('Plato agregado al menú')
+                onMensaje('Producto agregado al menú')
             }
             setModalAbierto(false)
             await cargar()
@@ -118,7 +118,7 @@ export function MenuPage({ onMensaje }: Props) {
         setEliminandoId(item.id)
         try {
             await menuService.eliminar(item.id)
-            onMensaje('Plato retirado del menú')
+            onMensaje('Producto retirado del menú')
             await cargar()
         } catch (e: unknown) {
             if (!esSesionExpirada(e)) {
@@ -161,7 +161,7 @@ export function MenuPage({ onMensaje }: Props) {
                     type="text"
                     value={busqueda}
                     onChange={e => setBusqueda(e.target.value)}
-                    placeholder="Buscar plato..."
+                    placeholder="Buscar producto..."
                     aria-label="Buscar en el menú"
                     className="flex-1 min-w-40 px-3 py-1.5 border border-gray-200 rounded-lg
                       text-xs bg-gray-50 focus:outline-none focus:border-gray-400
@@ -182,7 +182,7 @@ export function MenuPage({ onMensaje }: Props) {
                         className="px-4 py-1.5 bg-gray-900 text-white text-xs font-medium
                           rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                        + Plato
+                        + Producto
                     </button>
                 )}
             </div>
@@ -197,13 +197,13 @@ export function MenuPage({ onMensaje }: Props) {
                 {filtradas.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-gray-400 gap-2">
                         <div className="text-3xl opacity-20">○</div>
-                        <div className="text-sm">No hay platos</div>
+                        <div className="text-sm">No hay productos</div>
                     </div>
                 ) : (
                     <table className="w-full text-sm border-collapse">
                         <thead className="sticky top-0 z-10">
                         <tr className="bg-gray-50 border-b border-gray-100">
-                            {['Plato', 'Descripción', 'Categoría', 'Precio', 'Estado', '']
+                            {['Producto', 'Descripción', 'Categoría', 'Precio', 'Estado', '']
                                 .map((col, i) => (
                                     <th key={i}
                                         className="px-3 py-2.5 text-left text-xs font-medium
@@ -251,7 +251,7 @@ export function MenuPage({ onMensaje }: Props) {
                                         <>
                                             <button
                                                 onClick={() => abrirEditar(item)}
-                                                title="Editar plato"
+                                                title="Editar producto"
                                                 className="px-2 py-1 text-xs text-gray-400
                                      hover:text-gray-900 transition-colors"
                                             >
@@ -281,20 +281,20 @@ export function MenuPage({ onMensaje }: Props) {
             </div>
 
             <div className="text-xs text-gray-400 text-right flex-shrink-0">
-                {filtradas.length} de {items.length} platos
+                {filtradas.length} de {items.length} productos
             </div>
 
             {/* ── Modal crear/editar ────────────────────────────── */}
             <Modal
                 abierto={modalAbierto}
-                titulo={editando ? 'Editar plato' : 'Nuevo plato'}
+                titulo={editando ? 'Editar producto' : 'Nuevo producto'}
                 onCerrar={() => setModalAbierto(false)}
             >
                 <div className="space-y-3">
                     <div>
                         <label className="block text-xs text-gray-400 mb-1"
                                htmlFor="mi-nombre">
-                            Nombre del plato *
+                            Nombre del producto *
                         </label>
                         <input
                             id="mi-nombre"

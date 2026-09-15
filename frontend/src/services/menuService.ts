@@ -19,15 +19,15 @@ export interface MenuItemForm {
 }
 
 export const CATEGORIAS = [
-    'DESAYUNO', 'ALMUERZO', 'CENA', 'BEBIDAS', 'SNACKS',
+    'SNACKS', 'GALLETAS', 'DULCES', 'GASEOSAS', 'BEBIDAS',
 ] as const
 
 export const LABEL_CATEGORIA: Record<string, string> = {
-    DESAYUNO: 'Desayuno',
-    ALMUERZO: 'Almuerzo',
-    CENA:     'Cena',
+    SNACKS:   'Bocaditos',
+    GALLETAS: 'Galletas',
+    DULCES:   'Dulces',
+    GASEOSAS: 'Gaseosas',
     BEBIDAS:  'Bebidas',
-    SNACKS:   'Snacks',
 }
 
 // ── Servicio ─────────────────────────────────────────────────

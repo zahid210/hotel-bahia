@@ -85,12 +85,12 @@ export function PedidosPage({ onMensaje }: Props) {
         setErrorForm(null)
         setCatSel('TODAS')
         try {
-            const [todas, platos] = await Promise.all([
+            const [todas, productos] = await Promise.all([
                 reservaService.listarTodas(),
                 menuService.listar(true),
             ])
             setReservas(todas.filter(r => r.estado === 'CHECKIN'))
-            setMenu(platos)
+            setMenu(productos)
         } catch (e: unknown) {
             if (!esSesionExpirada(e)) {
                 setErrorForm(e instanceof Error ? e.message : 'Error al cargar datos')
@@ -119,7 +119,7 @@ export function PedidosPage({ onMensaje }: Props) {
         if (!reservaSel) return setErrorForm('Selecciona la reserva del huésped')
         const items: ItemPedido[] = Object.entries(cantidades)
             .map(([id, cantidad]) => ({ menuItemId: Number(id), cantidad }))
-        if (items.length === 0) return setErrorForm('Agrega al menos un plato')
+        if (items.length === 0) return setErrorForm('Agrega al menos un producto')
 
         setGuardando(true)
         setErrorForm(null)
@@ -395,9 +395,9 @@ export function PedidosPage({ onMensaje }: Props) {
                         )}
                     </div>
 
-                    {/* Plato + cantidad */}
+                    {/* Producto + cantidad */}
                     <div>
-                        <div className="text-xs text-gray-400 mb-1">Platos *</div>
+                        <div className="text-xs text-gray-400 mb-1">Productos *</div>
                         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg mb-2 flex-wrap">
                             {(['TODAS', ...CATEGORIAS] as string[]).map(c => (
                                 <button
@@ -415,7 +415,7 @@ export function PedidosPage({ onMensaje }: Props) {
                         <div className="max-h-48 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
                             {menuFiltrado.length === 0 ? (
                                 <div className="p-4 text-xs text-gray-400 text-center">
-                                    Sin platos disponibles
+                                    Sin productos disponibles
                                 </div>
                             ) : menuFiltrado.map(m => {
                                 const cant = cantidades[m.id] ?? 0
