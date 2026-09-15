@@ -285,7 +285,7 @@ export function NuevaReservaForm({ onSuccess }: Props) {
                 {enviando
                     ? <span className="flex items-center justify-center gap-2">
               <span className="w-3.5 h-3.5 border-2 border-white/30
-                               border-t-white rounded-full animate-spin" />
+                               border-t-white t-spin animate-spin" />
               Confirmando...
             </span>
                     : 'Confirmar reserva'}

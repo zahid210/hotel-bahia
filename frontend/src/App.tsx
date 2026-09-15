@@ -149,7 +149,7 @@ export default function App() {
             {/* Usuario */}
             <div className="p-4 border-t border-gray-100">
               <div className="flex items-center gap-2.5 mb-2">
-                <div className="w-8 h-8 rounded-full bg-ink flex items-center
+                <div className="w-8 h-8 t-dot bg-ink flex items-center
                               justify-center text-white text-[12px] font-semibold
                               flex-shrink-0">
                   {nombre?.charAt(0).toUpperCase()}
@@ -261,7 +261,7 @@ function Fallback({ texto }: { texto: string }) {
   return (
       <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
         <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
-                         rounded-full animate-spin" />
+                         t-spin animate-spin" />
         {texto}
       </div>
   )

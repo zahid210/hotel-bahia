@@ -44,14 +44,14 @@ body {
 
   /* ── Tarjeta blanca Apple ──────────────────────────────── */
   .t-card {
-    @apply rounded-2xl border border-gray-200/70 bg-white;
+    @apply border border-gray-200/70 bg-white;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05),
                 0 4px 16px rgba(0, 0, 0, 0.03);
   }
 
   /* ── Input estilo Apple ────────────────────────────────── */
   .t-input {
-    @apply w-full rounded-xl border border-gray-200 bg-white px-3 py-2
+    @apply w-full border border-gray-200 bg-white px-3 py-2
            text-[13px] text-ink placeholder:text-gray-400
            transition-all duration-150;
   }
@@ -79,12 +79,12 @@ body {
     @apply px-4 py-3 text-xs whitespace-nowrap;
   }
 
-  /* ── Controles segmentados estilo iOS ──────────────────── */
+  /* ── Controles segmentados ─────────────────────────────── */
   .t-seg {
-    @apply inline-flex items-center gap-1 rounded-full bg-gray-100 p-0.5;
+    @apply inline-flex items-center gap-1 bg-gray-100 p-0.5;
   }
   .t-seg-btn {
-    @apply cursor-pointer rounded-full px-3 py-1 text-[12px] font-medium
+    @apply cursor-pointer px-3 py-1 text-[12px] font-medium
            text-gray-500 transition-all duration-150;
   }
   .t-seg-btn:hover {
@@ -99,7 +99,7 @@ body {
   .t-btn-primary,
   .t-btn-secondary,
   .t-btn-ghost {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-full
+    @apply inline-flex items-center justify-center gap-1.5
            px-4 py-1.5 text-[13px] font-medium transition-all duration-150
            active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
   }
@@ -126,8 +126,12 @@ body {
     @apply bg-gray-100 text-gray-900;
   }
 
-  /* ── Badge / Píldora de estado ─────────────────────────── */
+  /* ── Badge de estado ──────────────────────────────────── */
   .t-badge {
-    @apply inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium;
+    @apply inline-flex items-center border px-2 py-0.5 text-[11px] font-medium;
   }
+
+  /* ── Elementos que sí quedan circulares ────────────────── */
+  .t-spin { border-radius: 9999px; }
+  .t-dot  { border-radius: 9999px; }
 }

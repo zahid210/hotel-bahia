@@ -114,7 +114,7 @@ export function ReservaDetailPanel({
         }
     }
 
-    const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+    const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white t-spin animate-spin"
 
     return (
         <div className="w-full lg:w-72 flex-shrink-0 lg:border-l border-gray-100 bg-white flex flex-col h-full max-h-[85vh] lg:max-h-full overflow-hidden">
@@ -135,7 +135,7 @@ export function ReservaDetailPanel({
                     onClick={onClose}
                     aria-label="Cerrar panel"
                     className="w-8 h-8 lg:w-7 lg:h-7 flex items-center justify-center
-               rounded-full border border-gray-200 text-gray-400 hover:text-gray-700
+               t-dot border border-gray-200 text-gray-400 hover:text-gray-700
                hover:bg-gray-50 text-[12px] transition-colors"
                 >✕</button>
             </div>

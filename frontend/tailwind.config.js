@@ -32,6 +32,18 @@ export default {
         card:  '0 1px 3px rgba(0, 0, 0, 0.05)',
         modal: '0 24px 60px rgba(0, 0, 0, 0.18)',
       },
+      // Esquinas rectas en todo el diseño (todos los radios = 0)
+      borderRadius: {
+        none:   '0',
+        DEFAULT: '0',
+        sm:      '0',
+        md:      '0',
+        lg:      '0',
+        xl:      '0',
+        '2xl':   '0',
+        '3xl':   '0',
+        full:    '0',
+      },
       keyframes: {
         slideIn: {
           '0%':   { opacity: '0', transform: 'translateX(16px)' },

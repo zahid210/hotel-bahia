@@ -66,7 +66,7 @@ export const ReservasPage = memo(function ReservasPage({
     if (cargando) return (
         <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
       <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
-                       rounded-full animate-spin" />
+                       t-spin animate-spin" />
             Cargando historial...
         </div>
     )

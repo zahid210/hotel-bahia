@@ -59,7 +59,7 @@ export const RoomCard = memo(function RoomCard({
     const labelFinal  = habitacion.excedida ? 'Excedida'          : cfg.label
 
     const estilos = [
-        'relative rounded-[16px] border p-3.5 transition-all duration-150 select-none text-left',
+        'relative border p-3.5 transition-all duration-150 select-none text-left',
         bgFinal,
         seleccionada
             ? 'border-apple ring-2 ring-apple/30 shadow-soft'
@@ -79,18 +79,18 @@ export const RoomCard = memo(function RoomCard({
         <>
             {/* Franja superior según estado */}
             {habitacion.excedida && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400 rounded-t-[16px]" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400" />
             )}
             {!habitacion.excedida && saleHoy && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400 rounded-t-[16px]" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400" />
             )}
             {!habitacion.excedida && pendienteCheckIn && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400 rounded-t-[16px]" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400" />
             )}
 
             {seleccionada && (
                 <span className="absolute top-2 right-2 w-2 h-2
-                         rounded-full bg-apple animate-pulse" />
+                         t-dot bg-apple animate-pulse" />
             )}
 
             <div className="font-semibold text-[15px] leading-none text-ink tracking-tight">
@@ -104,7 +104,7 @@ export const RoomCard = memo(function RoomCard({
 
             <div className={`inline-flex items-start gap-1.5 mt-2
                         text-[11px] font-medium leading-tight ${textFinal}`}>
-        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0
+        <span className={`w-1.5 h-1.5 t-dot flex-shrink-0
                           mt-0.5 ${dotFinal}`} />
                 <span className="break-words">
           {pendienteCheckIn && !habitacion.excedida

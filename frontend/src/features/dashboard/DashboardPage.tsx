@@ -193,7 +193,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                         >
                             {cargando
                                 ? <span className="w-3 h-3 border-2 border-gray-200
-                                   border-t-apple rounded-full animate-spin" />
+                                   border-t-apple t-spin animate-spin" />
                                 : '↻'}
                         </button>
                         {!esLimpieza && (
@@ -213,7 +213,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                         <div className="flex items-center justify-center h-48
                             text-gray-400 text-[13px] gap-2">
               <span className="w-4 h-4 border-2 border-gray-200
-                               border-t-apple rounded-full animate-spin" />
+                               border-t-apple t-spin animate-spin" />
                             Cargando habitaciones...
                         </div>
                     ) : pisosConHabitaciones.length === 0 ? (
@@ -295,14 +295,14 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
 
                     {/* Móvil: bottom sheet */}
                     <div className="lg:hidden fixed inset-x-0 bottom-0 z-50
-                    bg-white rounded-t-[24px] border-t border-gray-200
+                    bg-white border-t border-gray-200 rounded-t-none
                     shadow-modal max-h-[85vh] overflow-y-auto
                     animate-[slideUp_0.25s_ease]"
                          role="dialog"
                          aria-modal="true"
                          aria-label={`Detalle de la reserva en habitación ${seleccionada.reservaActiva.habitacionNumero}`}>
                         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-                            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+                            <div className="w-10 h-1 bg-gray-300 t-dot" />
                         </div>
                         <ReservaDetailPanel
                             reserva={seleccionada.reservaActiva}

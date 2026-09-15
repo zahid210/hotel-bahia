@@ -42,7 +42,7 @@ export function LoginPage({ onLogin }: Props) {
                 {/* Logo y título */}
                 <div className="mb-10 text-center">
                     <div className="inline-flex items-center justify-center w-14 h-14
-                          bg-ink rounded-[16px] mb-5 shadow-soft">
+                          bg-ink mb-5 shadow-soft">
                         <span className="text-white text-lg font-bold">H</span>
                     </div>
                     <h1 className="text-[22px] font-semibold tracking-tight text-ink">
@@ -117,7 +117,7 @@ export function LoginPage({ onLogin }: Props) {
                             {cargando ? (
                                 <span className="flex items-center justify-center gap-2">
                   <span className="w-3.5 h-3.5 border-2 border-white/30
-                                   border-t-white rounded-full animate-spin" />
+                                   border-t-white t-spin animate-spin" />
                   Verificando...
                 </span>
                             ) : 'Entrar'}

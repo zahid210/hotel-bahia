@@ -62,7 +62,7 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
                         ref={cerrarRef}
                         onClick={onCerrar}
                         aria-label="Cerrar"
-                        className="w-7 h-7 flex items-center justify-center rounded-full
+                        className="w-7 h-7 flex items-center justify-center t-dot
                                    bg-gray-100 text-gray-500 hover:bg-gray-200
                                    hover:text-ink text-xs transition-colors leading-none"
                     >✕</button>

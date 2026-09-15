@@ -166,7 +166,7 @@ export function PedidosPage({ onMensaje }: Props) {
     if (cargando && pedidos.length === 0) return (
         <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
       <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
-                       rounded-full animate-spin" />
+                       t-spin animate-spin" />
             Cargando pedidos...
         </div>
     )
@@ -408,7 +408,7 @@ export function PedidosPage({ onMensaje }: Props) {
                                                 onClick={() => agregar(m.id, -1)}
                                                 disabled={cant === 0}
                                                 aria-label={`Quitar ${m.nombre}`}
-                                                className="w-7 h-7 rounded-full border border-gray-200
+                                                className="w-7 h-7 t-dot border border-gray-200
                                      text-gray-500 hover:bg-gray-50 disabled:opacity-30
                                      text-[14px] leading-none transition-colors"
                                             >−</button>
@@ -418,7 +418,7 @@ export function PedidosPage({ onMensaje }: Props) {
                                             <button
                                                 onClick={() => agregar(m.id, 1)}
                                                 aria-label={`Agregar ${m.nombre}`}
-                                                className="w-7 h-7 rounded-full border border-gray-200
+                                                className="w-7 h-7 t-dot border border-gray-200
                                      text-gray-500 hover:bg-gray-50 text-[14px] leading-none
                                      transition-colors"
                                             >+</button>

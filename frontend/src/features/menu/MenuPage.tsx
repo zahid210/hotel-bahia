@@ -132,7 +132,7 @@ export function MenuPage({ onMensaje }: Props) {
     if (cargando && items.length === 0) return (
         <div className="flex items-center justify-center h-64 text-gray-400 text-[13px] gap-2">
       <span className="w-4 h-4 border-2 border-gray-200 border-t-apple
-                       rounded-full animate-spin" />
+                       t-spin animate-spin" />
             Cargando tienda...
         </div>
     )
@@ -225,7 +225,7 @@ export function MenuPage({ onMensaje }: Props) {
                                 <td className="t-td">
                                     {item.disponible ? (
                                         <span className="text-[11px] text-green-600 font-medium flex items-center gap-1.5">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                            <span className="w-1.5 h-1.5 t-dot bg-green-500" />
                                             Disponible
                                         </span>
                                     ) : (

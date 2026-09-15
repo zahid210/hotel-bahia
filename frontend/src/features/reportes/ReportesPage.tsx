@@ -199,7 +199,7 @@ export function ReportesPage() {
                 >
                     {cargando ? (
                         <span className="w-3 h-3 border-2 border-gray-200 border-t-apple
-                             rounded-full animate-spin inline-block" />
+                             t-spin animate-spin inline-block" />
                     ) : '↻'}
                 </button>
             </div>
@@ -377,7 +377,7 @@ export function ReportesPage() {
                                  last:border-0">
                       <span className="flex items-center gap-1.5">
                         <span
-                            className="w-2 h-2 rounded-full"
+                            className="w-2 h-2 t-dot"
                             style={{
                                 background: COLORES_TIPO[t.tipo] ?? '#9ca3af'
                             }}
