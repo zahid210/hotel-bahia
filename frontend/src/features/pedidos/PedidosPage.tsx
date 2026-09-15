@@ -76,7 +76,7 @@ export function PedidosPage({ onMensaje }: Props) {
         return lista
     }, [pedidos, filtro, busqueda])
 
-    // ── Abrir modal de nuevo pedido: precarga reservas (CHECKIN) y menú ──
+    // ── Abrir modal de nuevo pedido: precarga reservas (CHECKIN) y tienda ──
     const abrirNuevo = async () => {
         setModalAbierto(true)
         setReservaSel('')

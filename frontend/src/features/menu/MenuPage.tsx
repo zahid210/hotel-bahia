@@ -103,7 +103,7 @@ export function MenuPage({ onMensaje }: Props) {
                     ...form, nombre,
                     descripcion: (form.descripcion ?? '').trim() || null,
                 })
-                onMensaje('Producto agregado al menú')
+                onMensaje('Producto agregado a la tienda')
             }
             setModalAbierto(false)
             await cargar()
@@ -118,7 +118,7 @@ export function MenuPage({ onMensaje }: Props) {
         setEliminandoId(item.id)
         try {
             await menuService.eliminar(item.id)
-            onMensaje('Producto retirado del menú')
+            onMensaje('Producto retirado de la tienda')
             await cargar()
         } catch (e: unknown) {
             if (!esSesionExpirada(e)) {
@@ -133,7 +133,7 @@ export function MenuPage({ onMensaje }: Props) {
         <div className="flex items-center justify-center h-64 text-gray-400 text-sm gap-2">
       <span className="w-4 h-4 border-2 border-gray-200 border-t-gray-500
                        rounded-full animate-spin" />
-            Cargando menú...
+            Cargando tienda...
         </div>
     )
 
@@ -162,16 +162,16 @@ export function MenuPage({ onMensaje }: Props) {
                     value={busqueda}
                     onChange={e => setBusqueda(e.target.value)}
                     placeholder="Buscar producto..."
-                    aria-label="Buscar en el menú"
+                    aria-label="Buscar en la tienda"
                     className="flex-1 min-w-40 px-3 py-1.5 border border-gray-200 rounded-lg
                       text-xs bg-gray-50 focus:outline-none focus:border-gray-400
                       focus:bg-white placeholder:text-gray-300 transition-colors"
                 />
 
                 <button
-                    onClick={() => cargar().then(() => onMensaje('Menú actualizado'))}
-                    aria-label="Actualizar menú"
-                    title="Actualizar menú"
+                    onClick={() => cargar().then(() => onMensaje('Tienda actualizada'))}
+                    aria-label="Actualizar tienda"
+                    title="Actualizar tienda"
                     className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs
                       text-gray-500 hover:bg-gray-50 transition-colors"
                 >↻</button>
@@ -260,11 +260,11 @@ export function MenuPage({ onMensaje }: Props) {
                                             <button
                                                 onClick={() => {
                                                     if (window.confirm(
-                                                        `¿Retirar "${item.nombre}" del menú?`
+                                                        `¿Retirar "${item.nombre}" de la tienda?`
                                                     )) void eliminar(item)
                                                 }}
                                                 disabled={eliminandoId === item.id}
-                                                title="Retirar del menú"
+                                                title="Retirar de la tienda"
                                                 className="px-2 py-1 text-xs text-gray-400
                                      hover:text-red-500 transition-colors disabled:opacity-40"
                                             >

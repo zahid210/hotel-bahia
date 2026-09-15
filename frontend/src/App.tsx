@@ -33,7 +33,7 @@ const TITULOS: Record<Pagina, string> = {
     dashboard: 'Estado de habitaciones',
     reservas:  'Reservas',
     pedidos:   'Pedidos y consumo',
-    menu:      'Menú del hotel',
+    menu:      'Tienda del hotel',
     reportes:  'Reportes',
     usuarios:  'Usuarios',
 }
@@ -74,7 +74,7 @@ export default function App() {
     { id: 'dashboard', icon: '▦', label: 'Dashboard', roles: ['ADMIN', 'RECEPCIONISTA', 'LIMPIEZA'] },
     { id: 'reservas',  icon: '☰', label: 'Reservas',  roles: ['ADMIN', 'RECEPCIONISTA'] },
     { id: 'pedidos',   icon: '≡', label: 'Pedidos',   roles: ['ADMIN', 'RECEPCIONISTA'] },
-    { id: 'menu',      icon: '✦', label: 'Menú',      roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'menu',      icon: '✦', label: 'Tienda',    roles: ['ADMIN', 'RECEPCIONISTA'] },
     { id: 'reportes',  icon: '◎', label: 'Reportes',  roles: ['ADMIN'] },
     { id: 'usuarios',  icon: '▼', label: 'Usuarios',  roles: ['ADMIN'] },
   ]
@@ -221,7 +221,7 @@ export default function App() {
                   </Suspense>
               )}
               {pagina === 'menu' && !esLimpieza && (
-                  <Suspense fallback={<Fallback texto="Cargando menú..." />}>
+                  <Suspense fallback={<Fallback texto="Cargando tienda..." />}>
                     <MenuPage onMensaje={mostrarMensaje} />
                   </Suspense>
               )}
