@@ -28,8 +28,6 @@ interface NavItem {
     icon:  string
     label: string
     roles: Rol[]
-    from:  string
-    to:    string
 }
 
 const TITULOS: Record<Pagina, string> = {
@@ -78,12 +76,12 @@ export default function App() {
   const abrirModal = useCallback(() => setModalAbierto(true), [])
 
   const navItems: NavItem[] = [
-    { id: 'dashboard', icon: '▦', label: 'Dashboard', roles: ['ADMIN', 'RECEPCIONISTA', 'LIMPIEZA'], from: '#06b6d4', to: '#3b82f6' },
-    { id: 'reservas',  icon: '☰', label: 'Reservas',  roles: ['ADMIN', 'RECEPCIONISTA'],            from: '#7c3aed', to: '#d946ef' },
-    { id: 'pedidos',   icon: '≡', label: 'Pedidos',   roles: ['ADMIN', 'RECEPCIONISTA'],            from: '#f59e0b', to: '#f97316' },
-    { id: 'menu',      icon: '✦', label: 'Tienda',    roles: ['ADMIN', 'RECEPCIONISTA'],            from: '#10b981', to: '#14b8a6' },
-    { id: 'reportes',  icon: '◎', label: 'Reportes',  roles: ['ADMIN'],                             from: '#6366f1', to: '#ec4899' },
-    { id: 'usuarios',  icon: '▼', label: 'Usuarios',  roles: ['ADMIN'],                             from: '#f43f5e', to: '#fb923c' },
+    { id: 'dashboard', icon: '▦', label: 'Dashboard', roles: ['ADMIN', 'RECEPCIONISTA', 'LIMPIEZA'] },
+    { id: 'reservas',  icon: '☰', label: 'Reservas',  roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'pedidos',   icon: '≡', label: 'Pedidos',   roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'menu',      icon: '✦', label: 'Tienda',    roles: ['ADMIN', 'RECEPCIONISTA'] },
+    { id: 'reportes',  icon: '◎', label: 'Reportes',  roles: ['ADMIN'] },
+    { id: 'usuarios',  icon: '▼', label: 'Usuarios',  roles: ['ADMIN'] },
   ]
 
   const handleNavClick = (id: Pagina) => {
@@ -92,14 +90,9 @@ export default function App() {
   }
 
   const esLimpieza = rol === 'LIMPIEZA'
-  const activo = navItems.find(n => n.id === pagina)
 
   return (
       <PrivateRoute onLogin={() => mostrarMensaje('Sesión iniciada')}>
-
-        {/* Fondo aurora */}
-        <div className="app-bg" />
-        <div className="app-bg-grain" />
 
         <div className="flex h-screen overflow-hidden">
 
@@ -113,21 +106,22 @@ export default function App() {
 
           {/* ── Sidebar ──────────────────────────────────────── */}
           <aside className={[
-            'w-60 flex-shrink-0 glass border-r',
+            'w-60 flex-shrink-0 glass border-r shadow-none',
             'flex flex-col',
             'fixed inset-y-0 left-0 z-40 transition-transform duration-200 ease-out',
             'lg:relative lg:translate-x-0',
+            'lg:border-r',
             sidebarAbierto ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
           ].join(' ')}>
 
             {/* Logo */}
-            <div className="px-5 pt-5 pb-5 flex items-center gap-3">
-              <div className="w-9 h-9 flex items-center justify-center bg-brand-gradient
-                              text-white text-[14px] font-bold flex-shrink-0 shadow-glow">
+            <div className="px-5 pt-6 pb-5 flex items-center gap-3">
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg
+                              bg-brand text-white text-[13px] font-bold flex-shrink-0">
                 HB
               </div>
               <div>
-                <div className="text-[13px] font-semibold tracking-[0.02em] text-ink leading-tight">
+                <div className="text-[13px] font-semibold tracking-tight text-ink leading-tight">
                   Hotel Bahía
                 </div>
                 <div className="text-[11px] text-gray-400 font-medium">
@@ -138,6 +132,10 @@ export default function App() {
 
             {/* Navegación */}
             <nav className="px-3 flex-1 overflow-y-auto">
+              <div className="text-[10px] font-semibold uppercase tracking-wider
+                              text-gray-400 px-3 pt-2 pb-1">
+                Menú
+              </div>
               {navItems
                   .filter(item => item.roles.includes((rol ?? 'ADMIN') as Rol))
                   .map(item => {
@@ -146,32 +144,21 @@ export default function App() {
                       <button
                           key={item.id}
                           onClick={() => handleNavClick(item.id)}
-                          className={`group w-full text-left px-3 py-2.5 text-[13px] mb-1
-                               flex items-center gap-3 transition-all duration-150 relative
-                               ${on ? 'text-ink font-semibold' : 'text-gray-500 hover:text-gray-900'}`}
-                          style={on
-                            ? {
-                                background: `linear-gradient(135deg, ${item.from}26, ${item.to}1f)`,
-                                boxShadow: `inset 0 0 0 1px ${item.from}59`,
-                              }
-                            : undefined}
+                          className={`group w-full text-left pl-3 pr-3 py-2 rounded-md text-[13px] mb-0.5
+                               flex items-center gap-2.5 transition-colors duration-150 relative
+                               ${on
+                                  ? 'bg-brand-soft text-brand font-medium'
+                                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
                       >
-                        <span
-                            className="w-6 h-6 flex items-center justify-center text-[10px] flex-shrink-0
-                                       transition-all duration-150"
-                            style={on
-                              ? { background: `linear-gradient(135deg, ${item.from}, ${item.to})`, color: '#fff' }
-                              : { background: 'rgba(127,127,127,0.12)', color: 'inherit' }}
-                        >
+                        {on && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2
+                                           w-[3px] h-4 rounded-full bg-brand" />
+                        )}
+                        <span className={`text-[11px] w-4 text-center flex-shrink-0
+                                         ${on ? 'text-brand' : 'text-gray-400 group-hover:text-gray-600'}`}>
                           {item.icon}
                         </span>
                         {item.label}
-                        {on && (
-                          <span
-                              className="absolute right-3 w-1.5 h-1.5 t-dot"
-                              style={{ background: `linear-gradient(135deg, ${item.from}, ${item.to})` }}
-                          />
-                        )}
                       </button>
                     )
                   })}
@@ -187,11 +174,10 @@ export default function App() {
             </nav>
 
             {/* Usuario */}
-            <div className="p-4 border-t border-gray-200/60">
-              <div className="flex items-center gap-2.5 mb-2.5">
-                <div className="w-9 h-9 t-dot bg-brand-gradient flex items-center
-                              justify-center text-white text-[12px] font-semibold
-                              flex-shrink-0 shadow-glow">
+            <div className="p-4 border-t border-gray-200">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 t-dot bg-brand-soft text-brand flex items-center
+                              justify-center text-[12px] font-semibold flex-shrink-0">
                   {nombre?.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
@@ -203,7 +189,7 @@ export default function App() {
               </div>
               <button
                   onClick={() => logout()}
-                  className="text-[12px] text-gray-400 hover:text-brand transition-colors py-1"
+                  className="text-[12px] text-gray-400 hover:text-brand transition-colors"
               >
                 Cerrar sesión →
               </button>
@@ -212,8 +198,8 @@ export default function App() {
 
           {/* ── Main ──────────────────────────────────────────── */}
           <main className="flex-1 flex flex-col overflow-hidden min-w-0">
-            <header className="glass border-b border-gray-200/40 px-5 lg:px-7
-                             py-3.5 flex items-center justify-between flex-shrink-0 gap-3">
+            <header className="bg-white dark:bg-slate-900 border-b border-gray-200
+                             px-5 lg:px-7 py-3.5 flex items-center justify-between flex-shrink-0 gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                     className="lg:hidden text-gray-500 hover:text-ink text-lg leading-none"
@@ -223,27 +209,18 @@ export default function App() {
                 >
                   ☰
                 </button>
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {activo && (
-                    <span
-                        className="hidden sm:block w-2.5 h-2.5 t-dot flex-shrink-0"
-                        style={{ background: `linear-gradient(135deg, ${activo.from}, ${activo.to})`,
-                                 boxShadow: `0 0 12px ${activo.from}99` }}
-                    />
-                  )}
-                  <h1 className="text-[17px] font-semibold tracking-tight text-ink truncate">
-                    {TITULOS[pagina] ?? 'Back-office'}
-                  </h1>
-                </div>
+                <h1 className="text-[17px] font-semibold tracking-tight text-ink truncate">
+                  {TITULOS[pagina] ?? 'Back-office'}
+                </h1>
               </div>
 
               <button
                   onClick={toggle}
                   aria-label="Cambiar tema"
-                  title="Cambiar tema (claro / oscuro)"
-                  className="glass w-9 h-9 flex items-center justify-center
-                             text-[15px] text-gray-600 hover:text-ink
-                             transition-all hover:shadow-glow flex-shrink-0"
+                  title="Cambiar tema"
+                  className="w-8 h-8 flex items-center justify-center rounded-md
+                             text-[15px] text-gray-500 hover:text-ink
+                             hover:bg-gray-100 transition-colors flex-shrink-0"
               >
                 {esOscuro(tema) ? '☀' : '☾'}
               </button>
@@ -304,8 +281,8 @@ export default function App() {
           {/* ── Toast ─────────────────────────────────────────── */}
           {mensaje && (
               <div className="fixed left-1/2 -translate-x-1/2 z-50
-                  bg-brand-gradient text-white text-[12px] font-semibold
-                  px-5 py-2.5 shadow-glow
+                  bg-slate-900 text-white text-[12px] font-medium
+                  px-5 py-2.5 rounded-lg shadow-modal
                   bottom-16 lg:bottom-5 animate-slideUp">
                 {mensaje}
               </div>

@@ -1,6 +1,5 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { CSSProperties } from 'react'
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip,
     ResponsiveContainer, Cell, PieChart, Pie, Legend, TooltipProps
@@ -44,17 +43,15 @@ type Periodo = 'hoy' | 'semana' | 'mes' | 'custom'
 
 // ── Tarjeta de stat ───────────────────────────────────────────
 function StatCard({
-                      label, valor, sub, color = 'text-ink', accent,
+                      label, valor, sub, color = 'text-ink',
                   }: {
     label: string
     valor: string | number
     sub?: string
     color?: string
-    accent?: string
 }) {
     return (
-        <div className="t-card p-4"
-             style={{ '--card-accent': accent ?? 'linear-gradient(90deg, #7c3aed, #d946ef)' } as CSSProperties}>
+        <div className="t-card p-4">
             <div className="t-label mb-1">
                 {label}
             </div>
@@ -233,8 +230,7 @@ export function ReportesPage() {
                                 `${reporte.resumen.nochesVendidas} noches vendidas · ` +
                                 `${S(reporte.resumen.ingresoConsumo)} en consumo`
                             }
-                            color="text-emerald-500"
-                            accent="linear-gradient(90deg, #10b981, #06b6d4)"
+                            color="text-emerald-600"
                         />
                         <StatCard
                             label="Ocupación promedio"
@@ -242,26 +238,22 @@ export function ReportesPage() {
                             sub={`${reporte.totalHabitacionesHotel} hab. en total`}
                             color={
                                 reporte.resumen.ocupacionPromedio >= 70
-                                    ? 'text-emerald-500'
+                                    ? 'text-emerald-600'
                                     : reporte.resumen.ocupacionPromedio >= 40
-                                        ? 'text-blue-500'
-                                        : 'text-amber-500'
+                                        ? 'text-blue-600'
+                                        : 'text-amber-600'
                             }
-                            accent="linear-gradient(90deg, #3b82f6, #06b6d4)"
                         />
                         <StatCard
                             label="Precio promedio/noche"
                             valor={S(reporte.resumen.ingresoPromedioPorNoche)}
                             sub={`${reporte.resumen.checkoutsRealizados} check-outs`}
-                            color="text-amber-500"
-                            accent="linear-gradient(90deg, #f59e0b, #f97316)"
                         />
                         <StatCard
                             label="Reservas activas"
                             valor={reporte.resumen.reservasActivas}
                             sub={`${reporte.resumen.cancelaciones} cancelaciones`}
-                            color="text-violet-500"
-                            accent="linear-gradient(90deg, #8b5cf6, #d946ef)"
+                            color="text-violet-600"
                         />
                     </div>
 

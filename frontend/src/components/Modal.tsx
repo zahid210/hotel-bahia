@@ -51,11 +51,9 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
             {/* Backdrop — blur + tint */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
 
-            <div className="relative glass-strong
+            <div className="relative glass-strong rounded-lg
                           w-full max-w-md p-6 max-h-[90vh] overflow-y-auto
                           shadow-modal animate-slideUp">
-                <div className="absolute top-0 left-0 right-0 h-[3px]
-                                bg-brand-gradient" />
                 <div className="flex items-center justify-between mb-6">
                     <h2 id={tituloId} className="text-[15px] font-semibold text-ink">
                         {titulo}

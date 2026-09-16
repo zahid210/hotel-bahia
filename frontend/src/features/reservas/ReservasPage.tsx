@@ -2,7 +2,6 @@ import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { formatFecha, formatSoles, capitalizar } from '@/lib/format'
 import { ESTADO_CFG } from '@/lib/estadoReserva'
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
-import type { CSSProperties } from 'react'
 import { reservaService, Reserva } from '@/services/reservaService'
 
 type FiltroTab = 'TODAS' | 'ACTIVAS' | 'HISTORIAL'
@@ -83,13 +82,12 @@ export const ReservasPage = memo(function ReservasPage({
             {/* ── Stats ─────────────────────────────────────── */}
             <div className="grid grid-cols-4 gap-3 flex-shrink-0">
                 {[
-                    { label: 'Total',      value: stats.total,      color: 'text-brand',    from: '#7c3aed', to: '#d946ef' },
-                    { label: 'Activas',    value: stats.activas,    color: 'text-violet-500', from: '#8b5cf6', to: '#6366f1' },
-                    { label: 'En hotel',   value: stats.checkin,    color: 'text-rose-500',   from: '#f43f5e', to: '#f97316' },
-                    { label: 'Canceladas', value: stats.canceladas, color: 'text-gray-400',   from: '#94a3b8', to: '#64748b' },
+                    { label: 'Total',      value: stats.total,      color: 'text-ink'         },
+                    { label: 'Activas',    value: stats.activas,    color: 'text-violet-600'  },
+                    { label: 'En hotel',   value: stats.checkin,    color: 'text-rose-600'    },
+                    { label: 'Canceladas', value: stats.canceladas, color: 'text-gray-400'    },
                 ].map((s, i) => (
-                    <div key={i} className="t-card p-3.5"
-                         style={{ '--card-accent': `linear-gradient(90deg, ${s.from}, ${s.to})` } as CSSProperties}>
+                    <div key={i} className="t-card p-3.5">
                         <div className="t-label mb-1">
                             {s.label}
                         </div>

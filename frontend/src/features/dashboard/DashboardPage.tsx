@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback, memo } from 'react'
-import type { CSSProperties } from 'react'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useDashboard } from './hooks/useDashboard'
@@ -107,13 +106,13 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 {/* ── Stats: tarjetas individuales estilo Apple ─────────── */}
                 <div className="grid grid-cols-4 lg:grid-cols-7 gap-3 flex-shrink-0">
                     {[
-                        { label: 'Libres',       value: stats.libre,          color: 'text-emerald-500', filtro: 'LIBRE',     from: '#10b981', to: '#06b6d4' },
-                        { label: 'Ocupadas',     value: stats.ocupada,        color: 'text-rose-500',    filtro: 'OCUPADA',   from: '#f43f5e', to: '#f97316' },
-                        { label: 'Limpieza',     value: stats.limpieza,       color: 'text-blue-500',    filtro: 'LIMPIEZA',  from: '#3b82f6', to: '#06b6d4' },
-                        { label: 'Excedidas',    value: stats.excedidas,      color: 'text-amber-500',   filtro: 'EXCEDIDAS', from: '#f59e0b', to: '#ef4444' },
-                        { label: 'Ocupación',    value: `${stats.ocupacion}%`, color: 'text-ink',        filtro: null,        from: '#7c3aed', to: '#d946ef' },
-                        { label: 'Entradas hoy', value: stats.entradasHoy,    color: 'text-violet-500',  filtro: null,        from: '#8b5cf6', to: '#6366f1' },
-                        { label: 'Salidas hoy',  value: stats.salidasHoy,     color: 'text-orange-500',  filtro: null,        from: '#fb923c', to: '#f59e0b' },
+                        { label: 'Libres',       value: stats.libre,          color: 'text-emerald-600', filtro: 'LIBRE'     },
+                        { label: 'Ocupadas',     value: stats.ocupada,        color: 'text-rose-600',    filtro: 'OCUPADA'   },
+                        { label: 'Limpieza',     value: stats.limpieza,       color: 'text-blue-600',    filtro: 'LIMPIEZA'  },
+                        { label: 'Excedidas',    value: stats.excedidas,      color: 'text-amber-600',   filtro: 'EXCEDIDAS' },
+                        { label: 'Ocupación',    value: `${stats.ocupacion}%`, color: 'text-ink',        filtro: null        },
+                        { label: 'Entradas hoy', value: stats.entradasHoy,    color: 'text-violet-600',  filtro: null        },
+                        { label: 'Salidas hoy',  value: stats.salidasHoy,     color: 'text-orange-600',  filtro: null        },
                     ].map((s, i) => {
                         const activo = !!s.filtro && filtro === s.filtro
                         return (
@@ -133,7 +132,6 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                                         }
                                     }
                                     : undefined}
-                                style={{ '--card-accent': `linear-gradient(90deg, ${s.from}, ${s.to})` } as CSSProperties}
                                 className={[
                                     't-card p-3.5 flex flex-col justify-center transition-all duration-150',
                                     s.filtro ? 'cursor-pointer hover:bg-gray-50' : '',

@@ -40,33 +40,29 @@ export function LoginPage({ onLogin }: Props) {
     return (
         <div className="min-h-screen flex items-center justify-center p-5 antialiased relative">
 
-            {/* Fondo aurora */}
-            <div className="app-bg" />
-            <div className="app-bg-grain" />
-
             {/* Toggle de tema */}
             <button
                 onClick={toggle}
                 aria-label="Cambiar tema"
-                title="Cambiar tema (claro / oscuro)"
-                className="glass absolute top-5 right-5 w-10 h-10 flex items-center
-                           justify-center text-[16px] text-gray-600 hover:text-ink
-                           transition-all hover:shadow-glow z-10"
+                title="Cambiar tema"
+                className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center
+                           rounded-md text-[15px] text-gray-500 hover:text-ink
+                           hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors z-10"
             >
                 {tema === 'dark' ? '☀' : '☾'}
             </button>
 
             <div className="w-full max-w-sm relative z-10">
                 {/* Logo y título */}
-                <div className="mb-9 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16
-                          bg-brand-gradient mb-5 shadow-glow">
-                        <span className="text-white text-2xl font-bold">H</span>
+                <div className="mb-8 text-center">
+                    <div className="inline-flex items-center justify-center w-11 h-11
+                          rounded-xl bg-brand mb-5 text-white text-[15px] font-bold">
+                        HB
                     </div>
-                    <h1 className="text-[30px] font-bold tracking-tight text-gradient leading-tight">
+                    <h1 className="text-[22px] font-semibold tracking-tight text-ink">
                         Hotel Bahía
                     </h1>
-                    <p className="text-[13px] text-gray-500 mt-1.5">
+                    <p className="text-[13px] text-gray-500 mt-1">
                         Panel de recepción
                     </p>
                 </div>
@@ -80,8 +76,8 @@ export function LoginPage({ onLogin }: Props) {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
                         {error && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200
-                              text-red-700 text-[12px]">
+                            <div className="flex items-center gap-2 p-3 rounded-md
+                              bg-red-50 border border-red-200 text-red-700 text-[12px]">
                                 <span>⚠</span>
                                 <span>{error}</span>
                             </div>

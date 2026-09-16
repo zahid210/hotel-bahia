@@ -133,9 +133,9 @@ export const RoomCard = memo(function RoomCard({
             {esAccionLista && (
                 <button
                     onClick={() => onMarcarLista(habitacion.id)}
-                    className="mt-2.5 w-full py-1.5 text-[11px] font-medium text-apple
-                     border border-apple/30 rounded-full bg-white
-                     hover:bg-apple/5 active:scale-[0.98] transition-all duration-150"
+                    className="mt-2.5 w-full py-1.5 text-[11px] font-medium text-brand
+                     border border-brand/25 rounded-md bg-white
+                     hover:bg-brand-soft active:scale-[0.98] transition-all duration-150"
                 >
                     ✓ Lista
                 </button>
