@@ -20,7 +20,7 @@ type RolState = typeof ROLES[number]
 type ModalTipo = 'crear' | 'editar' | 'password' | null
 
 const CONST_ROL: Record<RolState, string> = {
-    ADMIN: 'bg-ink text-white border-transparent',
+    ADMIN: 'bg-brand text-white border-transparent',
     RECEPCIONISTA: 'bg-blue-50 text-blue-700 border-blue-200',
     LIMPIEZA: 'bg-teal-50 text-teal-700 border-teal-200',
 }
@@ -420,20 +420,21 @@ function FormUsuario({
                 </label>
             )}
 
-            <div>
-                <label className="t-label" htmlFor="us-pass">
-                        {soloPassword ? `Nueva contraseña * (mínimo 6 caracteres)`
-                            : mostrarPassword ? 'Contraseña * (mínimo 6 caracteres)'
-                                : 'Nueva contraseña' }
-                </label>
-                <input
-                    id="us-pass"
-                    type="password"
-                    value={password}
-                    onChange={e => set({ password: e.target.value })}
-                    className="t-input"
-                />
-            </div>
+            {(mostrarPassword || soloPassword) && (
+                <div>
+                    <label className="t-label" htmlFor="us-pass">
+                        Contraseña nueva * (mínimo 6 caracteres)
+                    </label>
+                    <input
+                        id="us-pass"
+                        type="password"
+                        value={password}
+                        onChange={e => set({ password: e.target.value })}
+                        autoFocus={soloPassword}
+                        className="t-input"
+                    />
+                </div>
+            )}
 
             {errorForm && (
                 <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl

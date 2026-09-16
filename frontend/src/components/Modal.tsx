@@ -1,12 +1,6 @@
 import { useEffect, useId, useRef } from 'react'
 import type { ReactNode } from 'react'
 
-// ── Modal accesible ───────────────────────────────────────────
-// - Cierra con Escape
-// - Mueve el foco al botón "Cerrar" al abrir
-// - aria-labelledby / aria-modal / role="dialog"
-// - Bloquea el scroll del fondo mientras está abierto
-// - Estilo glass: backdrop blur + tarjeta translúcida con filo degradado
 interface Props {
     abierto: boolean
     titulo:  string
@@ -16,18 +10,22 @@ interface Props {
 
 export function Modal({ abierto, titulo, onCerrar, children }: Props) {
     const tituloId = useId()
-    const cerrarRef = useRef<HTMLButtonElement>(null)
+    const onCerrarRef = useRef(onCerrar)
+
+    // Mantén la referencia más reciente sin re-disparar efectos.
+    useEffect(() => {
+        onCerrarRef.current = onCerrar
+    }, [onCerrar])
 
     useEffect(() => {
         if (!abierto) return
-        cerrarRef.current?.focus()
         const anterior = document.body.style.overflow
         document.body.style.overflow = 'hidden'
 
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 e.stopPropagation()
-                onCerrar()
+                onCerrarRef.current()
             }
         }
         document.addEventListener('keydown', onKey, true)
@@ -35,7 +33,7 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
             document.removeEventListener('keydown', onKey, true)
             document.body.style.overflow = anterior
         }
-    }, [abierto, onCerrar])
+    }, [abierto])
 
     if (!abierto) return null
 
@@ -46,7 +44,7 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
             role="dialog"
             aria-modal="true"
             aria-labelledby={tituloId}
-            onClick={e => e.target === e.currentTarget && onCerrar()}
+            onClick={e => e.target === e.currentTarget && onCerrarRef.current()}
         >
             {/* Backdrop — blur + tint */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
@@ -59,8 +57,7 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
                         {titulo}
                     </h2>
                     <button
-                        ref={cerrarRef}
-                        onClick={onCerrar}
+                        onClick={() => onCerrarRef.current()}
                         aria-label="Cerrar"
                         className="w-7 h-7 flex items-center justify-center t-dot
                                    bg-gray-100 text-gray-500 hover:bg-gray-200
