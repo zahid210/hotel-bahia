@@ -122,11 +122,7 @@ export default function App() {
           ].join(' ')}>
 
             {/* Logo */}
-            <div className="px-5 pt-6 pb-5 flex items-center gap-3">
-              <div className="w-8 h-8 flex items-center justify-center rounded-lg
-                              bg-brand text-white text-[13px] font-bold flex-shrink-0">
-                HB
-              </div>
+            <div className="px-5 pt-6 pb-5">
               <div>
                 <div className="text-[13px] font-semibold tracking-tight text-ink leading-tight">
                   Hotel Bahía
@@ -182,16 +178,10 @@ export default function App() {
 
             {/* Usuario */}
             <div className="p-4 border-t border-gray-200">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-8 h-8 t-dot bg-brand-soft text-brand flex items-center
-                              justify-center text-[12px] font-semibold flex-shrink-0">
-                  {nombre?.charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0">
-                  <div className="text-[12px] font-medium truncate text-ink">{nombre}</div>
-                  <div className="text-[11px] text-gray-400 capitalize">
-                    {rol?.toLowerCase()}
-                  </div>
+              <div className="min-w-0 mb-3">
+                <div className="text-[12px] font-medium truncate text-ink">{nombre}</div>
+                <div className="text-[11px] text-gray-400 capitalize">
+                  {rol?.toLowerCase()}
                 </div>
               </div>
               <button
@@ -205,7 +195,7 @@ export default function App() {
 
           {/* ── Main ──────────────────────────────────────────── */}
           <main className="flex-1 flex flex-col overflow-hidden min-w-0">
-            <header className="bg-white dark:bg-slate-900 border-b border-gray-200
+            <header className="bg-white border-b border-gray-200
                              px-5 lg:px-7 py-3.5 flex items-center justify-between flex-shrink-0 gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <button
@@ -288,7 +278,7 @@ export default function App() {
           {/* ── Toast ─────────────────────────────────────────── */}
           {mensaje && (
               <div className="fixed left-1/2 -translate-x-1/2 z-50
-                  bg-slate-900 text-white text-[12px] font-medium
+                  bg-gray-900 text-gray-50 text-[12px] font-medium
                   px-5 py-2.5 rounded-lg shadow-modal
                   bottom-16 lg:bottom-5 animate-slideUp">
                 {mensaje}

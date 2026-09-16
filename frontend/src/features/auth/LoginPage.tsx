@@ -47,7 +47,7 @@ export function LoginPage({ onLogin }: Props) {
                 title="Cambiar tema"
                 className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center
                            rounded-md text-[15px] text-gray-500 hover:text-ink
-                           hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors z-10"
+                           hover:bg-gray-100 transition-colors z-10"
             >
                 {tema === 'dark' ? '☀' : '☾'}
             </button>
@@ -55,10 +55,6 @@ export function LoginPage({ onLogin }: Props) {
             <div className="w-full max-w-sm relative z-10">
                 {/* Logo y título */}
                 <div className="mb-8 text-center">
-                    <div className="inline-flex items-center justify-center w-11 h-11
-                          rounded-xl bg-brand mb-5 text-white text-[15px] font-bold">
-                        HB
-                    </div>
                     <h1 className="text-[22px] font-semibold tracking-tight text-ink">
                         Hotel Bahía
                     </h1>
