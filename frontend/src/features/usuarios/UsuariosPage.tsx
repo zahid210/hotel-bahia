@@ -181,6 +181,8 @@ export function UsuariosPage({ onMensaje }: Props) {
                     onChange={e => setBusqueda(e.target.value)}
                     placeholder="Buscar por nombre, email o rol..."
                     aria-label="Buscar usuarios"
+                    autoComplete="off"
+                    name="buscar-usuarios"
                     className="t-input flex-1 min-w-40"
                 />
 
@@ -360,6 +362,7 @@ function FormUsuario({
                             id="us-nombre"
                             value={nombre}
                             onChange={e => set({ nombre: e.target.value })}
+                            autoComplete="off"
                             autoFocus
                             className="t-input"
                         />
@@ -374,6 +377,7 @@ function FormUsuario({
                             type="email"
                             value={email}
                             onChange={e => set({ email: e.target.value })}
+                            autoComplete="off"
                             className="t-input"
                         />
                     </div>
@@ -418,6 +422,8 @@ function FormUsuario({
                         type="password"
                         value={password}
                         onChange={e => set({ password: e.target.value })}
+                        autoComplete="new-password"
+                        name="nueva-password"
                         autoFocus={soloPassword}
                         className="t-input"
                     />
