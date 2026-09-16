@@ -58,37 +58,40 @@ export const RoomCard = memo(function RoomCard({
     const textFinal   = habitacion.excedida ? 'text-amber-700'    : cfg.text
     const labelFinal  = habitacion.excedida ? 'Excedida'          : cfg.label
 
+    const bordeEstado = habitacion.excedida
+        ? 'border-amber-300/60'
+        : saleHoy
+            ? 'border-orange-300/60'
+            : pendienteCheckIn
+                ? 'border-violet-300/60'
+                : cfg.border
+
     const estilos = [
-        'relative border p-3.5 rounded-xl select-none text-left',
+        'relative border p-3.5 rounded-xl select-none text-left overflow-hidden',
         'transition-[border-color,box-shadow] duration-150 ease-out',
         bgFinal,
         'shadow-card',
+        bordeEstado,
         seleccionada
-            ? 'border-apple ring-2 ring-apple/30 shadow-soft'
-            : habitacion.excedida
-                ? 'border-amber-300/60'
-                : saleHoy
-                    ? 'border-orange-300/60'
-                    : pendienteCheckIn
-                        ? 'border-violet-300/60'
-                        : cfg.border,
+            ? 'ring-2 ring-apple/30 shadow-soft'
+            : '',
         esClickable
-            ? 'cursor-pointer hover:border-brand/50 hover:shadow-soft active:scale-[0.99]'
+            ? 'cursor-pointer hover:shadow-soft active:scale-[0.99]'
             : 'cursor-default',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:border-brand',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30',
     ].join(' ')
 
     const contenido = (
         <>
             {/* Franja superior según estado */}
             {habitacion.excedida && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400 rounded-t-xl" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400" />
             )}
             {!habitacion.excedida && saleHoy && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400 rounded-t-xl" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400" />
             )}
             {!habitacion.excedida && pendienteCheckIn && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400 rounded-t-xl" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400" />
             )}
 
             {seleccionada && (
