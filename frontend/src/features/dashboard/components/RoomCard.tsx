@@ -59,7 +59,7 @@ export const RoomCard = memo(function RoomCard({
     const labelFinal  = habitacion.excedida ? 'Excedida'          : cfg.label
 
     const estilos = [
-        'relative border p-3.5 transition-all duration-150 select-none text-left',
+        'relative border p-3.5 transition-all duration-150 select-none text-left rounded-xl',
         bgFinal,
         seleccionada
             ? 'border-apple ring-2 ring-apple/30 shadow-soft'
@@ -79,13 +79,13 @@ export const RoomCard = memo(function RoomCard({
         <>
             {/* Franja superior según estado */}
             {habitacion.excedida && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-amber-400 rounded-t-xl" />
             )}
             {!habitacion.excedida && saleHoy && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-orange-400 rounded-t-xl" />
             )}
             {!habitacion.excedida && pendienteCheckIn && (
-                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400" />
+                <div className="absolute top-0 inset-x-0 h-[3px] bg-violet-400 rounded-t-xl" />
             )}
 
             {seleccionada && (
