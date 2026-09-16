@@ -191,7 +191,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 </div>
 
                 {/* ── Grid por pisos ────────────────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto space-y-6 pr-1">
+                <div className="flex-1 min-h-0 overflow-y-auto space-y-6 px-1">
                     {cargando && habitacionesConReserva.length === 0 ? (
                         <div className="flex items-center justify-center h-48
                             text-gray-400 text-[13px] gap-2">
