@@ -169,7 +169,7 @@ public class ReservaService {
         // El check-in solo corresponde el día de llegada o después.
         if (reserva.getFechaEntrada().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException(
-                    "El check-in no puede hacerse antes de la fecha de entrada del huésped."
+                    "No se puede registrar la entrada antes de la fecha de llegada del huésped."
             );
         }
 

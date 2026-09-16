@@ -339,7 +339,7 @@ export function PedidosPage({ onMensaje }: Props) {
                 <div className="space-y-4">
                     <div>
                         <label className="t-label" htmlFor="ped-reserva">
-                            Huésped (reserva con check-in) *
+                            Huésped (reserva con entrada) *
                         </label>
                         <select
                             id="ped-reserva"
@@ -356,7 +356,7 @@ export function PedidosPage({ onMensaje }: Props) {
                         </select>
                         {reservas.length === 0 && (
                             <div className="text-[12px] text-amber-600 mt-1.5">
-                                No hay reservas con check-in activo para registrar consumo.
+                                No hay reservas con entrada registrada para registrar consumo.
                             </div>
                         )}
                     </div>

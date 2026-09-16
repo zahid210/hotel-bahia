@@ -108,7 +108,7 @@ export const RoomCard = memo(function RoomCard({
                           mt-0.5 ${dotFinal}`} />
                 <span className="break-words">
           {pendienteCheckIn && !habitacion.excedida
-              ? 'Check-in hoy'
+              ? 'Entrada hoy'
               : labelFinal}
         </span>
             </div>

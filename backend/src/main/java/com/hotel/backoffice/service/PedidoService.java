@@ -61,7 +61,7 @@ public class PedidoService {
         // Un pedido solo tiene sentido si el huésped está en la habitación
         if (reserva.getEstado() != EstadoReserva.CHECKIN) {
             throw new IllegalArgumentException(
-                    "Solo se pueden pedir viandas a huéspedes en check-in."
+                    "Solo se pueden pedir viandas a huéspedes con entrada registrada."
             );
         }
 

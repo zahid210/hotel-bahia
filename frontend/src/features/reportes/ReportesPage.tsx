@@ -242,7 +242,7 @@ export function ReportesPage() {
                         <StatCard
                             label="Precio promedio/noche"
                             valor={S(reporte.resumen.ingresoPromedioPorNoche)}
-                            sub={`${reporte.resumen.checkoutsRealizados} check-outs`}
+                            sub={`${reporte.resumen.checkoutsRealizados} salidas`}
                         />
                         <StatCard
                             label="Reservas activas"
@@ -398,7 +398,7 @@ export function ReportesPage() {
                                     <div className="text-3xl opacity-20 mb-2">○</div>
                                     <div className="text-sm">Sin ingresos en el período</div>
                                     <div className="text-xs mt-1">
-                                        Realiza check-outs para ver datos aquí
+                                        Realiza salidas para ver datos aquí
                                     </div>
                                 </div>
                             </div>

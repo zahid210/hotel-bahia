@@ -73,7 +73,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
 
     const handleCheckOut = useCallback(async (reservaId: string) => {
         const actualizada = await checkOut(reservaId)
-        onMensaje(`Check-out · Hab. ${actualizada.habitacionNumero} → Limpieza`)
+        onMensaje(`Salida · Hab. ${actualizada.habitacionNumero} → Limpieza`)
         setSeleccionadaId(null)
         return actualizada
     }, [checkOut, onMensaje])
@@ -169,7 +169,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
             </span>
                         <span className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-violet-400 rounded-full" />
-              Check-in pendiente
+              Entrada pendiente
             </span>
                         <span className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-apple rounded-full" />

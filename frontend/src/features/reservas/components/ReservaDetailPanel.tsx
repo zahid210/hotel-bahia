@@ -87,7 +87,7 @@ export function ReservaDetailPanel({
         try {
             await onCheckIn(reserva.id)
             setConfirmandoCancelacion(false)
-            onMensaje(`Check-in realizado en habitación ${reserva.habitacionNumero}`)
+            onMensaje(`Entrada registrada en habitación ${reserva.habitacionNumero}`)
         } catch (e: unknown) {
             if (esSesionExpirada(e)) return   // PrivateRoute toma el control
             setErrorAccion(e instanceof Error ? e.message : 'Error')
@@ -209,14 +209,14 @@ export function ReservaDetailPanel({
                             </div>
                             {reserva.checkinReal && (
                                 <Campo
-                                    label="Check-in efectivo"
+                                    label="Entrada efectiva"
                                     valor={formatHora(reserva.checkinReal)}
                                     mono
                                 />
                             )}
                             {reserva.checkoutReal && (
                                 <Campo
-                                    label="Check-out efectivo"
+                                    label="Salida efectiva"
                                     valor={formatHora(reserva.checkoutReal)}
                                     mono
                                 />
@@ -240,7 +240,7 @@ export function ReservaDetailPanel({
                                 valor={formatFecha(reserva.fechaSalida)}
                             />
                             <Campo
-                                label="Checkout real"
+                                label="Salida real"
                                 valor={`${formatHora(reserva.checkoutReal)}`}
                                 mono
                             />
@@ -328,7 +328,7 @@ export function ReservaDetailPanel({
                             >
                                 {isBusy
                                     ? <><span className={spinnerCls}/> Procesando...</>
-                                    : '✓ Realizar Check-in'}
+                                    : '✓ Realizar Entrada'}
                             </button>
 
                             {confirmandoCancelacion ? (
@@ -382,7 +382,7 @@ export function ReservaDetailPanel({
                                     <div className="font-semibold mb-1">⚠ Fecha de salida superada</div>
                                     La fecha de salida era el{' '}
                                     <strong>{formatFecha(reserva.fechaSalida)}</strong>.
-                                    Al hacer check-out se calculará automáticamente el cargo
+                                    Al registrar la salida se calculará automáticamente el cargo
                                     por noche(s) adicional(es).
                                 </div>
                             ) : (
@@ -412,8 +412,8 @@ export function ReservaDetailPanel({
                                 {isBusy
                                     ? <><span className={spinnerCls} /> Procesando...</>
                                     : excedida
-                                        ? '→ Checkout + aplicar cargo extra'
-                                        : '→ Realizar Check-out'}
+                                        ? '→ Salida + aplicar cargo extra'
+                                        : '→ Realizar Salida'}
                             </button>
                         </>
                     )}
