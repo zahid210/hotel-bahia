@@ -166,6 +166,26 @@ public class ReservaService {
                         "Reserva no encontrada o no está CONFIRMADA"
                 ));
 
+        // El check-in solo corresponde el día de llegada o después.
+        if (reserva.getFechaEntrada().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "El check-in no puede hacerse antes de la fecha de entrada del huésped."
+            );
+        }
+
+        // Evitar doble ocupación física de la habitación.
+        EstadoHabitacion estadoHab = reserva.getHabitacion().getEstado();
+        if (estadoHab == EstadoHabitacion.OCUPADA) {
+            throw new IllegalArgumentException(
+                    "La habitación ya está ocupada por otro huésped."
+            );
+        }
+        if (estadoHab == EstadoHabitacion.MANTENIMIENTO) {
+            throw new IllegalArgumentException(
+                    "La habitación está en mantenimiento y no puede recibir huéspedes."
+            );
+        }
+
         // NIVEL 1: timestamp exacto del check-in
         reserva.setCheckinReal(LocalDateTime.now());
 

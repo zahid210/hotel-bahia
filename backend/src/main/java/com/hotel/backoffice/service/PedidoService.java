@@ -140,10 +140,19 @@ public class PedidoService {
             throw new IllegalArgumentException("Un pedido cancelado no se puede modificar.");
         }
 
+        Reserva reserva = pedido.getReserva();
+
+        // Solo se cobra al consumo a un huésped que sigue en el hotel.
+        if (nuevo == EstadoPedido.ENTREGADO
+                && reserva.getEstado() != EstadoReserva.CHECKIN) {
+            throw new IllegalArgumentException(
+                    "No se puede entregar el pedido: el huésped ya no está en la habitación."
+            );
+        }
+
         pedido.setEstado(nuevo);
 
         // Actualizar consumo acumulado de la reserva
-        Reserva reserva = pedido.getReserva();
         BigDecimal actualCon = reserva.getTotalConsumo() != null
                 ? reserva.getTotalConsumo() : BigDecimal.ZERO;
 

@@ -39,6 +39,15 @@ const TITULOS: Record<Pagina, string> = {
     usuarios:  'Usuarios',
 }
 
+const NAV_ITEMS: NavItem[] = [
+  { id: 'dashboard', icon: '▦', label: 'Dashboard', roles: ['ADMIN', 'RECEPCIONISTA', 'LIMPIEZA'] },
+  { id: 'reservas',  icon: '☰', label: 'Reservas',  roles: ['ADMIN', 'RECEPCIONISTA'] },
+  { id: 'pedidos',   icon: '≡', label: 'Pedidos',   roles: ['ADMIN', 'RECEPCIONISTA'] },
+  { id: 'menu',      icon: '✦', label: 'Tienda',    roles: ['ADMIN', 'RECEPCIONISTA'] },
+  { id: 'reportes',  icon: '◎', label: 'Reportes',  roles: ['ADMIN'] },
+  { id: 'usuarios',  icon: '▼', label: 'Usuarios',  roles: ['ADMIN'] },
+]
+
 // ── App principal ─────────────────────────────────────────────
 export default function App() {
   const { nombre, rol, logout } = useAuthStore()
@@ -75,14 +84,12 @@ export default function App() {
 
   const abrirModal = useCallback(() => setModalAbierto(true), [])
 
-  const navItems: NavItem[] = [
-    { id: 'dashboard', icon: '▦', label: 'Dashboard', roles: ['ADMIN', 'RECEPCIONISTA', 'LIMPIEZA'] },
-    { id: 'reservas',  icon: '☰', label: 'Reservas',  roles: ['ADMIN', 'RECEPCIONISTA'] },
-    { id: 'pedidos',   icon: '≡', label: 'Pedidos',   roles: ['ADMIN', 'RECEPCIONISTA'] },
-    { id: 'menu',      icon: '✦', label: 'Tienda',    roles: ['ADMIN', 'RECEPCIONISTA'] },
-    { id: 'reportes',  icon: '◎', label: 'Reportes',  roles: ['ADMIN'] },
-    { id: 'usuarios',  icon: '▼', label: 'Usuarios',  roles: ['ADMIN'] },
-  ]
+  // Si el rol activo no tiene acceso a la vista actual (cambio de rol sin
+  // recargar la página), se muestra el dashboard, que todos los roles ven.
+  const paginaEfectiva: Pagina = NAV_ITEMS
+      .some(item => item.id === pagina && item.roles.includes((rol ?? 'ADMIN') as Rol))
+      ? pagina
+      : 'dashboard'
 
   const handleNavClick = (id: Pagina) => {
     setPagina(id)
@@ -136,10 +143,10 @@ export default function App() {
                               text-gray-400 px-3 pt-2 pb-1">
                 Menú
               </div>
-              {navItems
+              {NAV_ITEMS
                   .filter(item => item.roles.includes((rol ?? 'ADMIN') as Rol))
                   .map(item => {
-                    const on = pagina === item.id
+                    const on = paginaEfectiva === item.id
                     return (
                       <button
                           key={item.id}
@@ -210,7 +217,7 @@ export default function App() {
                   ☰
                 </button>
                 <h1 className="text-[17px] font-semibold tracking-tight text-ink truncate">
-                  {TITULOS[pagina] ?? 'Back-office'}
+                  {TITULOS[paginaEfectiva] ?? 'Back-office'}
                 </h1>
               </div>
 
@@ -227,35 +234,35 @@ export default function App() {
             </header>
 
             <div className="flex-1 overflow-hidden p-4 lg:p-6">
-              {pagina === 'dashboard' && (
+              {paginaEfectiva === 'dashboard' && (
                   <DashboardPage
                       onMensaje={mostrarMensaje}
                       refreshSignal={versionReservas}
                   />
               )}
-              {pagina === 'reservas' && !esLimpieza && (
+              {paginaEfectiva === 'reservas' && !esLimpieza && (
                   <ReservasPage
                       onNuevaReserva={abrirModal}
                       onMensaje={mostrarMensaje}
                       refreshSignal={versionReservas}
                   />
               )}
-              {pagina === 'pedidos' && !esLimpieza && (
+              {paginaEfectiva === 'pedidos' && !esLimpieza && (
                   <Suspense fallback={<Fallback texto="Cargando pedidos..." />}>
                     <PedidosPage onMensaje={mostrarMensaje} />
                   </Suspense>
               )}
-              {pagina === 'menu' && !esLimpieza && (
+              {paginaEfectiva === 'menu' && !esLimpieza && (
                   <Suspense fallback={<Fallback texto="Cargando tienda..." />}>
                     <MenuPage onMensaje={mostrarMensaje} />
                   </Suspense>
               )}
-              {pagina === 'reportes' && rol === 'ADMIN' && (
+              {paginaEfectiva === 'reportes' && rol === 'ADMIN' && (
                   <Suspense fallback={<Fallback texto="Cargando reportes..." />}>
                     <ReportesPage />
                   </Suspense>
               )}
-              {pagina === 'usuarios' && rol === 'ADMIN' && (
+              {paginaEfectiva === 'usuarios' && rol === 'ADMIN' && (
                   <Suspense fallback={<Fallback texto="Cargando usuarios..." />}>
                     <UsuariosPage onMensaje={mostrarMensaje} />
                   </Suspense>
