@@ -59,8 +59,10 @@ export const RoomCard = memo(function RoomCard({
     const labelFinal  = habitacion.excedida ? 'Excedida'          : cfg.label
 
     const estilos = [
-        'relative border p-3.5 transition-all duration-150 select-none text-left rounded-xl',
+        'relative border p-3.5 rounded-xl select-none text-left',
+        'transition-[border-color,box-shadow] duration-150 ease-out',
         bgFinal,
+        'shadow-card',
         seleccionada
             ? 'border-apple ring-2 ring-apple/30 shadow-soft'
             : habitacion.excedida
@@ -69,10 +71,11 @@ export const RoomCard = memo(function RoomCard({
                     ? 'border-orange-300/60'
                     : pendienteCheckIn
                         ? 'border-violet-300/60'
-                        : [cfg.border, 'shadow-card'],
+                        : cfg.border,
         esClickable
-            ? 'cursor-pointer hover:shadow-soft hover:-translate-y-0.5'
+            ? 'cursor-pointer hover:border-brand/50 hover:shadow-soft active:scale-[0.99]'
             : 'cursor-default',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:border-brand',
     ].join(' ')
 
     const contenido = (
@@ -135,7 +138,8 @@ export const RoomCard = memo(function RoomCard({
                     onClick={() => onMarcarLista(habitacion.id)}
                     className="mt-2.5 w-full py-1.5 text-[11px] font-medium text-brand
                      border border-brand/25 rounded-md bg-white
-                     hover:bg-brand-soft active:scale-[0.98] transition-all duration-150"
+                     hover:bg-brand-soft active:scale-[0.98] transition-all duration-150
+                     focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
                 >
                     ✓ Lista
                 </button>
