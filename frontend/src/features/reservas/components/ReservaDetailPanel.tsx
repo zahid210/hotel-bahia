@@ -328,7 +328,7 @@ export function ReservaDetailPanel({
                             >
                                 {isBusy
                                     ? <><span className={spinnerCls}/> Procesando...</>
-                                    : '✓ Realizar Entrada'}
+                                    : '✓ Registrar Entrada'}
                             </button>
 
                             {confirmandoCancelacion ? (
@@ -412,8 +412,8 @@ export function ReservaDetailPanel({
                                 {isBusy
                                     ? <><span className={spinnerCls} /> Procesando...</>
                                     : excedida
-                                        ? '→ Salida + aplicar cargo extra'
-                                        : '→ Realizar Salida'}
+                                        ? '→ Registrar salida + aplicar cargo extra'
+                                        : '→ Registrar Salida'}
                             </button>
                         </>
                     )}
