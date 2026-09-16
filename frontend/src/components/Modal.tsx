@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 // - Mueve el foco al botón "Cerrar" al abrir
 // - aria-labelledby / aria-modal / role="dialog"
 // - Bloquea el scroll del fondo mientras está abierto
-// - Estilo Apple: blur backdrop, rounded-2xl, sombra modal suave
+// - Estilo glass: backdrop blur + tarjeta translúcida con filo degradado
 interface Props {
     abierto: boolean
     titulo:  string
@@ -48,12 +48,14 @@ export function Modal({ abierto, titulo, onCerrar, children }: Props) {
             aria-labelledby={tituloId}
             onClick={e => e.target === e.currentTarget && onCerrar()}
         >
-            {/* Backdrop Apple — blur + tint */}
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            {/* Backdrop — blur + tint */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
 
-            <div className="relative bg-white rounded-2xl border border-gray-200/60
+            <div className="relative glass-strong
                           w-full max-w-md p-6 max-h-[90vh] overflow-y-auto
                           shadow-modal animate-slideUp">
+                <div className="absolute top-0 left-0 right-0 h-[3px]
+                                bg-brand-gradient" />
                 <div className="flex items-center justify-between mb-6">
                     <h2 id={tituloId} className="text-[15px] font-semibold text-ink">
                         {titulo}

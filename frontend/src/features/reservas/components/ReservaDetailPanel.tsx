@@ -117,7 +117,7 @@ export function ReservaDetailPanel({
     const spinnerCls = "w-3.5 h-3.5 border-2 border-white/30 border-t-white t-spin animate-spin"
 
     return (
-        <div className="w-full lg:w-72 flex-shrink-0 lg:border-l border-gray-100 bg-white flex flex-col h-full max-h-[85vh] lg:max-h-full overflow-hidden">
+        <div className="w-full lg:w-72 flex-shrink-0 lg:border-l border-gray-100 glass-strong flex flex-col h-full max-h-[85vh] lg:max-h-full overflow-hidden">
 
             {/* ── Header ───────────────────────────────────────────── */}
             <div className="px-5 py-4 border-b border-gray-100

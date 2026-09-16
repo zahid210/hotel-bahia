@@ -1,6 +1,7 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { formatSoles } from '@/lib/format'
 import { useState, useMemo, useEffect, useCallback } from 'react'
+import type { CSSProperties } from 'react'
 import { Modal } from '@/components/Modal'
 import { pedidoService, Pedido, LABEL_ESTADO, ItemPedido } from '@/services/pedidoService'
 import { menuService, MenuItem, LABEL_CATEGORIA, CATEGORIAS } from '@/services/menuService'
@@ -177,12 +178,13 @@ export function PedidosPage({ onMensaje }: Props) {
             {/* ── Stats ─────────────────────────────────────── */}
             <div className="grid grid-cols-4 gap-3 flex-shrink-0">
                 {[
-                    { label: 'Total',      value: stats.todos,     color: 'text-ink'   },
-                    { label: 'Pendiente',  value: stats.pendiente, color: 'text-amber-600'  },
-                    { label: 'Entregados', value: stats.entregado, color: 'text-green-600'  },
-                    { label: 'Cancelados', value: stats.cancelado, color: 'text-gray-400'   },
+                    { label: 'Total',      value: stats.todos,     color: 'text-brand',     from: '#7c3aed', to: '#d946ef' },
+                    { label: 'Pendiente',  value: stats.pendiente, color: 'text-amber-500',  from: '#f59e0b', to: '#f97316' },
+                    { label: 'Entregados', value: stats.entregado, color: 'text-emerald-500', from: '#10b981', to: '#14b8a6' },
+                    { label: 'Cancelados', value: stats.cancelado, color: 'text-gray-400',   from: '#94a3b8', to: '#64748b' },
                 ].map((s, i) => (
-                    <div key={i} className="t-card p-3.5">
+                    <div key={i} className="t-card p-3.5"
+                         style={{ '--card-accent': `linear-gradient(90deg, ${s.from}, ${s.to})` } as CSSProperties}>
                         <div className="t-label mb-1">
                             {s.label}
                         </div>
@@ -394,7 +396,7 @@ export function PedidosPage({ onMensaje }: Props) {
                                 const cant = cantidades[m.id] ?? 0
                                 return (
                                     <div key={m.id}
-                                         className="flex items-center justify-between px-3.5 py-2.5 bg-white">
+                                         className="flex items-center justify-between px-3.5 py-2.5 glass">
                                         <div className="min-w-0">
                                             <div className="text-[13px] font-medium truncate text-ink">
                                                 {m.nombre}

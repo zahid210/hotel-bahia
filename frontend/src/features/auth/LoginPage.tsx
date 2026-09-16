@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { authService, LoginForm } from '@/services/authService'
 import { useAuthStore } from '@/store/useAuthStore'
+import { useThemeStore } from '@/store/useThemeStore'
 
 interface Props {
     onLogin: () => void
@@ -11,6 +12,7 @@ export function LoginPage({ onLogin }: Props) {
     const [error,    setError]    = useState<string | null>(null)
     const [cargando, setCargando] = useState(false)
     const setAuth = useAuthStore(s => s.setAuth)
+    const { tema, toggle } = useThemeStore()
 
     const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>()
 
@@ -36,19 +38,35 @@ export function LoginPage({ onLogin }: Props) {
     const campo = 't-input'
 
     return (
-        <div className="min-h-screen bg-fog flex items-center justify-center p-5 antialiased">
+        <div className="min-h-screen flex items-center justify-center p-5 antialiased relative">
+
+            {/* Fondo aurora */}
+            <div className="app-bg" />
+            <div className="app-bg-grain" />
+
+            {/* Toggle de tema */}
+            <button
+                onClick={toggle}
+                aria-label="Cambiar tema"
+                title="Cambiar tema (claro / oscuro)"
+                className="glass absolute top-5 right-5 w-10 h-10 flex items-center
+                           justify-center text-[16px] text-gray-600 hover:text-ink
+                           transition-all hover:shadow-glow z-10"
+            >
+                {tema === 'dark' ? '☀' : '☾'}
+            </button>
 
             <div className="w-full max-w-sm relative z-10">
                 {/* Logo y título */}
-                <div className="mb-10 text-center">
-                    <div className="inline-flex items-center justify-center w-14 h-14
-                          bg-ink mb-5 shadow-soft">
-                        <span className="text-white text-lg font-bold">H</span>
+                <div className="mb-9 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16
+                          bg-brand-gradient mb-5 shadow-glow">
+                        <span className="text-white text-2xl font-bold">H</span>
                     </div>
-                    <h1 className="text-[22px] font-semibold tracking-tight text-ink">
+                    <h1 className="text-[30px] font-bold tracking-tight text-gradient leading-tight">
                         Hotel Bahía
                     </h1>
-                    <p className="text-[13px] text-gray-400 mt-1">
+                    <p className="text-[13px] text-gray-500 mt-1.5">
                         Panel de recepción
                     </p>
                 </div>
@@ -63,7 +81,7 @@ export function LoginPage({ onLogin }: Props) {
 
                         {error && (
                             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200
-                              rounded-xl text-red-700 text-[12px]">
+                              text-red-700 text-[12px]">
                                 <span>⚠</span>
                                 <span>{error}</span>
                             </div>
@@ -125,7 +143,7 @@ export function LoginPage({ onLogin }: Props) {
                     </form>
                 </div>
 
-                <p className="text-center text-[11px] text-gray-300 mt-6">
+                <p className="text-center text-[11px] text-gray-400 mt-6">
                     © {new Date().getFullYear()} Hotel Bahía
                 </p>
             </div>

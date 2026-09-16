@@ -2,7 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Base Apple ─────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   TEMA — variables CSS (claro por defecto, .dark para oscuro)
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  color-scheme: light;
+
+  /* Escala de grises (slate) */
+  --g-50:  248 250 252;
+  --g-100: 241 245 249;
+  --g-200: 226 232 240;
+  --g-300: 203 213 225;
+  --g-400: 148 163 184;
+  --g-500: 100 116 139;
+  --g-600: 71 85 105;
+  --g-700: 51 65 85;
+  --g-800: 30 41 59;
+  --g-900: 15 23 42;
+
+  --ink: 15 23 42;
+  --fog: 244 245 250;
+
+  /* Superficies glass */
+  --glass-bg:        rgba(255, 255, 255, 0.60);
+  --glass-bg-strong: rgba(255, 255, 255, 0.82);
+  --glass-border:    rgba(255, 255, 255, 0.75);
+  --glass-shadow:    0 12px 40px rgba(15, 23, 42, 0.10);
+  --field-bg:        rgba(255, 255, 255, 0.72);
+
+  --accent: #7c3aed;
+  --accent-2: #d946ef;
+  --accent-3: #06b6d4;
+
+  /* Fondo aurora */
+  --bg: #eef0fa;
+  --blob-1: rgba(124, 58, 237, 0.38);
+  --blob-2: rgba(217, 70, 239, 0.30);
+  --blob-3: rgba(6, 182, 212, 0.32);
+  --blob-4: rgba(245, 158, 11, 0.18);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --g-50:  18 22 36;
+  --g-100: 26 31 49;
+  --g-200: 42 49 72;
+  --g-300: 61 70 99;
+  --g-400: 116 128 158;
+  --g-500: 148 163 184;
+  --g-600: 180 193 214;
+  --g-700: 210 220 238;
+  --g-800: 228 235 248;
+  --g-900: 244 248 255;
+
+  --ink: 241 245 249;
+  --fog: 8 11 22;
+
+  --glass-bg:        rgba(255, 255, 255, 0.055);
+  --glass-bg-strong: rgba(255, 255, 255, 0.10);
+  --glass-border:    rgba(255, 255, 255, 0.12);
+  --glass-shadow:    0 16px 50px rgba(0, 0, 0, 0.55);
+  --field-bg:        rgba(255, 255, 255, 0.05);
+
+  --bg: #05070f;
+  --blob-1: rgba(124, 58, 237, 0.50);
+  --blob-2: rgba(217, 70, 239, 0.38);
+  --blob-3: rgba(6, 182, 212, 0.40);
+  --blob-4: rgba(245, 158, 11, 0.16);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════════ */
 *,
 *::before,
 *::after {
@@ -15,65 +87,141 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: theme('fontFamily.sans');
-  background-color: theme('colors.fog');
-  color: theme('colors.ink');
+  background-color: var(--bg);
+  color: rgb(var(--ink));
   line-height: 1.45;
+  transition: background-color 0.4s ease, color 0.3s ease;
 }
 
-/* Selección azul Apple */
 ::selection {
-  background-color: rgba(0, 113, 227, 0.15);
-  color: theme('colors.ink');
+  background-color: rgba(124, 58, 237, 0.25);
+  color: rgb(var(--ink));
 }
 
-/* Focus ring por defecto: azul Apple */
 :focus-visible {
-  outline: 2px solid theme('colors.apple.DEFAULT');
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
-/* Scrollbars minimalistas — tono neutro Apple */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.28);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.45); }
 
-/* ── Componentes reutilizables ──────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   FONDO AURORA ANIMADO
+   ═══════════════════════════════════════════════════════════════════ */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg);
+  pointer-events: none;
+}
+.app-bg::before,
+.app-bg::after {
+  content: '';
+  position: absolute;
+  width: 75vmax;
+  height: 75vmax;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+.app-bg::before {
+  top: -28vmax;
+  left: -22vmax;
+  background:
+    radial-gradient(circle at 30% 30%, var(--blob-1), transparent 62%),
+    radial-gradient(circle at 70% 60%, var(--blob-2), transparent 60%);
+  animation: float 20s ease-in-out infinite;
+}
+.app-bg::after {
+  bottom: -32vmax;
+  right: -24vmax;
+  background:
+    radial-gradient(circle at 60% 40%, var(--blob-3), transparent 60%),
+    radial-gradient(circle at 35% 70%, var(--blob-4), transparent 62%);
+  animation: float-slow 28s ease-in-out infinite;
+}
+
+/* Grano sutil para dar textura */
+.app-bg-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPONENTES
+   ═══════════════════════════════════════════════════════════════════ */
 @layer components {
 
-  /* ── Tarjeta blanca Apple ──────────────────────────────── */
+  /* ── Superficies glass ─────────────────────────────────── */
+  .glass {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+    backdrop-filter: blur(24px) saturate(170%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* ── Tarjeta con filo degradado ────────────────────────── */
   .t-card {
-    @apply border border-gray-200/70 bg-white;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05),
-                0 4px 16px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+  .t-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, linear-gradient(90deg, #7c3aed, #d946ef 50%, #06b6d4));
+    opacity: 0.95;
   }
 
-  /* ── Input estilo Apple ────────────────────────────────── */
+  /* ── Input ─────────────────────────────────────────────── */
   .t-input {
-    @apply w-full border border-gray-200 bg-white px-3 py-2
-           text-[13px] text-ink placeholder:text-gray-400
-           transition-all duration-150;
+    @apply w-full px-3 py-2 text-[13px] transition-all duration-150;
+    background: var(--field-bg);
+    border: 1px solid var(--glass-border);
+    color: rgb(var(--ink));
   }
+  .t-input::placeholder { color: rgb(var(--g-400)); }
   .t-input:focus {
-    @apply border-apple outline-none ring-2 ring-apple/20;
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.20);
   }
-
-  /* ── Select / Date input (hack para quitar caret nativo gris) ── */
-  .t-input[type="date"]::-webkit-calendar-picker-indicator,
-  select.t-input {
-    @apply cursor-pointer;
-    filter: invert(0.3);
-  }
+  select.t-input { cursor: pointer; }
 
   /* ── Labels ────────────────────────────────────────────── */
   .t-label {
-    @apply mb-1 block text-[11px] font-medium uppercase tracking-wide text-gray-500;
+    @apply mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-500;
   }
 
-  /* ── Tabla (thead / tbody base) ────────────────────────── */
+  /* ── Tablas ────────────────────────────────────────────── */
   .t-th {
-    @apply px-4 py-2.5 text-left text-[11px] font-medium uppercase tracking-wider text-gray-400 whitespace-nowrap;
+    @apply px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap;
   }
   .t-td {
     @apply px-4 py-3 text-xs whitespace-nowrap;
@@ -81,17 +229,19 @@ body {
 
   /* ── Controles segmentados ─────────────────────────────── */
   .t-seg {
-    @apply inline-flex items-center gap-1 bg-gray-100 p-0.5;
+    @apply inline-flex items-center gap-1 p-0.5;
+    background: var(--field-bg);
+    border: 1px solid var(--glass-border);
   }
   .t-seg-btn {
-    @apply cursor-pointer px-3 py-1 text-[12px] font-medium
-           text-gray-500 transition-all duration-150;
+    @apply cursor-pointer px-3 py-1 text-[12px] font-medium text-gray-500
+           transition-all duration-150;
   }
-  .t-seg-btn:hover {
-    @apply text-gray-900;
-  }
+  .t-seg-btn:hover { @apply text-gray-900; }
   .t-seg-btn--active {
-    @apply bg-white text-gray-900 shadow-sm;
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #d946ef);
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
   }
 
   /* ── Botones ───────────────────────────────────────────── */
@@ -105,33 +255,83 @@ body {
   }
 
   .t-btn-primary {
-    background-color: theme('colors.apple.DEFAULT');
-    color: theme('colors.white');
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed 0%, #d946ef 100%);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
   }
   .t-btn-primary:hover {
-    background-color: theme('colors.apple.dark');
+    filter: brightness(1.08);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.45);
   }
 
   .t-btn-secondary {
-    @apply border border-gray-200 bg-white text-gray-600;
+    @apply text-gray-700;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
   }
-  .t-btn-secondary:hover {
-    @apply bg-gray-50 text-gray-900;
-  }
+  .t-btn-secondary:hover { @apply text-gray-900; background: var(--glass-bg-strong); }
 
-  .t-btn-ghost {
-    @apply px-3 text-gray-500;
-  }
-  .t-btn-ghost:hover {
-    @apply bg-gray-100 text-gray-900;
-  }
+  .t-btn-ghost { @apply px-3 text-gray-500; }
+  .t-btn-ghost:hover { @apply text-gray-900; background: var(--glass-bg); }
 
   /* ── Badge de estado ──────────────────────────────────── */
   .t-badge {
     @apply inline-flex items-center border px-2 py-0.5 text-[11px] font-medium;
   }
 
-  /* ── Elementos que sí quedan circulares ────────────────── */
+  /* ── Texto degradado ──────────────────────────────────── */
+  .text-gradient {
+    background: linear-gradient(135deg, #7c3aed, #d946ef 50%, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* ── Circulares ───────────────────────────────────────── */
   .t-spin { border-radius: 9999px; }
   .t-dot  { border-radius: 9999px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMPATIBILIDAD DARK — adapta utilidades existentes al tema oscuro
+   ═══════════════════════════════════════════════════════════════════ */
+.dark .bg-white    { background-color: var(--glass-bg); }
+.dark .bg-white\/80 { background-color: rgba(255, 255, 255, 0.08); }
+
+/* Estados: fondos suaves translúcidos */
+.dark .bg-red-50     { background-color: rgba(248, 113, 113, 0.12); }
+.dark .bg-red-50\/70 { background-color: rgba(248, 113, 113, 0.10); }
+.dark .bg-amber-50   { background-color: rgba(245, 158, 11, 0.12); }
+.dark .bg-orange-50  { background-color: rgba(249, 115, 22, 0.12); }
+.dark .bg-green-50   { background-color: rgba(34, 197, 94, 0.12); }
+.dark .bg-teal-50    { background-color: rgba(20, 184, 166, 0.12); }
+.dark .bg-blue-50    { background-color: rgba(59, 130, 246, 0.12); }
+.dark .bg-violet-50  { background-color: rgba(139, 92, 246, 0.12); }
+.dark .bg-purple-50  { background-color: rgba(168, 85, 247, 0.12); }
+
+/* Estados: textos */
+.dark .text-red-700, .dark .text-red-600, .dark .text-red-500 { color: #fca5a5; }
+.dark .text-amber-800, .dark .text-amber-700, .dark .text-amber-600, .dark .text-amber-500 { color: #fcd34d; }
+.dark .text-orange-700, .dark .text-orange-600, .dark .text-orange-500 { color: #fdba74; }
+.dark .text-green-700, .dark .text-green-600 { color: #86efac; }
+.dark .text-teal-700 { color: #5eead4; }
+.dark .text-blue-700, .dark .text-blue-600 { color: #93c5fd; }
+.dark .text-violet-700, .dark .text-violet-600 { color: #c4b5fd; }
+.dark .text-purple-700 { color: #d8b4fe; }
+
+/* Estados: bordes */
+.dark .border-red-200, .dark .border-red-200\/70 { border-color: rgba(248, 113, 113, 0.30); }
+.dark .border-amber-200\/70, .dark .border-amber-100, .dark .border-amber-300 { border-color: rgba(245, 158, 11, 0.30); }
+.dark .border-blue-200 { border-color: rgba(59, 130, 246, 0.30); }
+.dark .border-teal-200 { border-color: rgba(20, 184, 166, 0.30); }
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%      { transform: translate3d(4%, -6%, 0) scale(1.08); }
+  66%      { transform: translate3d(-5%, 4%, 0) scale(0.96); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(-6%, -4%, 0) scale(1.12); }
 }

@@ -4,11 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f5f7" />
+    <meta name="theme-color" content="#eef0fa" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="description" content="Back-office del Hotel Bahía: reservas, habitaciones y reportes." />
     <title>Hotel Bahía — Back-office</title>
+    <script>
+      // Aplica el tema antes del primer pintado para evitar destellos.
+      (function () {
+        try {
+          var t = localStorage.getItem('hotel-theme') || 'system';
+          var dark = t === 'dark' ||
+            (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          if (dark) root.classList.add('dark');
+          root.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, memo } from 'react'
+import type { CSSProperties } from 'react'
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useDashboard } from './hooks/useDashboard'
@@ -106,13 +107,13 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                 {/* ── Stats: tarjetas individuales estilo Apple ─────────── */}
                 <div className="grid grid-cols-4 lg:grid-cols-7 gap-3 flex-shrink-0">
                     {[
-                        { label: 'Libres',        value: stats.libre,          color: 'text-green-600',  filtro: 'LIBRE'          },
-                        { label: 'Ocupadas',      value: stats.ocupada,        color: 'text-red-600',    filtro: 'OCUPADA'        },
-                        { label: 'Limpieza',      value: stats.limpieza,       color: 'text-blue-600',   filtro: 'LIMPIEZA'       },
-                        { label: 'Excedidas',    value: stats.excedidas, color: 'text-amber-600',  filtro: 'EXCEDIDAS'},
-                        { label: 'Ocupación',     value: `${stats.ocupacion}%`,color: 'text-ink',   filtro: null             },
-                        { label: 'Entradas hoy',  value: stats.entradasHoy,    color: 'text-violet-600', filtro: null             },
-                        { label: 'Salidas hoy',   value: stats.salidasHoy,     color: 'text-orange-600', filtro: null             },
+                        { label: 'Libres',       value: stats.libre,          color: 'text-emerald-500', filtro: 'LIBRE',     from: '#10b981', to: '#06b6d4' },
+                        { label: 'Ocupadas',     value: stats.ocupada,        color: 'text-rose-500',    filtro: 'OCUPADA',   from: '#f43f5e', to: '#f97316' },
+                        { label: 'Limpieza',     value: stats.limpieza,       color: 'text-blue-500',    filtro: 'LIMPIEZA',  from: '#3b82f6', to: '#06b6d4' },
+                        { label: 'Excedidas',    value: stats.excedidas,      color: 'text-amber-500',   filtro: 'EXCEDIDAS', from: '#f59e0b', to: '#ef4444' },
+                        { label: 'Ocupación',    value: `${stats.ocupacion}%`, color: 'text-ink',        filtro: null,        from: '#7c3aed', to: '#d946ef' },
+                        { label: 'Entradas hoy', value: stats.entradasHoy,    color: 'text-violet-500',  filtro: null,        from: '#8b5cf6', to: '#6366f1' },
+                        { label: 'Salidas hoy',  value: stats.salidasHoy,     color: 'text-orange-500',  filtro: null,        from: '#fb923c', to: '#f59e0b' },
                     ].map((s, i) => {
                         const activo = !!s.filtro && filtro === s.filtro
                         return (
@@ -132,18 +133,19 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                                         }
                                     }
                                     : undefined}
+                                style={{ '--card-accent': `linear-gradient(90deg, ${s.from}, ${s.to})` } as CSSProperties}
                                 className={[
                                     't-card p-3.5 flex flex-col justify-center transition-all duration-150',
                                     s.filtro ? 'cursor-pointer hover:bg-gray-50' : '',
-                                    s.filtro ? 'focus-visible:ring-2 focus-visible:ring-apple focus-visible:outline-none' : '',
-                                    activo ? 'ring-2 ring-apple border-apple/40' : '',
+                                    s.filtro ? 'focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none' : '',
+                                    activo ? 'ring-2 ring-brand' : '',
                                 ].join(' ')}
                             >
                                 <div className="t-label mb-1">
                                     {s.label}
                                 </div>
                                 <div className={`text-[20px] font-semibold leading-none font-mono tracking-tight
-                  ${activo ? 'text-apple' : s.color}`}>
+                  ${activo ? 'text-brand' : s.color}`}>
                                     {s.value}
                                 </div>
                             </div>
@@ -295,7 +297,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
 
                     {/* Móvil: bottom sheet */}
                     <div className="lg:hidden fixed inset-x-0 bottom-0 z-50
-                    bg-white border-t border-gray-200 rounded-t-none
+                    bg-white border-t border-gray-200/40 glass-strong rounded-t-none
                     shadow-modal max-h-[85vh] overflow-y-auto
                     animate-[slideUp_0.25s_ease]"
                          role="dialog"

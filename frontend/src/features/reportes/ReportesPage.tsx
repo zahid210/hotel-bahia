@@ -1,5 +1,6 @@
 import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useState, useEffect, useCallback, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip,
     ResponsiveContainer, Cell, PieChart, Pie, Legend, TooltipProps
@@ -25,10 +26,10 @@ const labelDia = (fecha: string) => {
 
 // Color de barra según % de ocupación
 const colorOcupacion = (pct: number) => {
-    if (pct >= 80) return '#16a34a'   // verde
-    if (pct >= 50) return '#2563eb'   // azul
-    if (pct >= 25) return '#d97706'   // ámbar
-    return '#e5e7eb'                  // gris (vacío)
+    if (pct >= 80) return '#10b981'   // esmeralda
+    if (pct >= 50) return '#3b82f6'   // azul
+    if (pct >= 25) return '#f59e0b'   // ámbar
+    return '#94a3b8'                  // gris (vacío)
 }
 
 // Colores para el pie chart de tipos
@@ -43,15 +44,17 @@ type Periodo = 'hoy' | 'semana' | 'mes' | 'custom'
 
 // ── Tarjeta de stat ───────────────────────────────────────────
 function StatCard({
-                      label, valor, sub, color = 'text-ink',
+                      label, valor, sub, color = 'text-ink', accent,
                   }: {
     label: string
     valor: string | number
     sub?: string
     color?: string
+    accent?: string
 }) {
     return (
-        <div className="t-card p-4">
+        <div className="t-card p-4"
+             style={{ '--card-accent': accent ?? 'linear-gradient(90deg, #7c3aed, #d946ef)' } as CSSProperties}>
             <div className="t-label mb-1">
                 {label}
             </div>
@@ -79,14 +82,14 @@ function TooltipOcupacion(props: RechartsV3TooltipProps) {
     const d = payload[0].payload;
 
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm text-xs">
+        <div className="glass-strong p-3 shadow-modal text-xs">
             <div className="font-medium text-gray-700 mb-1">{label}</div>
             <div className="text-gray-500">
                 {d.habitacionesOcupadas} / {d.totalHabitaciones} hab.
             </div>
             <div className="font-mono text-gray-700">{pct(d.porcentaje)} ocupado</div>
             {d.ingresoDia > 0 && (
-                <div className="font-mono text-green-600 mt-0.5">
+                <div className="font-mono text-emerald-500 mt-0.5">
                     {S(d.ingresoDia)}
                 </div>
             )}
@@ -230,7 +233,8 @@ export function ReportesPage() {
                                 `${reporte.resumen.nochesVendidas} noches vendidas · ` +
                                 `${S(reporte.resumen.ingresoConsumo)} en consumo`
                             }
-                            color="text-green-600"
+                            color="text-emerald-500"
+                            accent="linear-gradient(90deg, #10b981, #06b6d4)"
                         />
                         <StatCard
                             label="Ocupación promedio"
@@ -238,22 +242,26 @@ export function ReportesPage() {
                             sub={`${reporte.totalHabitacionesHotel} hab. en total`}
                             color={
                                 reporte.resumen.ocupacionPromedio >= 70
-                                    ? 'text-green-600'
+                                    ? 'text-emerald-500'
                                     : reporte.resumen.ocupacionPromedio >= 40
-                                        ? 'text-blue-600'
-                                        : 'text-amber-600'
+                                        ? 'text-blue-500'
+                                        : 'text-amber-500'
                             }
+                            accent="linear-gradient(90deg, #3b82f6, #06b6d4)"
                         />
                         <StatCard
                             label="Precio promedio/noche"
                             valor={S(reporte.resumen.ingresoPromedioPorNoche)}
                             sub={`${reporte.resumen.checkoutsRealizados} check-outs`}
+                            color="text-amber-500"
+                            accent="linear-gradient(90deg, #f59e0b, #f97316)"
                         />
                         <StatCard
                             label="Reservas activas"
                             valor={reporte.resumen.reservasActivas}
                             sub={`${reporte.resumen.cancelaciones} cancelaciones`}
-                            color="text-violet-600"
+                            color="text-violet-500"
+                            accent="linear-gradient(90deg, #8b5cf6, #d946ef)"
                         />
                     </div>
 
@@ -271,10 +279,10 @@ export function ReportesPage() {
                                 <div className="hidden md:flex items-center gap-3 text-xs
                                 text-gray-400">
                                     {[
-                                        { color: '#16a34a', label: '≥80%' },
-                                        { color: '#2563eb', label: '50-79%' },
-                                        { color: '#d97706', label: '25-49%' },
-                                        { color: '#e5e7eb', label: '<25%' },
+                                        { color: '#10b981', label: '≥80%' },
+                                        { color: '#3b82f6', label: '50-79%' },
+                                        { color: '#f59e0b', label: '25-49%' },
+                                        { color: '#94a3b8', label: '<25%' },
                                     ].map(l => (
                                         <span key={l.label} className="flex items-center gap-1">
                       <span
