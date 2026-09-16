@@ -3,6 +3,7 @@ import { formatSoles, capitalizar } from '@/lib/format'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/Modal'
+import { RowAction, FormActions, ErrorBanner, ToolbarActions } from '@/components/ui'
 import {
     menuService,
     MenuItem,
@@ -163,26 +164,15 @@ export function MenuPage({ onMensaje }: Props) {
                     className="t-input flex-1 min-w-40"
                 />
 
-                <button
-                    onClick={() => cargar().then(() => onMensaje('Tienda actualizada'))}
-                    aria-label="Actualizar tienda"
-                    title="Actualizar tienda"
-                    className="t-btn-ghost min-w-[32px]"
-                >↻</button>
-
-                {esAdmin && (
-                    <button
-                        onClick={abrirCrear}
-                        className="t-btn-primary"
-                    >
-                        + Producto
-                    </button>
-                )}
+                <ToolbarActions
+                    onRefresh={() => cargar().then(() => onMensaje('Tienda actualizada'))}
+                    refreshAriaLabel="Actualizar tienda"
+                    crear={esAdmin ? { onClick: abrirCrear, label: '+ Producto' } : undefined}
+                />
             </div>
 
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
-                        text-red-700 text-[13px]">⚠ {error}</div>
+                <ErrorBanner>{error}</ErrorBanner>
             )}
 
             {/* ── Tabla ─────────────────────────────────────── */}
@@ -235,15 +225,14 @@ export function MenuPage({ onMensaje }: Props) {
                                 <td className="t-td text-right">
                                     {esAdmin && (
                                         <>
-                                            <button
+                                            <RowAction
                                                 onClick={() => abrirEditar(item)}
                                                 title="Editar producto"
-                                                className="px-2 py-1 text-[12px] text-apple
-                                     hover:underline transition-colors"
                                             >
                                                 Editar
-                                            </button>
-                                            <button
+                                            </RowAction>
+                                            <RowAction
+                                                color="gris"
                                                 onClick={() => {
                                                     if (window.confirm(
                                                         `¿Retirar "${item.nombre}" de la tienda?`
@@ -251,11 +240,9 @@ export function MenuPage({ onMensaje }: Props) {
                                                 }}
                                                 disabled={eliminandoId === item.id}
                                                 title="Retirar de la tienda"
-                                                className="px-2 py-1 text-[12px] text-gray-400
-                                     hover:text-red-500 transition-colors disabled:opacity-40"
                                             >
                                                 {eliminandoId === item.id ? '...' : 'Quitar'}
-                                            </button>
+                                            </RowAction>
                                         </>
                                     )}
                                 </td>
@@ -348,25 +335,17 @@ export function MenuPage({ onMensaje }: Props) {
                     </label>
 
                     {errorForm && (
-                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl
-                                text-red-700 text-[12px]">⚠ {errorForm}</div>
+                        <ErrorBanner variante="sm">{errorForm}</ErrorBanner>
                     )}
 
-                    <div className="flex justify-end gap-2 pt-1">
-                        <button
-                            onClick={() => setModalAbierto(false)}
-                            className="t-btn-ghost"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            onClick={guardar}
-                            disabled={guardando}
-                            className="t-btn-primary min-w-[92px]"
-                        >
-                            {guardando ? 'Guardando...' : 'Guardar'}
-                        </button>
-                    </div>
+                    <FormActions
+                        onCancelar={() => setModalAbierto(false)}
+                        onGuardar={guardar}
+                        guardando={guardando}
+                        texto="Guardar"
+                        textoGuardando="Guardando..."
+                        minAncho="min-w-[92px]"
+                    />
                 </div>
             </Modal>
         </div>

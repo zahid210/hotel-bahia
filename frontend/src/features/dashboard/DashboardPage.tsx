@@ -6,6 +6,7 @@ import { RoomCard } from './components/RoomCard'
 import { ReservaDetailPanel } from '@/features/reservas/components/ReservaDetailPanel'
 import { NuevaReservaForm } from '@/features/reservas/NuevaReservaForm'
 import { Modal } from '@/components/Modal'
+import { ToolbarActions, ErrorBanner } from '@/components/ui'
 
 type Filtro = 'TODAS' | 'LIBRE' | 'OCUPADA' | 'LIMPIEZA' | 'EXCEDIDAS'
 
@@ -85,14 +86,7 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
     }, [cancelar, onMensaje])
 
     if (error) return (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border
-                    border-red-200 rounded-2xl text-red-700 text-[13px]">
-            <span>⚠</span>
-            <span>{error}</span>
-            <button onClick={cargar} className="ml-auto text-apple hover:underline text-[12px] font-medium">
-                Reintentar
-            </button>
-        </div>
+        <ErrorBanner onRetry={() => void cargar()}>{error}</ErrorBanner>
     )
 
     return (
@@ -184,26 +178,15 @@ export const DashboardPage = memo(function DashboardPage({ onMensaje, refreshSig
                     </div>
 
                     <div className="ml-auto flex gap-2">
-                        <button
-                            onClick={cargar}
-                            disabled={cargando}
-                            title="Actualizar todo"
-                            aria-label="Actualizar todo"
-                            className="t-btn-ghost min-w-[32px]"
-                        >
-                            {cargando
-                                ? <span className="w-3 h-3 border-2 border-gray-200
-                                   border-t-apple t-spin animate-spin" />
-                                : '↻'}
-                        </button>
-                        {!esLimpieza && (
-                            <button
-                                onClick={() => setModalAbierto(true)}
-                                className="t-btn-primary"
-                            >
-                                + Nueva reserva
-                            </button>
-                        )}
+                        <ToolbarActions
+                            onRefresh={cargar}
+                            cargando={cargando}
+                            refreshAriaLabel="Actualizar todo"
+                            refreshTitulo="Actualizar todo"
+                            crear={!esLimpieza
+                                ? { onClick: () => setModalAbierto(true), label: '+ Nueva reserva' }
+                                : undefined}
+                        />
                     </div>
                 </div>
 

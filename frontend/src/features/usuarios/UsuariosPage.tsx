@@ -2,6 +2,7 @@ import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/Modal'
+import { RowAction, FormActions, ErrorBanner, ToolbarActions } from '@/components/ui'
 import {
     usuarioService,
     Usuario,
@@ -183,24 +184,15 @@ export function UsuariosPage({ onMensaje }: Props) {
                     className="t-input flex-1 min-w-40"
                 />
 
-                <button
-                    onClick={() => cargar().then(() => onMensaje('Usuarios actualizados'))}
-                    aria-label="Actualizar usuarios"
-                    title="Actualizar usuarios"
-                    className="t-btn-ghost min-w-[32px]"
-                >↻</button>
-
-                <button
-                    onClick={abrirCrear}
-                    className="t-btn-primary"
-                >
-                    + Usuario
-                </button>
+                <ToolbarActions
+                    onRefresh={() => cargar().then(() => onMensaje('Usuarios actualizados'))}
+                    refreshAriaLabel="Actualizar usuarios"
+                    crear={{ onClick: abrirCrear, label: '+ Usuario' }}
+                />
             </div>
 
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
-                        text-red-700 text-[13px]">⚠ {error}</div>
+                <ErrorBanner>{error}</ErrorBanner>
             )}
 
             {/* ── Tabla ─────────────────────────────────────── */}
@@ -249,22 +241,18 @@ export function UsuariosPage({ onMensaje }: Props) {
                                     )}
                                 </td>
                                 <td className="t-td text-right whitespace-nowrap">
-                                    <button
+                                    <RowAction
                                         onClick={() => abrirEditar(u)}
                                         title="Editar usuario"
-                                        className="px-2 py-1 text-[12px] text-apple
-                                     hover:underline transition-colors"
                                     >
                                         Editar
-                                    </button>
-                                    <button
+                                    </RowAction>
+                                    <RowAction
                                         onClick={() => abrirPassword(u)}
                                         title="Cambiar contraseña"
-                                        className="px-2 py-1 text-[12px] text-apple
-                                     hover:underline transition-colors"
                                     >
                                         Contraseña
-                                    </button>
+                                    </RowAction>
                                 </td>
                             </tr>
                         ))}
@@ -437,25 +425,17 @@ function FormUsuario({
             )}
 
             {errorForm && (
-                <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl
-                        text-red-700 text-[12px]">⚠ {errorForm}</div>
+                <ErrorBanner variante="sm">{errorForm}</ErrorBanner>
             )}
 
-            <div className="flex justify-end gap-2 pt-1">
-                <button
-                    onClick={onCerrar}
-                    className="t-btn-ghost"
-                >
-                    Cancelar
-                </button>
-                <button
-                    onClick={onGuardar}
-                    disabled={guardando}
-                    className="t-btn-primary min-w-[110px]"
-                >
-                    {guardando ? 'Guardando...' : accionTexto}
-                </button>
-            </div>
+            <FormActions
+                onCancelar={onCerrar}
+                onGuardar={onGuardar}
+                guardando={guardando}
+                texto={accionTexto}
+                textoGuardando="Guardando..."
+                minAncho="min-w-[110px]"
+            />
         </div>
     )
 }

@@ -3,6 +3,7 @@ import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { formatFecha, formatSoles, capitalizar } from '@/lib/format'
 import { ESTADO_CFG } from '@/lib/estadoReserva'
 import {Reserva} from '@/services/reservaService'
+import { ErrorBanner } from '@/components/ui'
 
 // ── Helpers de formato ────────────────────────────────────────
 
@@ -309,10 +310,9 @@ export function ReservaDetailPanel({
 
                 {/* Error de acción */}
                 {errorAccion && (
-                    <div className="mx-5 mb-3 p-2.5 bg-red-50 border border-red-200
-                          rounded-md text-xs text-red-700">
-                        ⚠ {errorAccion}
-                    </div>
+                    <ErrorBanner variante="sm" className="mx-5 mb-3">
+                        {errorAccion}
+                    </ErrorBanner>
                 )}
 
                 {/* ── Acciones por estado ──────────────────────────────── */}

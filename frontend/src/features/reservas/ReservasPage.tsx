@@ -3,6 +3,7 @@ import { formatFecha, formatSoles, capitalizar } from '@/lib/format'
 import { ESTADO_CFG } from '@/lib/estadoReserva'
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
 import { reservaService, Reserva } from '@/services/reservaService'
+import { ToolbarActions, ErrorBanner } from '@/components/ui'
 
 type FiltroTab = 'TODAS' | 'ACTIVAS' | 'HISTORIAL'
 
@@ -72,9 +73,7 @@ export const ReservasPage = memo(function ReservasPage({
     )
 
     if (error) return (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-[13px]">
-            ⚠ {error}
-        </div>
+        <ErrorBanner>{error}</ErrorBanner>
     )
 
     return (
@@ -125,19 +124,11 @@ export const ReservasPage = memo(function ReservasPage({
                     className="t-input flex-1 min-w-40"
                 />
 
-                <button
-                    onClick={() => cargar().then(() => onMensaje('Listado de reservas actualizado'))}
-                    aria-label="Actualizar listado"
-                    title="Actualizar listado"
-                    className="t-btn-ghost min-w-[32px]"
-                >↻</button>
-
-                <button
-                    onClick={onNuevaReserva}
-                    className="t-btn-primary"
-                >
-                    + Reserva
-                </button>
+                <ToolbarActions
+                    onRefresh={() => cargar().then(() => onMensaje('Listado de reservas actualizado'))}
+                    refreshAriaLabel="Actualizar listado"
+                    crear={{ onClick: onNuevaReserva, label: '+ Reserva' }}
+                />
             </div>
 
             {/* ── Tabla ─────────────────────────────────────── */}

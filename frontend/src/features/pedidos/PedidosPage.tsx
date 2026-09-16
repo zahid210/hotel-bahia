@@ -2,6 +2,7 @@ import { esSesionExpirada } from '@/lib/esErrorSesion'
 import { formatSoles } from '@/lib/format'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/Modal'
+import { RowAction, FormActions, ErrorBanner, ToolbarActions } from '@/components/ui'
 import { pedidoService, Pedido, LABEL_ESTADO, ItemPedido } from '@/services/pedidoService'
 import { menuService, MenuItem, LABEL_CATEGORIA, CATEGORIAS } from '@/services/menuService'
 import { reservaService, Reserva } from '@/services/reservaService'
@@ -221,24 +222,15 @@ export function PedidosPage({ onMensaje }: Props) {
                     className="t-input flex-1 min-w-40"
                 />
 
-                <button
-                    onClick={() => cargar().then(() => onMensaje('Pedidos actualizados'))}
-                    aria-label="Actualizar pedidos"
-                    title="Actualizar pedidos"
-                    className="t-btn-ghost min-w-[32px]"
-                >↻</button>
-
-                <button
-                    onClick={abrirNuevo}
-                    className="t-btn-primary"
-                >
-                    + Pedido
-                </button>
+                <ToolbarActions
+                    onRefresh={() => cargar().then(() => onMensaje('Pedidos actualizados'))}
+                    refreshAriaLabel="Actualizar pedidos"
+                    crear={{ onClick: abrirNuevo, label: '+ Pedido' }}
+                />
             </div>
 
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
-                        text-red-700 text-[13px]">⚠ {error}</div>
+                <ErrorBanner>{error}</ErrorBanner>
             )}
 
             {/* ── Tabla ─────────────────────────────────────── */}
@@ -293,41 +285,38 @@ export function PedidosPage({ onMensaje }: Props) {
                                 <td className="t-td text-right">
                                     {p.estado === 'PENDIENTE' && (
                                         <>
-                                            <button
+                                            <RowAction
+                                                color="verde"
                                                 onClick={() => void cambiarEstado(p, 'ENTREGADO')}
                                                 disabled={accionId === p.id}
-                                                className="px-2 py-1 text-[12px] text-green-600
-                                     hover:underline transition-colors disabled:opacity-40"
                                             >
                                                 Entregar
-                                            </button>
-                                            <button
+                                            </RowAction>
+                                            <RowAction
+                                                color="gris"
                                                 onClick={() => {
                                                     if (window.confirm('¿Cancelar este pedido?')) {
                                                         void cambiarEstado(p, 'CANCELADO')
                                                     }
                                                 }}
                                                 disabled={accionId === p.id}
-                                                className="px-2 py-1 text-[12px] text-gray-400
-                                     hover:text-red-500 transition-colors disabled:opacity-40"
                                             >
                                                 Cancelar
-                                            </button>
+                                            </RowAction>
                                         </>
                                     )}
                                     {p.estado === 'ENTREGADO' && (
-                                        <button
+                                        <RowAction
+                                            color="gris"
                                             onClick={() => {
                                                 if (window.confirm(
                                                     '¿Cancelar entregado? Se quitará del consumo de la reserva.'
                                                 )) void cambiarEstado(p, 'CANCELADO')
                                             }}
                                             disabled={accionId === p.id}
-                                            className="px-2 py-1 text-[12px] text-gray-400
-                                     hover:text-red-500 transition-colors disabled:opacity-40"
                                         >
                                             Cancelar
-                                        </button>
+                                        </RowAction>
                                     )}
                                 </td>
                             </tr>
@@ -449,25 +438,16 @@ export function PedidosPage({ onMensaje }: Props) {
                     </div>
 
                     {errorForm && (
-                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl
-                                text-red-700 text-[12px]">⚠ {errorForm}</div>
+                        <ErrorBanner variante="sm">{errorForm}</ErrorBanner>
                     )}
 
-                    <div className="flex justify-end gap-2 pt-1">
-                        <button
-                            onClick={() => setModalAbierto(false)}
-                            className="t-btn-ghost"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            onClick={crear}
-                            disabled={guardando}
-                            className="t-btn-primary"
-                        >
-                            {guardando ? 'Registrando...' : 'Registrar pedido'}
-                        </button>
-                    </div>
+                    <FormActions
+                        onCancelar={() => setModalAbierto(false)}
+                        onGuardar={crear}
+                        guardando={guardando}
+                        texto="Registrar pedido"
+                        textoGuardando="Registrando..."
+                    />
                 </div>
             </Modal>
         </div>

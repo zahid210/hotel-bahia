@@ -9,6 +9,7 @@ import {
     ReporteCompleto,
     OcupacionDia,
 } from '@/services/reporteService'
+import { RefreshButton, ErrorBanner } from '@/components/ui'
 
 // ── Helpers ───────────────────────────────────────────────────
 const S = (n: number) =>
@@ -190,24 +191,18 @@ export function ReportesPage() {
                     </div>
                 )}
 
-                <button
+                <RefreshButton
                     onClick={() => cargar(periodo, fechaIni, fechaFin)}
-                    disabled={cargando}
-                    aria-label="Actualizar reporte"
-                    title="Actualizar reporte"
-                    className="t-btn-ghost ml-auto min-w-[32px]"
-                >
-                    {cargando ? (
-                        <span className="w-3 h-3 border-2 border-gray-200 border-t-apple
-                             t-spin animate-spin inline-block" />
-                    ) : '↻'}
-                </button>
+                    cargando={cargando}
+                    ariaLabel="Actualizar reporte"
+                    titulo="Actualizar reporte"
+                    className="ml-auto"
+                />
             </div>
 
             {/* Error */}
             {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-2xl
-                        text-red-700 text-[13px]">⚠ {error}</div>
+                <ErrorBanner>{error}</ErrorBanner>
             )}
 
             {/* Skeleton mientras carga */}
